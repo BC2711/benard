@@ -1404,7 +1404,7 @@
                 const urlFields = ['customButtonUrl'];
                 urlFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
-                    if (field.value && !this.isValidUrl(field.value)) {
+                    if (!field.value) {
                         this.showError(fieldId, 'Please enter a valid URL.');
                         isValid = false;
                     }

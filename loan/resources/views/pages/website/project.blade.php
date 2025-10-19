@@ -690,6 +690,7 @@
     </div>
 
     <!-- Projects Preview -->
+    <!-- Projects Preview -->
     <div class="projects-preview-container">
         <section class="projects-section" aria-label="Projects Section Preview">
             <div class="projects-background-shapes">
@@ -713,40 +714,48 @@
                 <div class="projects-tabs" id="previewTabs">
                     <button class="tab-btn active" data-filter="all">All Success Stories</button>
                     @foreach ($projectsData['categories'] ?? [] as $category)
-                        <button class="tab-btn" data-filter="{{ $category['slug'] ?? '' }}">
-                            {{ $category['name'] ?? 'Category' }}
-                        </button>
+                        @if (is_array($category) && isset($category['name']) && isset($category['slug']))
+                            <button class="tab-btn" data-filter="{{ $category['slug'] }}">
+                                {{ $category['name'] }}
+                            </button>
+                        @endif
                     @endforeach
                 </div>
 
                 <div class="projects-grid" id="previewProjectsGrid">
                     @foreach ($projectsData['projects'] ?? [] as $project)
-                        <div class="project-card" data-categories="{{ implode(',', $project['categories'] ?? []) }}">
-                            <div class="project-image">
-                                @if (isset($project['image']) && $project['image'])
-                                    <img src="{{ Storage::url($project['image']) }}"
-                                        alt="{{ $project['alt'] ?? $project['title'] }}">
-                                @else
-                                    <span>{{ $project['title'] ?? 'Project' }}</span>
-                                @endif
-                            </div>
-                            <div class="project-content">
-                                <h3 class="project-title">{{ $project['title'] ?? 'Project Title' }}</h3>
-                                <p class="project-loan">{{ $project['loan'] ?? '' }}</p>
-                                <p class="project-result">{{ $project['result'] ?? '' }}</p>
-                                <div class="project-categories">
-                                    @foreach ($project['categories'] ?? [] as $categorySlug)
-                                        @php
-                                            $category = collect($projectsData['categories'] ?? [])->firstWhere(
-                                                'slug',
-                                                $categorySlug,
-                                            );
-                                        @endphp
-                                        <span class="category-tag">{{ $category['name'] ?? $categorySlug }}</span>
-                                    @endforeach
+                        @if (is_array($project) && isset($project['title']))
+                            <div class="project-card" data-categories="{{ implode(',', $project['categories'] ?? []) }}">
+                                <div class="project-image">
+                                    @if (isset($project['image']) && $project['image'])
+                                        <img src="{{ Storage::url($project['image']) }}"
+                                            alt="{{ $project['alt'] ?? $project['title'] }}">
+                                    @else
+                                        <span>{{ $project['title'] }}</span>
+                                    @endif
+                                </div>
+                                <div class="project-content">
+                                    <h3 class="project-title">{{ $project['title'] }}</h3>
+                                    <p class="project-loan">{{ $project['loan'] ?? '' }}</p>
+                                    <p class="project-result">{{ $project['result'] ?? '' }}</p>
+                                    <div class="project-categories">
+                                        @foreach ($project['categories'] ?? [] as $categorySlug)
+                                            @php
+                                                $category = collect($projectsData['categories'] ?? [])->firstWhere(
+                                                    'slug',
+                                                    $categorySlug,
+                                                );
+                                            @endphp
+                                            @if ($category && isset($category['name']))
+                                                <span class="category-tag">{{ $category['name'] }}</span>
+                                            @else
+                                                <span class="category-tag">{{ $categorySlug }}</span>
+                                            @endif
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     @endforeach
                 </div>
 
@@ -780,7 +789,7 @@
         <form id="projectsForm" action="{{ route('management.project-section') }}" method="POST" novalidate
             enctype="multipart/form-data">
             @csrf
-            @method('PUT')
+            <!-- Remove @method('PUT') since we're using POST in controller -->
 
             <div class="space-y-6">
                 <!-- Main Content Section -->
@@ -815,17 +824,18 @@
                     <div class="category-grid" id="categoriesContainer">
                         @for ($i = 1; $i <= 4; $i++)
                             <div class="category-item">
-                                <label for="category_{{ $i }}_name">Category {{ $i }} Name</label>
+                                <label for="category_{{ $i }}_name">Category {{ $i }} Name
+                                    *</label>
                                 <input type="text" id="category_{{ $i }}_name"
                                     name="categories[{{ $i }}][name]" class="form-control"
                                     value="{{ old("categories.$i.name", $projectsData['categories'][$i]['name'] ?? '') }}"
-                                    placeholder="e.g., Marketing Campaigns">
+                                    placeholder="e.g., Marketing Campaigns" required>
 
-                                <label for="category_{{ $i }}_slug" class="mt-2">Category Slug</label>
+                                <label for="category_{{ $i }}_slug" class="mt-2">Category Slug *</label>
                                 <input type="text" id="category_{{ $i }}_slug"
                                     name="categories[{{ $i }}][slug]" class="form-control"
                                     value="{{ old("categories.$i.slug", $projectsData['categories'][$i]['slug'] ?? '') }}"
-                                    placeholder="e.g., campaign">
+                                    placeholder="e.g., campaign" required>
                                 <p class="text-sm text-gray-500 mt-1">Used for filtering (lowercase, no spaces)</p>
                             </div>
                         @endfor
@@ -842,20 +852,20 @@
                     <!-- Project Tabs -->
                     <div class="project-tabs">
                         <div class="project-tab-buttons">
-                            {{-- @for ($i = 1; $i <= 4; $i++)
-                                <button type="button" class="project-tab-btn {{ $loop->first ? 'active' : '' }}"
+                            @for ($i = 1; $i <= 4; $i++)
+                                <button type="button" class="project-tab-btn {{ $i === 1 ? 'active' : '' }}"
                                     data-tab="project-{{ $i }}">
                                     Project {{ $i }}
                                 </button>
-                            @endfor --}}
+                            @endfor
                         </div>
                     </div>
 
                     <!-- Project Content -->
                     <div class="project-tab-contents">
-                        {{-- @for ($i = 1; $i <= 4; $i++)
+                        @for ($i = 1; $i <= 4; $i++)
                             <div id="project-{{ $i }}"
-                                class="project-tab-content {{ $loop->first ? 'active' : '' }}">
+                                class="project-tab-content {{ $i === 1 ? 'active' : '' }}">
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <!-- Project Details -->
                                     <div class="space-y-4">
@@ -885,15 +895,27 @@
                                         </div>
 
                                         <div>
-                                            <label>Categories</label>
+                                            <label>Categories *</label>
                                             <div class="checkbox-group">
                                                 @for ($cat = 1; $cat <= 4; $cat++)
+                                                    @php
+                                                        $categorySlug =
+                                                            $projectsData['categories'][$cat]['slug'] ??
+                                                            'category' . $cat;
+                                                        $isChecked = in_array(
+                                                            $categorySlug,
+                                                            old(
+                                                                'projects.' . $i . '.categories',
+                                                                $projectsData['projects'][$i]['categories'] ?? [],
+                                                            ),
+                                                        );
+                                                    @endphp
                                                     <div class="checkbox-item">
                                                         <input type="checkbox"
                                                             id="project_{{ $i }}_category_{{ $cat }}"
                                                             name="projects[{{ $i }}][categories][]"
-                                                            value="{{ $projectsData['categories'][$cat]['slug'] ?? 'category' . $cat }}"
-                                                            {{ in_array($projectsData['categories'][$cat]['slug'] ?? 'category' . $cat, old('projects.' . $i . '.categories', $projectsData['projects'][$i]['categories'] ?? [])) ? 'checked' : '' }}>
+                                                            value="{{ $categorySlug }}"
+                                                            {{ $isChecked ? 'checked' : '' }}>
                                                         <label
                                                             for="project_{{ $i }}_category_{{ $cat }}"
                                                             id="project-{{ $i }}-category-{{ $cat }}-label">
@@ -902,6 +924,8 @@
                                                     </div>
                                                 @endfor
                                             </div>
+                                            <span class="error-message"
+                                                id="project{{ $i }}CategoriesError"></span>
                                         </div>
                                     </div>
 
@@ -931,7 +955,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @endfor --}}
+                        @endfor
                     </div>
                 </div>
 
@@ -993,8 +1017,8 @@
                             <p class="text-sm text-gray-500 mt-1">Lower numbers display first</p>
                         </div>
                         <div>
-                            <label for="status">Status</label>
-                            <select id="status" name="status" class="form-control">
+                            <label for="status">Status *</label>
+                            <select id="status" name="status" class="form-control" required>
                                 <option value="ACTIVE"
                                     {{ old('status', $projectsData['status'] ?? '') == 'ACTIVE' ? 'selected' : '' }}>Active
                                 </option>
@@ -1215,7 +1239,7 @@
 
                 // Validate required fields
                 const requiredFields = [
-                    'headline', 'title'
+                    'headline', 'title', 'status'
                 ];
 
                 requiredFields.forEach(fieldId => {
@@ -1226,13 +1250,33 @@
                     }
                 });
 
-                // Validate project titles
+                // Validate categories
+                for (let i = 1; i <= 4; i++) {
+                    const categoryName = document.getElementById(`category_${i}_name`);
+                    const categorySlug = document.getElementById(`category_${i}_slug`);
+
+                    if (categoryName && !categoryName.value.trim()) {
+                        this.showError(`category_${i}_name`, 'Category name is required.');
+                        isValid = false;
+                    }
+
+                    if (categorySlug && !categorySlug.value.trim()) {
+                        this.showError(`category_${i}_slug`, 'Category slug is required.');
+                        isValid = false;
+                    }
+                }
+
+                // Validate projects
                 for (let i = 1; i <= 4; i++) {
                     const projectTitle = document.getElementById(`project_${i}_title`);
+                    const projectCategories = document.querySelectorAll(
+                        `input[name="projects[${i}][categories][]"]:checked`);
+
                     if (projectTitle && projectTitle.value.trim()) {
-                        // If any project field is filled, validate required fields for that project
-                        if (!projectTitle.value.trim()) {
-                            this.showError(`project${i}Title`, 'Project title is required when adding a project.');
+                        // Validate categories for projects with titles
+                        if (projectCategories.length === 0) {
+                            this.showError(`project${i}Categories`,
+                                'At least one category is required for this project.');
                             isValid = false;
                         }
                     }

@@ -366,6 +366,23 @@
             border-top: 1px solid #e5e7eb;
         }
 
+        /* Empty state styles */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from {
@@ -444,43 +461,6 @@
                 padding: 0 1rem;
             }
         }
-
-        /* Utility Classes */
-        .text-primary {
-            color: var(--primary-color);
-        }
-
-        .text-secondary {
-            color: var(--secondary-color);
-        }
-
-        .bg-light {
-            background: #f8f9fa;
-        }
-
-        .rounded-lg {
-            border-radius: 12px;
-        }
-
-        .shadow-sm {
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .grid-cols-3 {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        @media (max-width: 1024px) {
-            .grid-cols-3 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .grid-cols-3 {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 @endpush
 
@@ -495,12 +475,12 @@
                         your website.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button
+                    <button type="button" id="previewBtn"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
                         <i class="fas fa-eye"></i>
                         Preview
                     </button>
-                    <button
+                    <button type="button" id="resetBtn"
                         class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2">
                         <i class="fas fa-sync-alt"></i>
                         Reset
@@ -540,29 +520,44 @@
         <section class="client-section" aria-label="Client Section Preview">
             <div class="client-content">
                 <div class="client-heading" id="clientHeading">
-                    <h2 id="previewMainHeading">{{ $form->headline ?? 'Trusted by Marketing Professionals' }}</h2>
+                    <h2 id="previewMainHeading">{{ $form['headline'] ?? 'Trusted by Marketing Professionals' }}</h2>
                     <p id="previewSubheading">
-                        {{ $form->subheadline ?? "We're proud to support marketing agencies, content creators, and entrepreneurs who are driving innovation and growth in their industries." }}
+                        {{ $form['subheadline'] ?? "We're proud to support marketing agencies, content creators, and entrepreneurs who are driving innovation and growth in their industries." }}
                     </p>
                 </div>
 
                 <div class="client-logos" id="previewClientLogos">
+                    @php
+                        $hasClients = false;
+                    @endphp
                     @foreach (range(1, 6) as $client)
-                        @if (isset($form['client_' . $client . '_name']) && $form['client_' . $client . '_name'])
+                        @if (!empty($form['client_' . $client . '_name']))
+                            @php $hasClients = true; @endphp
                             <a href="{{ $form['client_' . $client . '_url'] ?? '#!' }}" class="client-logo-item"
                                 style="animation-delay: {{ $form['client_' . $client . '_animation_delay'] ?? '0.1' }}s">
                                 <div class="client-name">{{ $form['client_' . $client . '_name'] }}</div>
-                                @if (isset($form['client_' . $client . '_description']) && $form['client_' . $client . '_description'])
+                                @if (!empty($form['client_' . $client . '_description']))
                                     <div class="client-description">{{ $form['client_' . $client . '_description'] }}</div>
                                 @endif
                             </a>
                         @endif
                     @endforeach
+
+                    @if (!$hasClients)
+                        <div class="empty-state col-span-full">
+                            <i class="fas fa-users"></i>
+                            <p>No clients configured. Add client information in the admin panel.</p>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="success-highlights" id="previewSuccessHighlights">
+                    @php
+                        $hasHighlights = false;
+                    @endphp
                     @foreach (range(1, 3) as $highlight)
-                        @if (isset($form['highlight_' . $highlight . '_amount']) && $form['highlight_' . $highlight . '_amount'])
+                        @if (!empty($form['highlight_' . $highlight . '_amount']))
+                            @php $hasHighlights = true; @endphp
                             <div class="highlight-item"
                                 style="animation-delay: {{ $form['highlight_' . $highlight . '_animation_delay'] ?? '0.7' }}s">
                                 <div class="highlight-content">
@@ -578,17 +573,24 @@
                             </div>
                         @endif
                     @endforeach
+
+                    @if (!$hasHighlights)
+                        <div class="empty-state col-span-full">
+                            <i class="fas fa-chart-line"></i>
+                            <p>No success highlights configured. Add highlights in the admin panel.</p>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="client-cta" id="previewCta">
-                    <h3 id="previewCtaHeadline">{{ $form->cta_headline ?? 'Ready to join our growing community?' }}</h3>
+                    <h3 id="previewCtaHeadline">{{ $form['cta_headline'] ?? 'Ready to join our growing community?' }}</h3>
                     <p id="previewCtaSubheadline">
-                        {{ $form->cta_subheadline ?? 'Get the funding you need to scale your marketing business' }}</p>
+                        {{ $form['cta_subheadline'] ?? 'Get the funding you need to scale your marketing business' }}</p>
                     <div class="cta-buttons">
                         <a href="#!" class="cta-button"
-                            id="previewCtaPrimary">{{ $form->cta_primary_text ?? 'Start Your Application' }}</a>
+                            id="previewCtaPrimary">{{ $form['cta_primary_text'] ?? 'Start Your Application' }}</a>
                         <a href="#!" class="cta-button-secondary"
-                            id="previewCtaSecondary">{{ $form->cta_secondary_text ?? 'View Client Stories' }}</a>
+                            id="previewCtaSecondary">{{ $form['cta_secondary_text'] ?? 'View Client Stories' }}</a>
                     </div>
                 </div>
             </div>
@@ -602,15 +604,14 @@
             Manage Client Section
         </h3>
 
-        <form id="clientForm" action="{{ route('management.client-section') }}" method="POST" novalidate
-            enctype="multipart/form-data">
+        <form id="clientForm" action="{{ route('management.client-section') }}" method="POST" novalidate>
             @csrf
 
             <!-- Main Content Section -->
             <div class="form-group">
                 <label for="headline">Main Headline *</label>
                 <input type="text" id="headline" name="headline" class="form-control"
-                    value="{{ old('headline', $form->headline ?? '') }}" placeholder="Trusted by Marketing Professionals"
+                    value="{{ old('headline', $form['headline'] ?? '') }}" placeholder="Trusted by Marketing Professionals"
                     required maxlength="100">
                 <span class="error-message" id="headlineError"></span>
             </div>
@@ -619,19 +620,20 @@
                 <label for="subheadline">Subheadline</label>
                 <textarea id="subheadline" name="subheadline" class="form-control" rows="4"
                     placeholder="We're proud to support marketing agencies, content creators, and entrepreneurs who are driving innovation and growth in their industries."
-                    maxlength="500">{{ old('subheadline', $form->subheadline ?? '') }}</textarea>
+                    maxlength="500">{{ old('subheadline', $form['subheadline'] ?? '') }}</textarea>
                 <span class="error-message" id="subheadlineError"></span>
             </div>
 
             <!-- Client Logos Section -->
             <div class="form-group">
-                <label>Client Logos & Partners</label>
+                <label>Client Logos & Partners (At least one client required)</label>
                 <div id="clientLogosContainer">
                     @foreach (range(1, 6) as $client)
                         <div class="client-item-row">
-                            <input type="text" name="client_{{ $client }}_name" class="form-control"
+                            <input type="text" name="client_{{ $client }}_name"
+                                class="form-control client-name-input"
                                 value="{{ old('client_' . $client . '_name', $form['client_' . $client . '_name'] ?? '') }}"
-                                placeholder="Client Name (e.g., SocialBoost)" required maxlength="50">
+                                placeholder="Client Name (e.g., SocialBoost)" maxlength="50">
                             <input type="text" name="client_{{ $client }}_description" class="form-control"
                                 value="{{ old('client_' . $client . '_description', $form['client_' . $client . '_description'] ?? '') }}"
                                 placeholder="Client Description (e.g., Marketing Agency)" maxlength="100">
@@ -639,24 +641,12 @@
                                 value="{{ old('client_' . $client . '_url', $form['client_' . $client . '_url'] ?? '') }}"
                                 placeholder="Website URL">
                             <select name="client_{{ $client }}_animation_delay" class="form-control">
-                                <option value="0.1"
-                                    {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == '0.1' ? 'selected' : '' }}>
-                                    0.1s</option>
-                                <option value="0.2"
-                                    {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == '0.2' ? 'selected' : '' }}>
-                                    0.2s</option>
-                                <option value="0.3"
-                                    {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == '0.3' ? 'selected' : '' }}>
-                                    0.3s</option>
-                                <option value="0.4"
-                                    {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == '0.4' ? 'selected' : '' }}>
-                                    0.4s</option>
-                                <option value="0.5"
-                                    {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == '0.5' ? 'selected' : '' }}>
-                                    0.5s</option>
-                                <option value="0.6"
-                                    {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == '0.6' ? 'selected' : '' }}>
-                                    0.6s</option>
+                                @foreach (['0.1', '0.2', '0.3', '0.4', '0.5', '0.6'] as $delay)
+                                    <option value="{{ $delay }}"
+                                        {{ old('client_' . $client . '_animation_delay', $form['client_' . $client . '_animation_delay'] ?? '') == $delay ? 'selected' : '' }}>
+                                        {{ $delay }}s
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     @endforeach
@@ -681,21 +671,20 @@
                             <select name="highlight_{{ $highlight }}_color" class="form-control">
                                 <option value="#db9123"
                                     {{ old('highlight_' . $highlight . '_color', $form['highlight_' . $highlight . '_color'] ?? '') == '#db9123' ? 'selected' : '' }}>
-                                    Orange (#db9123)</option>
+                                    Orange (#db9123)
+                                </option>
                                 <option value="#7a4603"
                                     {{ old('highlight_' . $highlight . '_color', $form['highlight_' . $highlight . '_color'] ?? '') == '#7a4603' ? 'selected' : '' }}>
-                                    Brown (#7a4603)</option>
+                                    Brown (#7a4603)
+                                </option>
                             </select>
                             <select name="highlight_{{ $highlight }}_animation_delay" class="form-control">
-                                <option value="0.7"
-                                    {{ old('highlight_' . $highlight . '_animation_delay', $form['highlight_' . $highlight . '_animation_delay'] ?? '') == '0.7' ? 'selected' : '' }}>
-                                    0.7s</option>
-                                <option value="0.8"
-                                    {{ old('highlight_' . $highlight . '_animation_delay', $form['highlight_' . $highlight . '_animation_delay'] ?? '') == '0.8' ? 'selected' : '' }}>
-                                    0.8s</option>
-                                <option value="0.9"
-                                    {{ old('highlight_' . $highlight . '_animation_delay', $form['highlight_' . $highlight . '_animation_delay'] ?? '') == '0.9' ? 'selected' : '' }}>
-                                    0.9s</option>
+                                @foreach (['0.7', '0.8', '0.9'] as $delay)
+                                    <option value="{{ $delay }}"
+                                        {{ old('highlight_' . $highlight . '_animation_delay', $form['highlight_' . $highlight . '_animation_delay'] ?? '') == $delay ? 'selected' : '' }}>
+                                        {{ $delay }}s
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     @endforeach
@@ -706,7 +695,7 @@
             <div class="form-group">
                 <label for="cta_headline">CTA Headline</label>
                 <input type="text" id="cta_headline" name="cta_headline" class="form-control"
-                    value="{{ old('cta_headline', $form->cta_headline ?? '') }}"
+                    value="{{ old('cta_headline', $form['cta_headline'] ?? '') }}"
                     placeholder="Ready to join our growing community?" maxlength="100">
                 <span class="error-message" id="ctaHeadlineError"></span>
             </div>
@@ -714,7 +703,7 @@
             <div class="form-group">
                 <label for="cta_subheadline">CTA Subheadline</label>
                 <textarea id="cta_subheadline" name="cta_subheadline" class="form-control" rows="3"
-                    placeholder="Get the funding you need to scale your marketing business" maxlength="300">{{ old('cta_subheadline', $form->cta_subheadline ?? '') }}</textarea>
+                    placeholder="Get the funding you need to scale your marketing business" maxlength="300">{{ old('cta_subheadline', $form['cta_subheadline'] ?? '') }}</textarea>
                 <span class="error-message" id="ctaSubheadlineError"></span>
             </div>
 
@@ -722,7 +711,7 @@
                 <div class="form-group">
                     <label for="cta_primary_text">Primary Button Text</label>
                     <input type="text" id="cta_primary_text" name="cta_primary_text" class="form-control"
-                        value="{{ old('cta_primary_text', $form->cta_primary_text ?? '') }}"
+                        value="{{ old('cta_primary_text', $form['cta_primary_text'] ?? '') }}"
                         placeholder="Start Your Application" maxlength="50">
                     <span class="error-message" id="ctaPrimaryTextError"></span>
                 </div>
@@ -730,7 +719,7 @@
                 <div class="form-group">
                     <label for="cta_secondary_text">Secondary Button Text</label>
                     <input type="text" id="cta_secondary_text" name="cta_secondary_text" class="form-control"
-                        value="{{ old('cta_secondary_text', $form->cta_secondary_text ?? '') }}"
+                        value="{{ old('cta_secondary_text', $form['cta_secondary_text'] ?? '') }}"
                         placeholder="View Client Stories" maxlength="50">
                     <span class="error-message" id="ctaSecondaryTextError"></span>
                 </div>
@@ -741,26 +730,30 @@
                 <div class="form-group">
                     <label for="title">Section Title *</label>
                     <input type="text" id="title" name="title" class="form-control"
-                        value="{{ old('title', $form->title ?? '') }}" placeholder="Enter section title" required
-                        maxlength="100">
+                        value="{{ old('title', $form['title'] ?? 'Client Section') }}" placeholder="Enter section title"
+                        required maxlength="100">
                     <span class="error-message" id="titleError"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="order">Display Order</label>
                     <input type="number" id="order" name="order" class="form-control"
-                        value="{{ old('order', $form->order ?? 0) }}" min="0" max="100" step="1">
+                        value="{{ old('order', $form['order'] ?? 0) }}" min="0" max="100" step="1">
                     <span class="error-message" id="orderError"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="status">Status</label>
                     <select id="status" name="status" class="form-control">
-                        <option value="ACTIVE" {{ old('status', $form->status ?? '') == 'ACTIVE' ? 'selected' : '' }}>
-                            Active</option>
-                        <option value="INACTIVE" {{ old('status', $form->status ?? '') == 'INACTIVE' ? 'selected' : '' }}>
-                            Inactive</option>
-                        <option value="DRAFT" {{ old('status', $form->status ?? '') == 'DRAFT' ? 'selected' : '' }}>Draft
+                        <option value="ACTIVE" {{ old('status', $form['status'] ?? '') == 'ACTIVE' ? 'selected' : '' }}>
+                            Active
+                        </option>
+                        <option value="INACTIVE"
+                            {{ old('status', $form['status'] ?? '') == 'INACTIVE' ? 'selected' : '' }}>
+                            Inactive
+                        </option>
+                        <option value="DRAFT" {{ old('status', $form['status'] ?? '') == 'DRAFT' ? 'selected' : '' }}>
+                            Draft
                         </option>
                     </select>
                     <span class="error-message" id="statusError"></span>
@@ -792,7 +785,9 @@
                     adminPanel: document.getElementById('adminPanel'),
                     toggleAdminBtn: document.getElementById('toggleAdmin'),
                     clientForm: document.getElementById('clientForm'),
-                    cancelEditBtn: document.getElementById('cancelEdit')
+                    cancelEditBtn: document.getElementById('cancelEdit'),
+                    previewBtn: document.getElementById('previewBtn'),
+                    resetBtn: document.getElementById('resetBtn')
                 };
 
                 this.init();
@@ -801,21 +796,51 @@
             init() {
                 this.setupEventListeners();
                 this.setupRealTimePreview();
+                this.setupButtonFunctionality();
             }
 
             setupEventListeners() {
                 // Toggle admin panel
-                this.elements.toggleAdminBtn.addEventListener('click', () => this.toggleAdminPanel());
+                if (this.elements.toggleAdminBtn) {
+                    this.elements.toggleAdminBtn.addEventListener('click', () => this.toggleAdminPanel());
+                }
 
                 // Cancel edit
-                this.elements.cancelEditBtn.addEventListener('click', () => this.hideAdminPanel());
+                if (this.elements.cancelEditBtn) {
+                    this.elements.cancelEditBtn.addEventListener('click', () => this.hideAdminPanel());
+                }
 
                 // Form submission
-                this.elements.clientForm.addEventListener('submit', (e) => this.validateForm(e));
+                if (this.elements.clientForm) {
+                    this.elements.clientForm.addEventListener('submit', (e) => this.validateForm(e));
+                }
+            }
+
+            setupButtonFunctionality() {
+                // Preview button
+                if (this.elements.previewBtn) {
+                    this.elements.previewBtn.addEventListener('click', () => {
+                        const previewContainer = document.querySelector('.client-preview-container');
+                        if (previewContainer) {
+                            previewContainer.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+
+                // Reset button
+                if (this.elements.resetBtn) {
+                    this.elements.resetBtn.addEventListener('click', () => {
+                        if (confirm('Are you sure you want to reset all changes? This will reload the page.')) {
+                            window.location.reload();
+                        }
+                    });
+                }
             }
 
             setupRealTimePreview() {
-                // Real-time preview updates
+                // Real-time preview updates for text fields
                 const previewFields = [{
                         input: 'headline',
                         preview: 'previewMainHeading'
@@ -848,6 +873,8 @@
                         input.addEventListener('input', () => {
                             this.updatePreview(field);
                         });
+                        // Initialize preview on load
+                        this.updatePreview(field);
                     }
                 });
 
@@ -865,6 +892,10 @@
                     input.addEventListener('input', () => this.updateHighlightsPreview());
                     input.addEventListener('change', () => this.updateHighlightsPreview());
                 });
+
+                // Initialize previews on load
+                this.updateClientLogosPreview();
+                this.updateHighlightsPreview();
             }
 
             updatePreview(field) {
@@ -872,13 +903,16 @@
                 const preview = document.getElementById(field.preview);
 
                 if (input && preview) {
-                    preview.textContent = input.value;
+                    preview.textContent = input.value || preview.textContent;
                 }
             }
 
             updateClientLogosPreview() {
                 const previewContainer = document.getElementById('previewClientLogos');
+                if (!previewContainer) return;
+
                 let html = '';
+                let hasClients = false;
 
                 for (let i = 1; i <= 6; i++) {
                     const nameInput = document.querySelector(`input[name="client_${i}_name"]`);
@@ -886,7 +920,8 @@
                     const urlInput = document.querySelector(`input[name="client_${i}_url"]`);
                     const delaySelect = document.querySelector(`select[name="client_${i}_animation_delay"]`);
 
-                    if (nameInput && nameInput.value) {
+                    if (nameInput && nameInput.value.trim()) {
+                        hasClients = true;
                         const name = nameInput.value;
                         const description = descInput ? descInput.value : '';
                         const url = urlInput && urlInput.value ? urlInput.value : '#!';
@@ -894,11 +929,20 @@
 
                         html += `
                             <a href="${url}" class="client-logo-item" style="animation-delay: ${delay}s">
-                                <div class="client-name">${name}</div>
-                                ${description ? `<div class="client-description">${description}</div>` : ''}
+                                <div class="client-name">${this.escapeHtml(name)}</div>
+                                ${description ? `<div class="client-description">${this.escapeHtml(description)}</div>` : ''}
                             </a>
                         `;
                     }
+                }
+
+                if (!hasClients) {
+                    html = `
+                        <div class="empty-state col-span-full">
+                            <i class="fas fa-users"></i>
+                            <p>No clients configured. Add client information in the admin panel.</p>
+                        </div>
+                    `;
                 }
 
                 previewContainer.innerHTML = html;
@@ -906,7 +950,10 @@
 
             updateHighlightsPreview() {
                 const previewContainer = document.getElementById('previewSuccessHighlights');
+                if (!previewContainer) return;
+
                 let html = '';
+                let hasHighlights = false;
 
                 for (let i = 1; i <= 3; i++) {
                     const amountInput = document.querySelector(`input[name="highlight_${i}_amount"]`);
@@ -915,7 +962,8 @@
                     const colorSelect = document.querySelector(`select[name="highlight_${i}_color"]`);
                     const delaySelect = document.querySelector(`select[name="highlight_${i}_animation_delay"]`);
 
-                    if (amountInput && amountInput.value) {
+                    if (amountInput && amountInput.value.trim()) {
+                        hasHighlights = true;
                         const amount = amountInput.value;
                         const client = clientInput ? clientInput.value : '';
                         const result = resultInput ? resultInput.value : '';
@@ -926,11 +974,11 @@
                             <div class="highlight-item" style="animation-delay: ${delay}s">
                                 <div class="highlight-content">
                                     <div class="highlight-amount" style="background-color: ${color}">
-                                        ${amount}
+                                        ${this.escapeHtml(amount)}
                                     </div>
                                     <div class="highlight-text">
-                                        <h4>${client}</h4>
-                                        <p>${result}</p>
+                                        <h4>${this.escapeHtml(client)}</h4>
+                                        <p>${this.escapeHtml(result)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -938,10 +986,31 @@
                     }
                 }
 
+                if (!hasHighlights) {
+                    html = `
+                        <div class="empty-state col-span-full">
+                            <i class="fas fa-chart-line"></i>
+                            <p>No success highlights configured. Add highlights in the admin panel.</p>
+                        </div>
+                    `;
+                }
+
                 previewContainer.innerHTML = html;
             }
 
+            escapeHtml(unsafe) {
+                if (!unsafe) return '';
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
             toggleAdminPanel() {
+                if (!this.elements.adminPanel) return;
+
                 this.elements.adminPanel.classList.toggle('show');
                 const isVisible = this.elements.adminPanel.classList.contains('show');
 
@@ -954,7 +1023,9 @@
             }
 
             hideAdminPanel() {
-                this.elements.adminPanel.classList.remove('show');
+                if (this.elements.adminPanel) {
+                    this.elements.adminPanel.classList.remove('show');
+                }
             }
 
             validateForm(e) {
@@ -964,13 +1035,11 @@
                 this.clearErrors();
 
                 // Validate required fields
-                const requiredFields = [
-                    'headline', 'title'
-                ];
+                const requiredFields = ['headline', 'title'];
 
                 requiredFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
-                    if (!field.value.trim()) {
+                    if (field && !field.value.trim()) {
                         this.showError(fieldId, 'This field is required.');
                         isValid = false;
                     }
@@ -993,9 +1062,11 @@
 
                 if (!isValid) {
                     e.preventDefault();
-                    this.elements.adminPanel.scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    if (this.elements.adminPanel) {
+                        this.elements.adminPanel.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             }
 
@@ -1022,7 +1093,7 @@
         }
 
         // Initialize the client section manager
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             new ClientSectionManager();
         });
     </script>

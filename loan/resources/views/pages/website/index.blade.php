@@ -33,11 +33,11 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
         <!-- Hero -->
         @include('layouts.website.hero')
 
-        <!-- Small Features -->
-        @include('layouts.website.smallfeatures')
-
         <!-- About -->
         @include('layouts.website.about')
+
+        <!-- Small Features -->
+        @include('layouts.website.smallfeatures')
 
         <!-- Services -->
         @include('layouts.website.service')

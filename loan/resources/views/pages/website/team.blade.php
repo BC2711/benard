@@ -1238,7 +1238,7 @@
                 const urlFields = ['ctaPrimaryButtonUrl', 'ctaSecondaryButtonUrl'];
                 urlFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
-                    if (field.value && !this.isValidUrl(field.value)) {
+                    if (!field.value) {
                         this.showError(fieldId, 'Please enter a valid URL.');
                         isValid = false;
                     }
@@ -1258,7 +1258,7 @@
                         const input = row.querySelector(`[name="teamMembers[${index}][${field}]"]`);
                         if (input && !input.value.trim()) {
                             this.showError(`teamMembers[${index}][${field}]`,
-                            'This field is required.');
+                                'This field is required.');
                             isValid = false;
                         }
                     });

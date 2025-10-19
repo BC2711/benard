@@ -695,7 +695,7 @@
         <form id="featuresForm" method="POST" action="{{ route('management.feature-section') }}" novalidate>
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                 <!-- Left Column -->
                 <div class="space-y-6">
                     <div class="form-group">

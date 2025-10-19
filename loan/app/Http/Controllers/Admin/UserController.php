@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -14,7 +17,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::latest()->paginate(10);
+        return view('profile.index', compact('users'));
     }
 
     /**
@@ -22,7 +26,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        $genders = ['MALE' => 'Male', 'FEMALE' => 'Female', 'OTHER' => 'Other'];
+        $roles = ['ADMIN' => 'Administrator', 'USER' => 'User', 'MANAGER' => 'Manager'];
+        $statuses = ['ACTIVE' => 'Active', 'INACTIVE' => 'Inactive', 'SUSPENDED' => 'Suspended'];
+
+        return view('profile.create', compact('genders', 'roles', 'statuses'));
     }
 
     /**
@@ -30,7 +38,39 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'username' => 'required|string|unique:users,username|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'date_of_birth' => 'required|date|before:today',
+            'gender' => 'required|in:male,female,other',
+            'role' => 'required|in:admin,user,manager',
+            'status' => 'required|in:active,inactive,suspended',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        try {
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                $validated['profile_picture'] = $request->file('profile_picture')->store('profile-pictures', 'public');
+            }
+
+            // Hash password
+            $validated['password'] = Hash::make($validated['password']);
+
+            User::create($validated);
+
+            return redirect()->route('profile.users.index')
+                ->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error creating user: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
@@ -38,7 +78,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return view('profile.show', compact('user'));
     }
 
     /**
@@ -46,7 +86,11 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        $genders = ['MALE' => 'Male', 'FEMALE' => 'Female', 'OTHER' => 'Other'];
+        $roles = ['ADMIN' => 'Administrator', 'USER' => 'User', 'MANAGER' => 'Manager'];
+        $statuses = ['ACTIVE' => 'Active', 'INACTIVE' => 'Inactive', 'SUSPENDED' => 'Suspended'];
+
+        return view('profile.edit', compact('user', 'genders', 'roles', 'statuses'));
     }
 
     /**
@@ -54,7 +98,56 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'date_of_birth' => 'required|date|before:today',
+            'gender' => 'required|in:male,female,other',
+            'role' => 'required|in:admin,user,manager',
+            'status' => 'required|in:active,inactive,suspended',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        try {
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile picture if exists
+                if ($user->profile_picture) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+                $validated['profile_picture'] = $request->file('profile_picture')->store('profile-pictures', 'public');
+            }
+
+            // Update password only if provided
+            if ($request->filled('password')) {
+                $validated['password'] = Hash::make($validated['password']);
+            } else {
+                unset($validated['password']);
+            }
+
+            $user->update($validated);
+
+            return redirect()->route('profile.users.index')
+                ->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error updating user: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
@@ -62,164 +155,161 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        try {
+            // Prevent users from deleting themselves
+            if ($user->id === Auth::id()) {
+                return redirect()->back()
+                    ->with('error', 'You cannot delete your own account.');
+            }
+
+            // Delete profile picture if exists
+            if ($user->profile_picture) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+
+            $user->delete();
+
+            return redirect()->route('profile.users.index')
+                ->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting user: ' . $e->getMessage());
+        }
     }
 
-    public function user_management(Request $request)
+    /**
+     * Toggle user status
+     */
+    public function toggleStatus(User $user)
     {
-        // Get or create user management section data
-        $section = Section::where('section_type', 'USER_MANAGEMENT')->first();
-
-        if (!$section) {
-            $defaultContent = [
-                'headline' => 'User Management',
-                'subheadline' => 'Manage system users, roles, and permissions efficiently',
-                'settings' => [
-                    'allow_registration' => true,
-                    'require_email_verification' => true,
-                    'default_role' => 'user',
-                    'max_login_attempts' => 5,
-                    'lockout_duration' => 30, // minutes
-                    'password_expiry_days' => 90
-                ]
-            ];
-
-            $section = Section::create([
-                'name' => 'User Management',
-                'description' => 'User management and administration section',
-                'section_type' => 'USER_MANAGEMENT',
-                'status' => 'ACTIVE',
-                'content' => $defaultContent,
-                'published_at' => now(),
-                'author' => 'system',
-                'last_modified_by' => 'system'
-            ]);
-        }
-
-        // Handle user actions
-        if ($request->has('action')) {
-            return $this->handleUserAction($request);
-        }
-
-        // Handle settings update
-        if ($request->isMethod('post') && $request->has('settings')) {
-            $data = $request->validate([
-                'settings.allow_registration' => 'sometimes|boolean',
-                'settings.require_email_verification' => 'sometimes|boolean',
-                'settings.default_role' => 'required|in:super_admin,admin,user,moderator',
-                'settings.max_login_attempts' => 'required|integer|min:1|max:10',
-                'settings.lockout_duration' => 'required|integer|min:1|max:1440',
-                'settings.password_expiry_days' => 'required|integer|min:1|max:365'
+        try {
+            $user->update([
+                'status' => $user->status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
             ]);
 
-            $currentContent = $this->getContentAsArray($section->content);
-            $userData = array_merge($currentContent, [
-                'settings' => $data['settings']
+            return redirect()->back()
+                ->with('success', 'User status updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error updating user status: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Unlock user account
+     */
+    public function unlock(User $user)
+    {
+        try {
+            $user->update([
+                'locked_at' => null,
+                'attempts' => 0
             ]);
 
-            $section->update([
-                'content' => $userData,
-                'last_modified_by' => Auth::user()->name ?? 'admin'
-            ]);
-
-            return redirect()->back()->with('success', 'User management settings updated successfully.');
+            return redirect()->back()
+                ->with('success', 'User account unlocked successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error unlocking user account: ' . $e->getMessage());
         }
+    }
 
-        // Get users with pagination and search
-        $users = User::query();
+    /**
+     * Show user profile
+     */
+    public function profile()
+    {
+        $user = Auth::user();
+        $genders = ['MALE' => 'Male', 'FEMALE' => 'Female', 'OTHER' => 'Other'];
+        return view('profile.profile', compact('user', 'genders'));
+    }
 
-        // Search functionality
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $users->where(function ($query) use ($search) {
-                $query->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('username', 'like', "%{$search}%");
-            });
-        }
+    /**
+     * Update user profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
 
-        // Filter by role
-        if ($request->has('role') && $request->get('role') !== 'all') {
-            $users->where('role', $request->get('role'));
-        }
-
-        // Filter by status
-        if ($request->has('status') && $request->get('status') !== 'all') {
-            $users->where('status', $request->get('status'));
-        }
-
-        $users = $users->orderBy('created_at', 'desc')->paginate(10);
-
-        // Ensure content is always returned as array
-        $userData = $this->getContentAsArray($section->content);
-
-        return view('pages.management.user-management', [
-            'section' => $section,
-            'userData' => $userData,
-            'users' => $users,
-            'filters' => [
-                'search' => $request->get('search'),
-                'role' => $request->get('role', 'all'),
-                'status' => $request->get('status', 'all')
-            ]
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'date_of_birth' => 'required|date|before:today',
+            'gender' => 'required|in:male,female,other',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    }
-
-    private function handleUserAction(Request $request)
-    {
-        $action = $request->get('action');
-        $userId = $request->get('user_id');
 
         try {
-            $user = User::findOrFail($userId);
-
-            switch ($action) {
-                case 'activate':
-                    $user->update(['status' => 'active']);
-                    return response()->json(['success' => true, 'message' => 'User activated successfully.']);
-
-                case 'deactivate':
-                    $user->update(['status' => 'inactive']);
-                    return response()->json(['success' => true, 'message' => 'User deactivated successfully.']);
-
-                case 'unlock':
-                    $user->update([
-                        'locked_at' => null,
-                        'attempts' => 0
-                    ]);
-                    return response()->json(['success' => true, 'message' => 'User unlocked successfully.']);
-
-                case 'delete':
-                    // Prevent self-deletion
-                    if ($user->id === Auth::id()) {
-                        return response()->json(['success' => false, 'message' => 'You cannot delete your own account.'], 400);
-                    }
-                    $user->delete();
-                    return response()->json(['success' => true, 'message' => 'User deleted successfully.']);
-
-                case 'change_role':
-                    $newRole = $request->get('role');
-                    $user->update(['role' => $newRole]);
-                    return response()->json(['success' => true, 'message' => "User role updated to {$newRole}."]);
-
-                default:
-                    return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile picture if exists
+                if ($user->profile_picture) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+                $validated['profile_picture'] = $request->file('profile_picture')->store('profile-pictures', 'public');
             }
+
+            $user->update($validated);
+
+            return redirect()->route('profile.users.profile')
+                ->with('success', 'Profile updated successfully.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error performing action.'], 500);
+            return redirect()->back()
+                ->with('error', 'Error updating profile: ' . $e->getMessage())
+                ->withInput();
         }
     }
-    private function getContentAsArray($content)
+
+    /**
+     * Show change password form
+     */
+    public function showChangePasswordForm()
     {
-        if (is_array($content)) {
-            return $content;
-        }
+        return view('profile.change-password');
+    }
 
-        if (is_string($content)) {
-            return json_decode($content, true) ?? [];
-        }
+    /**
+     * Change user password
+     */
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
 
-        return [];
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed|different:current_password',
+        ]);
+
+        try {
+            // Verify current password
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                return redirect()->back()
+                    ->with('error', 'Current password is incorrect.')
+                    ->withInput();
+            }
+
+            $user->update([
+                'password' => Hash::make($validated['password'])
+            ]);
+
+            return redirect()->route('profile.users.profile')
+                ->with('success', 'Password changed successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error changing password: ' . $e->getMessage());
+        }
     }
 }

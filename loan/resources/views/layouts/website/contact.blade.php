@@ -24,7 +24,6 @@
         position: absolute;
         animation: float 4s ease-in-out infinite;
         will-change: transform;
-        /* background-color: #427c0c */
     }
 
     .bg-shape.circle {
@@ -125,7 +124,6 @@
     }
 
     .contact-icon {
-        background-color: #f5a623;
         padding: 1rem;
         border-radius: 50%;
         display: flex;
@@ -133,18 +131,9 @@
         justify-content: center;
         flex-shrink: 0;
         transition: transform 0.3s ease;
-    }
-
-    .contact-icon.location {
-        background-color: #6b3d02;
-    }
-
-    .contact-icon.phone {
-        background-color: #f5a623;
-    }
-
-    .contact-icon.hours {
-        background-color: #6b3d02;
+        color: white;
+        width: 48px;
+        height: 48px;
     }
 
     .contact-item h3 {
@@ -185,27 +174,12 @@
     .social-link {
         width: 44px;
         height: 44px;
-        border: 2px solid #6b3d02;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
-    }
-
-    .social-link.facebook {
-        background-color: #6b3d02;
-        border-color: #6b3d02;
-    }
-
-    .social-link.twitter {
-        background-color: #f5a623;
-        border-color: #f5a623;
-    }
-
-    .social-link.linkedin {
-        background-color: #6b3d02;
-        border-color: #6b3d02;
+        text-decoration: none;
     }
 
     .social-link:hover {
@@ -213,16 +187,8 @@
         transform: scale(1.1);
     }
 
-    .social-link.facebook:hover svg' %} {
-        fill: #6b3d02;
-    }
-
-    .social-link.twitter:hover svg' %} {
-        fill: #f5a623;
-    }
-
-    .social-link.linkedin:hover svg' %} {
-        fill: #6b3d02;
+    .social-link:hover i {
+        color: inherit;
     }
 
     /* Contact Form */
@@ -437,9 +403,9 @@
 
     <!-- Section Title -->
     <div class="section-title">
-        <h2>Get Started with Your Loan Application</h2>
-        <p>Ready to fund your next marketing success? Our team is here to help you navigate the loan process and find
-            the perfect financing solution for your business.</p>
+        <h2>{{ $sectionData['headline'] ?? 'Get Started with Your Loan Application' }}</h2>
+        <p>{{ $sectionData['subheadline'] ?? 'Ready to fund your next marketing success? Our team is here to help you navigate the loan process and find the perfect financing solution for your business.' }}
+        </p>
     </div>
 
     <!-- Contact Information and Form -->
@@ -448,94 +414,139 @@
             <!-- Contact Information -->
             <div class="contact-info">
                 <div class="contact-list">
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                           <i class="fas fa-envelope"></i>
-                            {{-- <img src="{{ asset('assets/images/icon-email.svg') }}" alt="Email icon" width="24" height="24"> --}}
+                    @foreach ($sectionData['contact_info'] ?? [] as $contact)
+                        <div class="contact-item">
+                            <div class="contact-icon"
+                                style="background-color: {{ $contact['icon_color'] ?? '#f5a623' }};">
+                                @if (str_contains(strtolower($contact['title']), 'email'))
+                                    <i class="fas fa-envelope"></i>
+                                @elseif(str_contains(strtolower($contact['title']), 'location'))
+                                    <i class="fas fa-building"></i>
+                                @elseif(str_contains(strtolower($contact['title']), 'phone'))
+                                    <i class="fas fa-phone"></i>
+                                @elseif(str_contains(strtolower($contact['title']), 'hour'))
+                                    <i class="fas fa-clock"></i>
+                                @else
+                                    <i class="fas fa-info-circle"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <h3>{{ $contact['title'] ?? 'Contact Information' }}</h3>
+                                @if (str_contains(strtolower($contact['title']), 'email'))
+                                    <p><a href="mailto:{{ $contact['value'] }}"
+                                            aria-label="Email {{ $contact['value'] }}">{{ $contact['value'] }}</a></p>
+                                @elseif(str_contains(strtolower($contact['title']), 'phone'))
+                                    <p><a href="tel:{{ preg_replace('/[^0-9+]/', '', $contact['value']) }}"
+                                            aria-label="Call {{ $contact['value'] }}">{{ $contact['value'] }}</a></p>
+                                @else
+                                    <p>{{ $contact['value'] }}</p>
+                                @endif
+                            </div>
                         </div>
-                        <div>
-                            <h3>Email Address</h3>
-                            <p><a href="mailto:loans@londaloans.com"
-                                    aria-label="Email loans@londaloans.com">loans@londaloans.com</a></p>
+                    @endforeach
+
+                    {{-- Fallback contact info if no data --}}
+                    @if (empty($sectionData['contact_info']))
+                        <div class="contact-item">
+                            <div class="contact-icon" style="background-color: #f5a623;">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h3>Email Address</h3>
+                                <p><a href="mailto:loans@londaloans.com"
+                                        aria-label="Email loans@londaloans.com">loans@londaloans.com</a></p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon location">
-                            <i class="fas fa-building"></i>
-                            {{-- <img src="{{ asset('assets/images/icon-location.svg') }}" alt="Location icon" width="24" height="24"> --}}
+                        <div class="contact-item">
+                            <div class="contact-icon" style="background-color: #6b3d02;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h3>Office Location</h3>
+                                <p>123 Marketing District<br>San Francisco, CA 94105</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3>Office Location</h3>
-                            <p>123 Marketing District<br>San Francisco, CA 94105</p>
+                        <div class="contact-item">
+                            <div class="contact-icon" style="background-color: #f5a623;">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h3>Phone Number</h3>
+                                <p><a href="tel:+18005551234" aria-label="Call +1 (800) 555-1234">+1 (800) 555-1234</a>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon phone">
-                            <i class="fas fa-phone"></i>
-                            {{-- <img src="{{ asset('assets/images/icon-phone.svg') }}" alt="Phone icon" width="24" height="24"> --}}
+                        <div class="contact-item">
+                            <div class="contact-icon" style="background-color: #6b3d02;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h3>Business Hours</h3>
+                                <p>Mon-Fri: 8AM-6PM PST<br>Sat: 9AM-2PM PST</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3>Phone Number</h3>
-                            <p><a href="tel:+18005551234" aria-label="Call +1 (800) 555-1234">+1 (800) 555-1234</a></p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon hours">
-                            <i class="fas fa-clock"></i>
-                            {{-- <img src="{{ asset('assets/images/icon-clock.svg') }}" alt="Hours icon" width="24" height="24"> --}}
-                        </div>
-                        <div>
-                            <h3>Business Hours</h3>
-                            <p>Mon-Fri: 8AM-6PM PST<br>Sat: 9AM-2PM PST</p>
-                        </div>
-                    </div>
+                    @endif
                 </div>
                 <hr class="contact-divider">
                 <div class="social-section">
                     <h3>Follow Us</h3>
                     <ul class="social-links">
-                        <li>
-                            <a href="https://facebook.com/londaloans" class="social-link facebook"
-                                aria-label="Follow us on Facebook">
-                                <svg width="11" height="20" fill="white" viewBox="0 0 11 20"
-                                    xmlns="http://www.w3.org/2000/svg'">
-                                    <path
-                                        d="M6.83366 11.3752H9.12533L10.042 7.7085H6.83366V5.87516C6.83366 4.931 6.83366 4.04183 8.667 4.04183H10.042V0.96183C9.74316 0.922413 8.61475 0.833496 7.42308 0.833496C4.93433 0.833496 3.16699 2.35241 3.16699 5.14183V7.7085H0.416992V11.3752H3.16699V19.1668H6.83366V11.3752Z" />
-                                </svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://twitter.com/londaloans" class="social-link twitter"
-                                aria-label="Follow us on Twitter">
-                                <svg width="20" height="16" fill="white" viewBox="0 0 20 16"
-                                    xmlns="http://www.w3.org/2000/svg'">
-                                    <path
-                                        d="M19.3153 2.18484C18.6155 2.4944 17.8733 2.6977 17.1134 2.78801C17.9144 2.30899 18.5138 1.55511 18.8001 0.666844C18.0484 1.11418 17.2244 1.42768 16.3654 1.59726C15.7885 0.979958 15.0238 0.57056 14.1901 0.432713C13.3565 0.294866 12.5007 0.436294 11.7558 0.835009C11.0108 1.23372 10.4185 1.86739 10.0708 2.63749C9.72313 3.40759 9.63963 4.27098 9.83327 5.09343C8.30896 5.01703 6.81775 4.62091 5.45645 3.93079C4.09516 3.24067 2.89423 2.27197 1.93161 1.08759C1.59088 1.67284 1.41182 2.33814 1.41278 3.01534C1.41278 4.34451 2.08928 5.51876 3.11778 6.20626C2.50912 6.1871 1.91386 6.02273 1.38161 5.72685V5.77451C1.38179 6.65974 1.68811 7.51766 2.24864 8.20282C2.80916 8.88797 3.58938 9.3582 4.45703 9.53376C3.89201 9.68688 3.29956 9.70945 2.72453 9.59976C2.96915 10.3617 3.44595 11.0281 4.08815 11.5056C4.73035 11.9831 5.50581 12.2478 6.30594 12.2627C5.51072 12.8872 4.60019 13.3489 3.62642 13.6213C2.65264 13.8938 1.63473 13.9716 0.630859 13.8503C2.38325 14.9773 4.4232 15.5756 6.50669 15.5737C13.5586 15.5737 17.415 9.73176 17.415 4.66535C17.415 4.50035 17.4104 4.33351 17.4031 4.17035C18.1537 3.62783 18.8016 2.95578 19.3162 2.18576L19.3153 2.18484Z" />
-                                </svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://linkedin.com/company/londaloans" class="social-link linkedin"
-                                aria-label="Follow us on LinkedIn">
-                                <svg width="19" height="18" fill="white" viewBox="0 0 19 18"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M4.36198 2.58327C4.36174 3.0695 4.16835 3.53572 3.82436 3.87937C3.48037 4.22301 3.01396 4.41593 2.52773 4.41569C2.0415 4.41545 1.57528 4.22206 1.23164 3.87807C0.887991 3.53408 0.69507 3.06767 0.695313 2.58144C0.695556 2.09521 0.888943 1.62899 1.23293 1.28535C1.57692 0.941701 2.04333 0.748781 2.52956 0.749024C3.01579 0.749267 3.48201 0.942654 3.82566 1.28664C4.1693 1.63063 4.36222 2.09704 4.36198 2.58327ZM4.41698 5.77327H0.750313V17.2499H4.41698V5.77327ZM10.2103 5.77327H6.56198V17.2499H10.1736V11.2274C10.1736 7.87244 14.5461 7.56077 14.5461 11.2274V17.2499H18.167V9.98077C18.167 4.32494 11.6953 4.53577 10.1736 7.31327L10.2103 5.77327Z" />
-                                </svg>
-                            </a>
-                        </li>
+                        @foreach ($sectionData['social_links'] ?? [] as $social)
+                            <li>
+                                <a href="{{ $social['url'] }}" class="social-link"
+                                    style="background-color: {{ $social['color'] ?? '#6b3d02' }}; border-color: {{ $social['color'] ?? '#6b3d02' }};"
+                                    aria-label="Follow us on {{ $social['platform'] }}" target="_blank"
+                                    rel="noopener noreferrer">
+                                    @if (strtolower($social['platform']) == 'facebook')
+                                        <i class="fab fa-facebook-f" style="color: white;"></i>
+                                    @elseif(strtolower($social['platform']) == 'twitter')
+                                        <i class="fab fa-twitter" style="color: white;"></i>
+                                    @elseif(strtolower($social['platform']) == 'linkedin')
+                                        <i class="fab fa-linkedin-in" style="color: white;"></i>
+                                    @else
+                                        <i class="fas fa-share-alt" style="color: white;"></i>
+                                    @endif
+                                </a>
+                            </li>
+                        @endforeach
+
+                        {{-- Fallback social links if no data --}}
+                        @if (empty($sectionData['social_links']))
+                            <li>
+                                <a href="https://facebook.com/londaloans" class="social-link"
+                                    style="background-color: #6b3d02; border-color: #6b3d02;"
+                                    aria-label="Follow us on Facebook" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-facebook-f" style="color: white;"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://twitter.com/londaloans" class="social-link"
+                                    style="background-color: #f5a623; border-color: #f5a623;"
+                                    aria-label="Follow us on Twitter" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-twitter" style="color: white;"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://linkedin.com/company/londaloans" class="social-link"
+                                    style="background-color: #6b3d02; border-color: #6b3d02;"
+                                    aria-label="Follow us on LinkedIn" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-linkedin-in" style="color: white;"></i>
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </div>
 
             <!-- Contact Form -->
             <div class="contact-form">
-                <form action="/submit-application" method="POST">
+                <form action="{{ $sectionData['form_config']['action'] ?? '/submit-application' }}" method="POST">
+                    @csrf
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="fullname">Full Name</label>
-                            <input type="text" name="fullname" id="fullname" placeholder="Your full name" required
-                                class="form-control">
+                            <input type="text" name="fullname" id="fullname" placeholder="Your full name"
+                                required class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="email">Email Address</label>
@@ -553,11 +564,16 @@
                             <label for="business">Business Type</label>
                             <select name="business" id="business" class="form-control" required>
                                 <option value="" disabled selected>Select your business type</option>
-                                <option value="marketing-agency">Marketing Agency</option>
-                                <option value="ecommerce">E-commerce Business</option>
-                                <option value="content-creator">Content Creator</option>
-                                <option value="consulting">Consulting Business</option>
-                                <option value="other">Other</option>
+                                @foreach ($sectionData['form_options']['business_types'] ?? [] as $businessType)
+                                    <option value="{{ Str::slug($businessType) }}">{{ $businessType }}</option>
+                                @endforeach
+                                @if (empty($sectionData['form_options']['business_types']))
+                                    <option value="marketing-agency">Marketing Agency</option>
+                                    <option value="ecommerce">E-commerce Business</option>
+                                    <option value="content-creator">Content Creator</option>
+                                    <option value="consulting">Consulting Business</option>
+                                    <option value="other">Other</option>
+                                @endif
                             </select>
                         </div>
                     </div>
@@ -566,21 +582,31 @@
                             <label for="loan-amount">Desired Loan Amount</label>
                             <select name="loan-amount" id="loan-amount" class="form-control" required>
                                 <option value="" disabled selected>Select amount range</option>
-                                <option value="5k-25k">$5,000 - $25,000</option>
-                                <option value="25k-75k">$25,000 - $75,000</option>
-                                <option value="75k-150k">$75,000 - $150,000</option>
-                                <option value="150k-plus">$150,000+</option>
+                                @foreach ($sectionData['form_options']['loan_amounts'] ?? [] as $loanAmount)
+                                    <option value="{{ Str::slug($loanAmount) }}">{{ $loanAmount }}</option>
+                                @endforeach
+                                @if (empty($sectionData['form_options']['loan_amounts']))
+                                    <option value="5k-25k">$5,000 - $25,000</option>
+                                    <option value="25k-75k">$25,000 - $75,000</option>
+                                    <option value="75k-150k">$75,000 - $150,000</option>
+                                    <option value="150k-plus">$150,000+</option>
+                                @endif
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="purpose">Loan Purpose</label>
                             <select name="purpose" id="purpose" class="form-control" required>
                                 <option value="" disabled selected>Select purpose</option>
-                                <option value="marketing-campaign">Marketing Campaign</option>
-                                <option value="business-expansion">Business Expansion</option>
-                                <option value="equipment">Equipment Purchase</option>
-                                <option value="working-capital">Working Capital</option>
-                                <option value="other">Other</option>
+                                @foreach ($sectionData['form_options']['loan_purposes'] ?? [] as $purpose)
+                                    <option value="{{ Str::slug($purpose) }}">{{ $purpose }}</option>
+                                @endforeach
+                                @if (empty($sectionData['form_options']['loan_purposes']))
+                                    <option value="marketing-campaign">Marketing Campaign</option>
+                                    <option value="business-expansion">Business Expansion</option>
+                                    <option value="equipment">Equipment Purchase</option>
+                                    <option value="working-capital">Working Capital</option>
+                                    <option value="other">Other</option>
+                                @endif
                             </select>
                         </div>
                     </div>
@@ -590,10 +616,12 @@
                             id="message" class="form-control"></textarea>
                     </div>
                     <div class="form-submit">
-                        <button type="submit" class="submit-btn" aria-label="Submit loan application">Submit
-                            Application</button>
-                        <p class="form-note">One of our loan specialists will contact you within 24 hours to discuss
-                            your application.</p>
+                        <button type="submit" class="submit-btn" aria-label="Submit loan application">
+                            {{ $sectionData['form_config']['submit_text'] ?? 'Submit Application' }}
+                        </button>
+                        <p class="form-note">
+                            {{ $sectionData['form_config']['note'] ?? 'One of our loan specialists will contact you within 24 hours to discuss your application.' }}
+                        </p>
                     </div>
                 </form>
             </div>

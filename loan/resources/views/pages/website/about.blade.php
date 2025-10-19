@@ -706,44 +706,51 @@
                 <!-- Right Column -->
                 <div class="space-y-6">
                     <div class="form-group">
-                        <label for="videoCtaUrl">Video CTA URL *</label>
-                        <input type="url" id="videoCtaUrl" name="videoCtaUrl" class="form-control"
-                            value="{{ old('videoCtaUrl', $aboutData['videoCta']['url'] ?? '') }}"
+                        <label for="video_cta_url">Video CTA URL *</label>
+                        <input type="url" id="video_cta_url" name="video_cta_url" class="form-control"
+                            value="{{ old('video_cta_url', $aboutData['video_cta']['url'] ?? '') }}"
                             placeholder="https://www.youtube.com/watch?v=..." required>
                         <span class="error-message" id="videoCtaUrlError"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="videoCtaText">Video CTA Text *</label>
-                        <input type="text" id="videoCtaText" name="videoCtaText" class="form-control"
-                            value="{{ old('videoCtaText', $aboutData['videoCta']['text'] ?? '') }}"
+                        <label for="video_cta_text">Video CTA Text *</label>
+                        <input type="text" id="video_cta_text" name="video_cta_text" class="form-control"
+                            value="{{ old('video_cta_text', $aboutData['video_cta']['text'] ?? '') }}"
                             placeholder="e.g., Watch Our Story" required>
                         <span class="error-message" id="videoCtaTextError"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="videoCtaAriaLabel">Video CTA ARIA Label *</label>
-                        <input type="text" id="videoCtaAriaLabel" name="videoCtaAriaLabel" class="form-control"
-                            value="{{ old('videoCtaAriaLabel', $aboutData['videoCta']['ariaLabel'] ?? '') }}"
+                        <label for="video_cta_aria_label">Video CTA ARIA Label *</label>
+                        <input type="text" id="video_cta_aria_label" name="video_cta_aria_label" class="form-control"
+                            value="{{ old('video_cta_aria_label', $aboutData['video_cta']['aria_label'] ?? '') }}"
                             placeholder="e.g., Watch our company story video" required>
                         <span class="error-message" id="videoCtaAriaLabelError"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Images and Shapes -->
+            <!-- In the Images and Shapes section -->
             <div class="form-group">
                 <label>Images and Shapes</label>
                 <div id="imageItemsContainer" class="image-items-container">
-                    @foreach ($aboutData['images'] ?? [] as $index => $image)
+                    @php
+                        $images = $aboutData['images'] ?? [];
+                    @endphp
+                    @foreach ($images as $index => $image)
                         <div class="image-item-row">
                             <div class="w-full">
                                 <label>Image File</label>
-                                <input type="file" name="images[{{ $index }}][file]"
+                                <input type="file" name="image_files[{{ $index }}]"
                                     class="form-control image-file-input" accept="image/*">
                                 @if (isset($image['src']) && $image['src'])
                                     <div class="image-preview">
-                                        <img src="{{ Storage::url($image['src']) }}" alt="Current image">
+                                        @if (str_starts_with($image['src'], 'assets/'))
+                                            <img src="{{ asset($image['src']) }}" alt="Current image">
+                                        @else
+                                            <img src="{{ Storage::url($image['src']) }}" alt="Current image">
+                                        @endif
                                         <p class="text-sm text-gray-600 mt-2 text-center">Current image</p>
                                     </div>
                                 @endif
@@ -757,42 +764,46 @@
                             </div>
                             <div class="w-full">
                                 <label>Shape File</label>
-                                <input type="file" name="images[{{ $index }}][shapeFile]"
+                                <input type="file" name="shape_files[{{ $index }}]"
                                     class="form-control shape-file-input" accept="image/*">
                                 @if (isset($image['shape']) && $image['shape'])
                                     <div class="image-preview">
-                                        <img src="{{ Storage::url($image['shape']) }}" alt="Current shape">
+                                        @if (str_starts_with($image['shape'], 'assets/'))
+                                            <img src="{{ asset($image['shape']) }}" alt="Current shape">
+                                        @else
+                                            <img src="{{ Storage::url($image['shape']) }}" alt="Current shape">
+                                        @endif
                                         <p class="text-sm text-gray-600 mt-2 text-center">Current shape</p>
                                     </div>
                                 @endif
                             </div>
                             <div class="w-full">
                                 <label>Shape Alt Text</label>
-                                <input type="text" name="images[{{ $index }}][shapeAlt]"
+                                <input type="text" name="images[{{ $index }}][shape_alt]"
                                     class="form-control shape-alt-input"
-                                    value="{{ old("images.$index.shapeAlt", $image['shapeAlt'] ?? '') }}"
+                                    value="{{ old("images.$index.shape_alt", $image['shape_alt'] ?? '') }}"
                                     placeholder="Shape description">
                             </div>
                             <div class="w-full">
                                 <label>Shape Position</label>
-                                <select name="images[{{ $index }}][shapePosition]"
+                                <select name="images[{{ $index }}][shape_position]"
                                     class="form-control shape-position-input">
                                     <option value="">None</option>
                                     <option value="top-left"
-                                        {{ old("images.$index.shapePosition", $image['shapePosition'] ?? '') == 'top-left' ? 'selected' : '' }}>
+                                        {{ old("images.$index.shape_position", $image['shape_position'] ?? '') == 'top-left' ? 'selected' : '' }}>
                                         Top Left</option>
                                     <option value="top-right"
-                                        {{ old("images.$index.shapePosition", $image['shapePosition'] ?? '') == 'top-right' ? 'selected' : '' }}>
+                                        {{ old("images.$index.shape_position", $image['shape_position'] ?? '') == 'top-right' ? 'selected' : '' }}>
                                         Top Right</option>
                                     <option value="bottom-left"
-                                        {{ old("images.$index.shapePosition", $image['shapePosition'] ?? '') == 'bottom-left' ? 'selected' : '' }}>
+                                        {{ old("images.$index.shape_position", $image['shape_position'] ?? '') == 'bottom-left' ? 'selected' : '' }}>
                                         Bottom Left</option>
                                 </select>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" name="images[{{ $index }}][isCentered]"
+                                <input type="checkbox" name="images[{{ $index }}][is_centered]" value="1"
                                     class="form-control is-centered-input"
-                                    {{ old("images.$index.isCentered", $image['isCentered'] ?? false) ? 'checked' : '' }}>
+                                    {{ old("images.$index.is_centered", $image['is_centered'] ?? false) ? 'checked' : '' }}>
                                 <label class="ml-2">Center Image</label>
                             </div>
                             <button type="button" class="admin-btn btn-danger remove-image"
@@ -811,7 +822,10 @@
             <div class="form-group">
                 <label>Feature Items</label>
                 <div id="featureItemsContainer" class="feature-items-container">
-                    @foreach ($aboutData['features'] ?? [] as $index => $feature)
+                    @php
+                        $features = $aboutData['features'] ?? [];
+                    @endphp
+                    @foreach ($features as $index => $feature)
                         <div class="feature-item-row">
                             <input type="text" name="features[{{ $index }}][title]"
                                 class="form-control feature-title-input"
@@ -821,13 +835,13 @@
                                 class="form-control feature-description-input"
                                 value="{{ old("features.$index.description", $feature['description'] ?? '') }}"
                                 placeholder="Feature Description" required>
-                            <select name="features[{{ $index }}][bgColor]"
+                            <select name="features[{{ $index }}][bg_color]"
                                 class="form-control feature-bg-color-input">
                                 <option value="primary"
-                                    {{ old("features.$index.bgColor", $feature['bgColor'] ?? '') == 'primary' ? 'selected' : '' }}>
+                                    {{ old("features.$index.bg_color", $feature['bg_color'] ?? '') == 'primary' ? 'selected' : '' }}>
                                     Primary Color</option>
                                 <option value="secondary"
-                                    {{ old("features.$index.bgColor", $feature['bgColor'] ?? '') == 'secondary' ? 'selected' : '' }}>
+                                    {{ old("features.$index.bg_color", $feature['bg_color'] ?? '') == 'secondary' ? 'selected' : '' }}>
                                     Secondary Color</option>
                             </select>
                             <button type="button" class="admin-btn btn-danger remove-feature"
@@ -846,7 +860,10 @@
             <div class="form-group">
                 <label>Stats</label>
                 <div id="statItemsContainer" class="stat-items-container">
-                    @foreach ($aboutData['stats'] ?? [] as $index => $stat)
+                    @php
+                        $stats = $aboutData['stats'] ?? [];
+                    @endphp
+                    @foreach ($stats as $index => $stat)
                         <div class="stat-item-row">
                             <input type="text" name="stats[{{ $index }}][value]"
                                 class="form-control stat-value-input"
@@ -892,101 +909,10 @@
     <script>
         class AboutSectionManager {
             constructor() {
-                this.aboutData = this.getDefaultData();
+                this.aboutData = @json($aboutData);
                 this.elements = this.initializeElements();
                 this.isEditing = false;
                 this.init();
-            }
-
-            getDefaultData() {
-                return {
-                    subheading: "Why Choose Londa Loans",
-                    heading: "We Empower Marketeers with Financial Solutions That Drive Growth",
-                    description: "At Londa Loans, we understand the unique financial needs of marketers and entrepreneurs. Our tailored loan programs are designed specifically to fuel your business growth and marketing initiatives.",
-                    images: [{
-                            id: 1,
-                            src: "{{ asset('assets/images/about-01.png') }}",
-                            alt: "Team collaborating on a marketing campaign",
-                            shape: "{{ asset('assets/images/shape-05.svg') }}",
-                            shapeAlt: "Decorative shape pattern",
-                            shapePosition: "top-left",
-                            isCentered: false
-                        },
-                        {
-                            id: 2,
-                            src: "{{ asset('assets/images/about-02.png') }}",
-                            alt: "Entrepreneur analyzing financial growth",
-                            shape: null,
-                            shapeAlt: null,
-                            shapePosition: null,
-                            isCentered: false
-                        },
-                        {
-                            id: 3,
-                            src: "{{ asset('assets/images/about-03.png') }}",
-                            alt: "Marketer presenting a growth strategy",
-                            shape: "{{ asset('assets/images/shape-06.svg') }}",
-                            shapeAlt: "Decorative shape accent",
-                            shapePosition: "top-right",
-                            isCentered: true
-                        },
-                        {
-                            id: 4,
-                            src: null,
-                            alt: null,
-                            shape: "{{ asset('assets/images/shape-07.svg') }}",
-                            shapeAlt: "Decorative shape detail",
-                            shapePosition: "bottom-left",
-                            isCentered: true
-                        }
-                    ],
-                    features: [{
-                            id: 1,
-                            title: "Fast Approval",
-                            description: "Get decisions within 24 hours",
-                            bgColor: "primary"
-                        },
-                        {
-                            id: 2,
-                            title: "Flexible Terms",
-                            description: "Repayment plans that work for you",
-                            bgColor: "secondary"
-                        },
-                        {
-                            id: 3,
-                            title: "No Hidden Fees",
-                            description: "Transparent pricing always",
-                            bgColor: "primary"
-                        },
-                        {
-                            id: 4,
-                            title: "Marketing Focus",
-                            description: "Loans designed for marketeers",
-                            bgColor: "secondary"
-                        }
-                    ],
-                    stats: [{
-                            id: 1,
-                            value: "500+",
-                            label: "Successful Campaigns Funded"
-                        },
-                        {
-                            id: 2,
-                            value: "98%",
-                            label: "Customer Satisfaction"
-                        },
-                        {
-                            id: 3,
-                            value: "$10M+",
-                            label: "Loans Disbursed"
-                        }
-                    ],
-                    videoCta: {
-                        url: "https://www.youtube.com/watch?v=xcJtL7QggTI",
-                        text: "See How We Empower Marketers",
-                        ariaLabel: "Watch video about Londa Loans' impact on marketers"
-                    }
-                };
             }
 
             initializeElements() {
@@ -1009,16 +935,25 @@
             }
 
             init() {
-                this.loadData();
                 this.renderAbout();
                 this.setupEventListeners();
                 this.setupRealTimePreview();
+                this.setupFileInputHandling();
             }
 
-            loadData() {
-                // In a real application, this would load from your backend
-                // For now, we'll use the default data
-                console.log('About section manager initialized');
+            setupFileInputHandling() {
+                // Clear empty file inputs before form submission to prevent validation errors
+                this.elements.aboutForm.addEventListener('submit', (e) => {
+                    const emptyFileInputs = this.elements.aboutForm.querySelectorAll('input[type="file"]');
+                    emptyFileInputs.forEach(input => {
+                        if (!input.files || input.files.length === 0) {
+                            // Create a new input without the name attribute to exclude from submission
+                            const newInput = input.cloneNode(false);
+                            newInput.removeAttribute('name');
+                            input.parentNode.replaceChild(newInput, input);
+                        }
+                    });
+                });
             }
 
             renderAbout() {
@@ -1026,15 +961,15 @@
                 this.elements.aboutImages.innerHTML = `
                     <div class="about-images-grid">
                         ${this.aboutData.images.map(image => `
-                                    <div class="about-image-container" ${image.isCentered ? 'style="grid-column: span 2;"' : ''}>
-                                        ${image.shape ? `
-                                    <img src="${image.shape}" alt="${this.sanitizeInput(image.shapeAlt)}" class="shape shape--${image.shapePosition}" />
+                                                                <div class="about-image-container ${image.is_centered ? 'about-image--center' : ''}" ${image.is_centered ? 'style="grid-column: span 2;"' : ''}>
+                                                                    ${image.shape ? `
+                                    <img src="${this.getImageUrl(image.shape)}" alt="${this.sanitizeInput(image.shape_alt)}" class="shape shape--${image.shape_position}" />
                                 ` : ''}
-                                        ${image.src ? `
-                                    <img src="${image.src}" alt="${this.sanitizeInput(image.alt)}" class="about-image ${image.isCentered ? 'about-image--center' : ''}" />
+                                                                    ${image.src ? `
+                                    <img src="${this.getImageUrl(image.src)}" alt="${this.sanitizeInput(image.alt)}" class="about-image" />
                                 ` : ''}
-                                    </div>
-                                `).join('')}
+                                                                </div>
+                                                            `).join('')}
                     </div>
                 `;
 
@@ -1045,31 +980,31 @@
                     <p class="about-description">${this.sanitizeInput(this.aboutData.description)}</p>
                     <div class="features-list" role="list">
                         ${this.aboutData.features.map(feature => `
-                                    <div class="feature-item" role="listitem">
-                                        <div class="feature-icon-container ${feature.bgColor === 'secondary' ? 'secondary' : ''}">
-                                            <img src="{{ asset('assets/images/icon-check.svg') }}" alt="Check mark for ${this.sanitizeInput(feature.title)}" class="feature-icon" />
-                                        </div>
-                                        <div>
-                                            <h4 class="feature-title">${this.sanitizeInput(feature.title)}</h4>
-                                            <p class="feature-description">${this.sanitizeInput(feature.description)}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
+                                                                <div class="feature-item" role="listitem">
+                                                                    <div class="feature-icon-container ${feature.bg_color === 'secondary' ? 'secondary' : ''}">
+                                                                        <img src="{{ asset('assets/images/icon-check.svg') }}" alt="Check mark for ${this.sanitizeInput(feature.title)}" class="feature-icon" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 class="feature-title">${this.sanitizeInput(feature.title)}</h4>
+                                                                        <p class="feature-description">${this.sanitizeInput(feature.description)}</p>
+                                                                    </div>
+                                                                </div>
+                                                            `).join('')}
                     </div>
                     <div class="stats" role="list">
                         ${this.aboutData.stats.map(stat => `
-                                    <div class="stat-item" role="listitem">
-                                        <span class="stat-value">${this.sanitizeInput(stat.value)}</span>
-                                        <span class="stat-label">${this.sanitizeInput(stat.label)}</span>
-                                    </div>
-                                `).join('')}
+                                                                <div class="stat-item" role="listitem">
+                                                                    <span class="stat-value">${this.sanitizeInput(stat.value)}</span>
+                                                                    <span class="stat-label">${this.sanitizeInput(stat.label)}</span>
+                                                                </div>
+                                                            `).join('')}
                     </div>
-                    <a href="${this.sanitizeInput(this.aboutData.videoCta.url)}" data-fslightbox class="video-cta" aria-label="${this.sanitizeInput(this.aboutData.videoCta.ariaLabel)}">
+                    <a href="${this.sanitizeInput(this.aboutData.video_cta.url)}" data-fslightbox class="video-cta" aria-label="${this.sanitizeInput(this.aboutData.video_cta.aria_label)}">
                         <span class="video-cta-icon-container">
                             <span class="video-cta-pulse"></span>
                             <img src="{{ asset('assets/images/icon-play.svg') }}" alt="Play video icon" class="video-cta-icon" />
                         </span>
-                        <span class="video-cta-text">${this.sanitizeInput(this.aboutData.videoCta.text)}</span>
+                        <span class="video-cta-text">${this.sanitizeInput(this.aboutData.video_cta.text)}</span>
                     </a>
                 `;
 
@@ -1077,6 +1012,14 @@
                 if (window.refreshFsLightbox) {
                     window.refreshFsLightbox();
                 }
+            }
+
+            getImageUrl(path) {
+                if (!path) return '';
+                if (path.startsWith('assets/') || path.startsWith('http')) {
+                    return path;
+                }
+                return `/storage/${path}`;
             }
 
             setupEventListeners() {
@@ -1124,27 +1067,27 @@
                 // Real-time preview updates for form fields
                 const previewFields = [{
                         input: 'aboutSubheading',
-                        preview: 'aboutSubheading'
+                        preview: 'subheading'
                     },
                     {
                         input: 'aboutHeading',
-                        preview: 'aboutHeading'
+                        preview: 'heading'
                     },
                     {
                         input: 'aboutDescription',
-                        preview: 'aboutDescription'
+                        preview: 'description'
                     },
                     {
-                        input: 'videoCtaUrl',
-                        preview: 'videoCtaUrl'
+                        input: 'video_cta_url',
+                        preview: 'video_cta.url'
                     },
                     {
-                        input: 'videoCtaText',
-                        preview: 'videoCtaText'
+                        input: 'video_cta_text',
+                        preview: 'video_cta.text'
                     },
                     {
-                        input: 'videoCtaAriaLabel',
-                        preview: 'videoCtaAriaLabel'
+                        input: 'video_cta_aria_label',
+                        preview: 'video_cta.aria_label'
                     }
                 ];
 
@@ -1152,26 +1095,22 @@
                     const input = document.getElementById(field.input);
                     if (input) {
                         input.addEventListener('input', () => {
-                            this.updateAboutData();
+                            this.updateAboutData(field.preview, input.value);
                             this.renderAbout();
                         });
                     }
                 });
             }
 
-            updateAboutData() {
-                // Update basic data from form inputs
-                this.aboutData.subheading = document.getElementById('aboutSubheading')?.value || this.aboutData
-                    .subheading;
-                this.aboutData.heading = document.getElementById('aboutHeading')?.value || this.aboutData.heading;
-                this.aboutData.description = document.getElementById('aboutDescription')?.value || this.aboutData
-                    .description;
-                this.aboutData.videoCta.url = document.getElementById('videoCtaUrl')?.value || this.aboutData.videoCta
-                    .url;
-                this.aboutData.videoCta.text = document.getElementById('videoCtaText')?.value || this.aboutData.videoCta
-                    .text;
-                this.aboutData.videoCta.ariaLabel = document.getElementById('videoCtaAriaLabel')?.value || this
-                    .aboutData.videoCta.ariaLabel;
+            updateAboutData(path, value) {
+                const paths = path.split('.');
+                let current = this.aboutData;
+
+                for (let i = 0; i < paths.length - 1; i++) {
+                    current = current[paths[i]];
+                }
+
+                current[paths[paths.length - 1]] = value;
             }
 
             toggleAdminPanel() {
@@ -1195,41 +1134,41 @@
                 const newId = imageRows.length;
 
                 const imageHtml = `
-                    <div class="image-item-row">
-                        <div class="w-full">
-                            <label>Image File</label>
-                            <input type="file" name="images[${newId}][file]" class="form-control image-file-input" accept="image/*">
-                        </div>
-                        <div class="w-full">
-                            <label>Image Alt Text</label>
-                            <input type="text" name="images[${newId}][alt]" class="form-control image-alt-input" placeholder="Image description">
-                        </div>
-                        <div class="w-full">
-                            <label>Shape File</label>
-                            <input type="file" name="images[${newId}][shapeFile]" class="form-control shape-file-input" accept="image/*">
-                        </div>
-                        <div class="w-full">
-                            <label>Shape Alt Text</label>
-                            <input type="text" name="images[${newId}][shapeAlt]" class="form-control shape-alt-input" placeholder="Shape description">
-                        </div>
-                        <div class="w-full">
-                            <label>Shape Position</label>
-                            <select name="images[${newId}][shapePosition]" class="form-control shape-position-input">
-                                <option value="">None</option>
-                                <option value="top-left">Top Left</option>
-                                <option value="top-right">Top Right</option>
-                                <option value="bottom-left">Bottom Left</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" name="images[${newId}][isCentered]" class="form-control is-centered-input">
-                            <label class="ml-2">Center Image</label>
-                        </div>
-                        <button type="button" class="admin-btn btn-danger remove-image" data-id="${newId}" aria-label="Remove image">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
+                                    <div class="image-item-row">
+                                        <div class="w-full">
+                                            <label>Image File</label>
+                                            <input type="file" name="image_files[${newId}]" class="form-control image-file-input" accept="image/*">
+                                        </div>
+                                        <div class="w-full">
+                                            <label>Image Alt Text</label>
+                                            <input type="text" name="images[${newId}][alt]" class="form-control image-alt-input" placeholder="Image description">
+                                        </div>
+                                        <div class="w-full">
+                                            <label>Shape File</label>
+                                            <input type="file" name="shape_files[${newId}]" class="form-control shape-file-input" accept="image/*">
+                                        </div>
+                                        <div class="w-full">
+                                            <label>Shape Alt Text</label>
+                                            <input type="text" name="images[${newId}][shape_alt]" class="form-control shape-alt-input" placeholder="Shape description">
+                                        </div>
+                                        <div class="w-full">
+                                            <label>Shape Position</label>
+                                            <select name="images[${newId}][shape_position]" class="form-control shape-position-input">
+                                                <option value="">None</option>
+                                                <option value="top-left">Top Left</option>
+                                                <option value="top-right">Top Right</option>
+                                                <option value="bottom-left">Bottom Left</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="images[${newId}][is_centered]" value="1" class="form-control is-centered-input">
+                                            <label class="ml-2">Center Image</label>
+                                        </div>
+                                        <button type="button" class="admin-btn btn-danger remove-image" data-id="${newId}" aria-label="Remove image">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `;
 
                 this.elements.imageItemsContainer.insertAdjacentHTML('beforeend', imageHtml);
             }
@@ -1242,7 +1181,7 @@
                     <div class="feature-item-row">
                         <input type="text" name="features[${newId}][title]" class="form-control feature-title-input" placeholder="Feature Title" required>
                         <input type="text" name="features[${newId}][description]" class="form-control feature-description-input" placeholder="Feature Description" required>
-                        <select name="features[${newId}][bgColor]" class="form-control feature-bg-color-input">
+                        <select name="features[${newId}][bg_color]" class="form-control feature-bg-color-input">
                             <option value="primary">Primary Color</option>
                             <option value="secondary">Secondary Color</option>
                         </select>
@@ -1287,7 +1226,7 @@
                 // Validate required fields
                 const requiredFields = [
                     'aboutSubheading', 'aboutHeading', 'aboutDescription',
-                    'videoCtaUrl', 'videoCtaText', 'videoCtaAriaLabel'
+                    'video_cta_url', 'video_cta_text', 'video_cta_aria_label'
                 ];
 
                 requiredFields.forEach(fieldId => {
@@ -1299,11 +1238,30 @@
                 });
 
                 // Validate URL format
-                const urlField = document.getElementById('videoCtaUrl');
+                const urlField = document.getElementById('video_cta_url');
                 if (urlField.value && !this.isValidUrl(urlField.value)) {
-                    this.showError('videoCtaUrl', 'Please enter a valid URL.');
+                    this.showError('video_cta_url', 'Please enter a valid URL.');
                     isValid = false;
                 }
+
+                // Validate feature items
+                const featureInputs = this.elements.aboutForm.querySelectorAll(
+                    '.feature-title-input, .feature-description-input');
+                featureInputs.forEach(input => {
+                    if (!input.value.trim() && input.hasAttribute('required')) {
+                        this.showError(input.name, 'This field is required.');
+                        isValid = false;
+                    }
+                });
+
+                // Validate stat items
+                const statInputs = this.elements.aboutForm.querySelectorAll('.stat-value-input, .stat-label-input');
+                statInputs.forEach(input => {
+                    if (!input.value.trim() && input.hasAttribute('required')) {
+                        this.showError(input.name, 'This field is required.');
+                        isValid = false;
+                    }
+                });
 
                 if (!isValid) {
                     e.preventDefault();
@@ -1345,10 +1303,8 @@
 
             resetToDefault() {
                 if (confirm('Are you sure you want to reset all changes to default values?')) {
-                    this.aboutData = this.getDefaultData();
-                    this.renderAbout();
-                    this.hideAdminPanel();
-                    this.showNotification('Reset to default values successfully!', 'success');
+                    // This would typically reload the page to get fresh data from server
+                    window.location.reload();
                 }
             }
 

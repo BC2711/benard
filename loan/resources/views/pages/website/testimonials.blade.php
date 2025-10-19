@@ -45,47 +45,14 @@
             animation: float 3s ease-in-out infinite;
         }
 
-        .shape-1 {
-            top: 10%;
-            left: 5%;
-            width: 150px;
-            height: 150px;
-            animation-duration: 3s;
+        /* @foreach ($testimonialsData['background_shapes'] ?? [] as $shape)
+        .shape-{{ $shape['id'] }} {
+            {{ $shape['position'] }} width: {{ $shape['size'] }};
+            height: {{ $shape['size'] }};
+            animation-duration: {{ $shape['animationDuration'] }};
         }
-
-        .shape-2 {
-            top: 15%;
-            right: 5%;
-            width: 80px;
-            height: 80px;
-            animation-duration: 3.5s;
-        }
-
-        .shape-3 {
-            top: 20%;
-            left: 10%;
-            width: 70px;
-            height: 70px;
-            animation-duration: 4s;
-        }
-
-        .shape-4 {
-            bottom: 10%;
-            right: 15%;
-            width: 90px;
-            height: 90px;
-            animation-duration: 3.8s;
-        }
-
-        .shape-5 {
-            bottom: 15%;
-            left: 10%;
-            width: 85px;
-            height: 85px;
-            animation-duration: 4.2s;
-        }
-
-        .testimonials-content {
+        @endforeach
+        */ .testimonials-content {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 clamp(1rem, 3vw, 2rem);
@@ -671,11 +638,9 @@
     <div class="testimonials-preview-container">
         <section class="testimonials-section" aria-label="Testimonials Section Preview">
             <div class="testimonials-background">
-                <div class="background-shape shape-1"></div>
-                <div class="background-shape shape-2"></div>
-                <div class="background-shape shape-3"></div>
-                <div class="background-shape shape-4"></div>
-                <div class="background-shape shape-5"></div>
+                @foreach ($testimonialsData['background_shapes'] ?? [] as $shape)
+                    <div class="background-shape shape-{{ $shape['id'] }}"></div>
+                @endforeach
             </div>
 
             <div class="testimonials-content">
@@ -795,30 +760,30 @@
                     </h4>
 
                     <!-- Testimonial Tabs -->
-                    {{-- <div class="testimonial-tabs">
+                    <div class="testimonial-tabs">
                         <div class="testimonial-tab-buttons">
-                            @for ($i = 1; $i <= 3; $i++)
-                                <button type="button" class="testimonial-tab-btn {{ $loop->first ? 'active' : '' }}"
+                            @for ($i = 0; $i < 3; $i++)
+                                <button type="button" class="testimonial-tab-btn {{ $i === 0 ? 'active' : '' }}"
                                     data-tab="testimonial-{{ $i }}">
-                                    Testimonial {{ $i }}
+                                    Testimonial {{ $i + 1 }}
                                 </button>
                             @endfor
                         </div>
-                    </div> --}}
+                    </div>
 
                     <!-- Testimonial Content -->
                     <div class="testimonial-tab-contents">
-                        {{-- @for ($i = 1; $i <= 3; $i++)
+                        @for ($i = 0; $i < 3; $i++)
                             <div id="testimonial-{{ $i }}"
-                                class="testimonial-tab-content {{ $loop->first ? 'active' : '' }}">
+                                class="testimonial-tab-content {{ $i === 0 ? 'active' : '' }}">
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <!-- Testimonial Details -->
                                     <div class="space-y-4">
                                         <div>
                                             <label for="testimonial_{{ $i }}_name">Client Name *</label>
                                             <input type="text" id="testimonial_{{ $i }}_name"
-                                                name="testimonials[{{ $i - 1 }}][name]" class="form-control"
-                                                value="{{ old('testimonials.' . ($i - 1) . '.name', $testimonialsData['testimonials'][$i - 1]['name'] ?? '') }}"
+                                                name="testimonials[{{ $i }}][name]" class="form-control"
+                                                value="{{ old("testimonials.$i.name", $testimonialsData['testimonials'][$i]['name'] ?? '') }}"
                                                 placeholder="e.g., Sarah Johnson" required>
                                             <span class="error-message"
                                                 id="testimonial{{ $i }}NameError"></span>
@@ -828,29 +793,29 @@
                                             <label for="testimonial_{{ $i }}_position">Position &
                                                 Company</label>
                                             <input type="text" id="testimonial_{{ $i }}_position"
-                                                name="testimonials[{{ $i - 1 }}][position]" class="form-control"
-                                                value="{{ old('testimonials.' . ($i - 1) . '.position', $testimonialsData['testimonials'][$i - 1]['position'] ?? '') }}"
+                                                name="testimonials[{{ $i }}][position]" class="form-control"
+                                                value="{{ old("testimonials.$i.position", $testimonialsData['testimonials'][$i]['position'] ?? '') }}"
                                                 placeholder="e.g., Owner @SocialBoost Agency">
                                         </div>
 
                                         <div>
                                             <label for="testimonial_{{ $i }}_rating">Rating</label>
                                             <select id="testimonial_{{ $i }}_rating"
-                                                name="testimonials[{{ $i - 1 }}][rating]" class="form-control">
+                                                name="testimonials[{{ $i }}][rating]" class="form-control">
                                                 <option value="5"
-                                                    {{ old('testimonials.' . ($i - 1) . '.rating', $testimonialsData['testimonials'][$i - 1]['rating'] ?? '') == '5' ? 'selected' : '' }}>
+                                                    {{ old("testimonials.$i.rating", $testimonialsData['testimonials'][$i]['rating'] ?? '') == '5' ? 'selected' : '' }}>
                                                     ★★★★★ (5 stars)</option>
                                                 <option value="4"
-                                                    {{ old('testimonials.' . ($i - 1) . '.rating', $testimonialsData['testimonials'][$i - 1]['rating'] ?? '') == '4' ? 'selected' : '' }}>
+                                                    {{ old("testimonials.$i.rating", $testimonialsData['testimonials'][$i]['rating'] ?? '') == '4' ? 'selected' : '' }}>
                                                     ★★★★☆ (4 stars)</option>
                                                 <option value="3"
-                                                    {{ old('testimonials.' . ($i - 1) . '.rating', $testimonialsData['testimonials'][$i - 1]['rating'] ?? '') == '3' ? 'selected' : '' }}>
+                                                    {{ old("testimonials.$i.rating", $testimonialsData['testimonials'][$i]['rating'] ?? '') == '3' ? 'selected' : '' }}>
                                                     ★★★☆☆ (3 stars)</option>
                                                 <option value="2"
-                                                    {{ old('testimonials.' . ($i - 1) . '.rating', $testimonialsData['testimonials'][$i - 1]['rating'] ?? '') == '2' ? 'selected' : '' }}>
+                                                    {{ old("testimonials.$i.rating", $testimonialsData['testimonials'][$i]['rating'] ?? '') == '2' ? 'selected' : '' }}>
                                                     ★★☆☆☆ (2 stars)</option>
                                                 <option value="1"
-                                                    {{ old('testimonials.' . ($i - 1) . '.rating', $testimonialsData['testimonials'][$i - 1]['rating'] ?? '') == '1' ? 'selected' : '' }}>
+                                                    {{ old("testimonials.$i.rating", $testimonialsData['testimonials'][$i]['rating'] ?? '') == '1' ? 'selected' : '' }}>
                                                     ★☆☆☆☆ (1 star)</option>
                                             </select>
                                         </div>
@@ -861,8 +826,8 @@
                                         <div>
                                             <label for="testimonial_{{ $i }}_content">Testimonial Content
                                                 *</label>
-                                            <textarea id="testimonial_{{ $i }}_content" name="testimonials[{{ $i - 1 }}][content]"
-                                                class="form-control" rows="6" placeholder="Londa Loans funded our social media campaign..." required>{{ old('testimonials.' . ($i - 1) . '.content', $testimonialsData['testimonials'][$i - 1]['content'] ?? '') }}</textarea>
+                                            <textarea id="testimonial_{{ $i }}_content" name="testimonials[{{ $i }}][content]"
+                                                class="form-control" rows="6" placeholder="Londa Loans funded our social media campaign..." required>{{ old("testimonials.$i.content", $testimonialsData['testimonials'][$i]['content'] ?? '') }}</textarea>
                                             <span class="error-message"
                                                 id="testimonial{{ $i }}ContentError"></span>
                                         </div>
@@ -870,20 +835,31 @@
                                         <div>
                                             <label for="testimonial_{{ $i }}_photo">Client Photo</label>
                                             <input type="file" id="testimonial_{{ $i }}_photo"
-                                                name="testimonials[{{ $i - 1 }}][photo]" class="form-control"
+                                                name="testimonials[{{ $i }}][photo]" class="form-control"
                                                 accept="image/jpeg,image/png,image/webp">
-                                            @if (isset($testimonialsData['testimonials'][$i - 1]['photo']) && $testimonialsData['testimonials'][$i - 1]['photo'])
-                                                <div class="image-preview">
-                                                    <img src="{{ Storage::url($testimonialsData['testimonials'][$i - 1]['photo']) }}"
-                                                        alt="Current client photo">
-                                                    <p class="text-sm text-gray-600 mt-2 text-center">Current photo</p>
+
+                                            <!-- Current Photo Preview with Delete Option -->
+                                            @if (isset($testimonialsData['testimonials'][$i]['photo']) && $testimonialsData['testimonials'][$i]['photo'])
+                                                <div class="image-preview mt-2">
+                                                    <img src="{{ Storage::url($testimonialsData['testimonials'][$i]['photo']) }}"
+                                                        alt="Current client photo" class="max-w-xs rounded-lg">
+                                                    <p class="text-sm text-gray-600 mt-2">Current photo</p>
+                                                    <button type="button"
+                                                        class="admin-btn btn-danger mt-2 delete-photo-btn"
+                                                        data-testimonial-index="{{ $i }}"
+                                                        data-photo-path="{{ $testimonialsData['testimonials'][$i]['photo'] }}">
+                                                        <i class="fas fa-trash"></i> Delete Photo
+                                                    </button>
                                                 </div>
                                             @endif
+
+                                            <p class="text-sm text-gray-500 mt-1">Max file size: 2MB. Allowed formats:
+                                                JPEG, PNG, JPG, WebP</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endfor --}}
+                        @endfor
                     </div>
                 </div>
 
@@ -899,11 +875,12 @@
                                 <input type="text" name="indicators[{{ $index }}][value]"
                                     class="form-control trust-value-input"
                                     value="{{ old("indicators.$index.value", $indicator['value'] ?? '') }}"
-                                    data-id="{{ $index }}" placeholder="Value (e.g., 500+)">
+                                    data-id="{{ $index }}" placeholder="Value (e.g., 500+)" required>
                                 <input type="text" name="indicators[{{ $index }}][label]"
                                     class="form-control trust-label-input"
                                     value="{{ old("indicators.$index.label", $indicator['label'] ?? '') }}"
-                                    data-id="{{ $index }}" placeholder="Label (e.g., Marketing Campaigns Funded)">
+                                    data-id="{{ $index }}" placeholder="Label (e.g., Marketing Campaigns Funded)"
+                                    required>
                                 <button type="button" class="admin-btn btn-danger remove-trust-indicator"
                                     data-id="{{ $index }}" aria-label="Remove trust indicator">
                                     <i class="fas fa-trash"></i>
@@ -974,8 +951,8 @@
                             <p class="text-sm text-gray-500 mt-1">Lower numbers display first</p>
                         </div>
                         <div>
-                            <label for="status">Status</label>
-                            <select id="status" name="status" class="form-control">
+                            <label for="status">Status *</label>
+                            <select id="status" name="status" class="form-control" required>
                                 <option value="ACTIVE"
                                     {{ old('status', $testimonialsData['status'] ?? '') == 'ACTIVE' ? 'selected' : '' }}>
                                     Active</option>
@@ -1024,6 +1001,8 @@
                     testimonialTabContents: document.querySelectorAll('.testimonial-tab-content')
                 };
 
+                this.trustIndicatorCounter = {{ count($testimonialsData['indicators'] ?? []) }};
+
                 this.init();
             }
 
@@ -1031,6 +1010,7 @@
                 this.setupEventListeners();
                 this.setupRealTimePreview();
                 this.setupTestimonialTabs();
+                this.setupPhotoDeletion();
             }
 
             setupEventListeners() {
@@ -1050,6 +1030,15 @@
                 this.elements.trustIndicatorsContainer.addEventListener('click', (e) => {
                     if (e.target.closest('.remove-trust-indicator')) {
                         this.removeTrustIndicator(e.target.closest('.remove-trust-indicator'));
+                    }
+                });
+            }
+
+            setupPhotoDeletion() {
+                // Photo deletion event delegation
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-photo-btn')) {
+                        this.deletePhoto(e.target.closest('.delete-photo-btn'));
                     }
                 });
             }
@@ -1110,24 +1099,6 @@
                         });
                     }
                 });
-
-                // Update testimonials preview
-                for (let i = 1; i <= 3; i++) {
-                    const nameInput = document.getElementById(`testimonial_${i}_name`);
-                    const positionInput = document.getElementById(`testimonial_${i}_position`);
-                    const contentInput = document.getElementById(`testimonial_${i}_content`);
-                    const ratingInput = document.getElementById(`testimonial_${i}_rating`);
-
-                    if (nameInput) nameInput.addEventListener('input', () => this.updateTestimonialsPreview());
-                    if (positionInput) positionInput.addEventListener('input', () => this.updateTestimonialsPreview());
-                    if (contentInput) contentInput.addEventListener('input', () => this.updateTestimonialsPreview());
-                    if (ratingInput) ratingInput.addEventListener('change', () => this.updateTestimonialsPreview());
-                }
-
-                // Update trust indicators preview
-                document.querySelectorAll('.trust-value-input, .trust-label-input').forEach(input => {
-                    input.addEventListener('input', () => this.updateTrustIndicatorsPreview());
-                });
             }
 
             updatePreview(field) {
@@ -1137,17 +1108,6 @@
                 if (input && preview) {
                     preview.textContent = input.value;
                 }
-            }
-
-            updateTestimonialsPreview() {
-                // This would update the testimonials grid in real-time
-                // Implementation would depend on your specific needs
-                console.log('Updating testimonials preview...');
-            }
-
-            updateTrustIndicatorsPreview() {
-                // This would update the trust indicators in real-time
-                console.log('Updating trust indicators preview...');
             }
 
             toggleAdminPanel() {
@@ -1167,24 +1127,22 @@
             }
 
             addTrustIndicator() {
-                const trustRows = document.querySelectorAll('.trust-item-row');
-                const newId = trustRows.length > 0 ?
-                    parseInt(trustRows[trustRows.length - 1].querySelector('.trust-value-input').dataset.id) + 1 : 0;
+                const newId = this.trustIndicatorCounter++;
 
                 const indicatorHtml = `
-                    <div class="trust-item-row">
-                        <input type="text" name="indicators[${newId}][value]" 
-                               class="form-control trust-value-input" data-id="${newId}" 
-                               placeholder="Value (e.g., 500+)" required>
-                        <input type="text" name="indicators[${newId}][label]" 
-                               class="form-control trust-label-input" data-id="${newId}" 
-                               placeholder="Label (e.g., Marketeers Funded)" required>
-                        <button type="button" class="admin-btn btn-danger remove-trust-indicator" 
-                                data-id="${newId}" aria-label="Remove trust indicator">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
+                <div class="trust-item-row">
+                    <input type="text" name="indicators[${newId}][value]" 
+                           class="form-control trust-value-input" data-id="${newId}" 
+                           placeholder="Value (e.g., 500+)" required>
+                    <input type="text" name="indicators[${newId}][label]" 
+                           class="form-control trust-label-input" data-id="${newId}" 
+                           placeholder="Label (e.g., Marketeers Funded)" required>
+                    <button type="button" class="admin-btn btn-danger remove-trust-indicator" 
+                            data-id="${newId}" aria-label="Remove trust indicator">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
 
                 this.elements.trustIndicatorsContainer.insertAdjacentHTML('beforeend', indicatorHtml);
             }
@@ -1195,6 +1153,73 @@
                 }
             }
 
+            async deletePhoto(button) {
+                const testimonialIndex = button.getAttribute('data-testimonial-index');
+                const photoPath = button.getAttribute('data-photo-path');
+
+                if (!confirm('Are you sure you want to delete this photo?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/management/testimonial-section/delete-photo/${testimonialIndex}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Remove the photo preview
+                        const previewContainer = button.closest('.image-preview');
+                        if (previewContainer) {
+                            previewContainer.remove();
+                        }
+
+                        // Clear the file input
+                        const fileInput = document.getElementById(`testimonial_${testimonialIndex}_photo`);
+                        if (fileInput) {
+                            fileInput.value = '';
+                        }
+
+                        // Show success message
+                        this.showNotification('Photo deleted successfully', 'success');
+                    } else {
+                        this.showNotification(data.message || 'Failed to delete photo', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting photo:', error);
+                    this.showNotification('Failed to delete photo. Please try again.', 'error');
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
             validateForm(e) {
                 let isValid = true;
 
@@ -1203,7 +1228,7 @@
 
                 // Validate required fields
                 const requiredFields = [
-                    'headline', 'title'
+                    'headline', 'title', 'status'
                 ];
 
                 requiredFields.forEach(fieldId => {
@@ -1215,7 +1240,7 @@
                 });
 
                 // Validate testimonials
-                for (let i = 1; i <= 3; i++) {
+                for (let i = 0; i < 3; i++) {
                     const testimonialName = document.getElementById(`testimonial_${i}_name`);
                     const testimonialContent = document.getElementById(`testimonial_${i}_content`);
 
@@ -1224,7 +1249,45 @@
                             'Testimonial content is required when name is provided.');
                         isValid = false;
                     }
+
+                    if (testimonialName && testimonialName.value.trim() && testimonialContent && testimonialContent
+                        .value.trim()) {
+                        // Both name and content are provided, validate content length
+                        if (testimonialContent.value.length > 1000) {
+                            this.showError(`testimonial${i}Content`,
+                                'Testimonial content must not exceed 1000 characters.');
+                            isValid = false;
+                        }
+                    }
+
+                    // Validate file size if a file is selected
+                    const photoInput = document.getElementById(`testimonial_${i}_photo`);
+                    if (photoInput && photoInput.files.length > 0) {
+                        const file = photoInput.files[0];
+                        if (file.size > 2 * 1024 * 1024) { // 2MB in bytes
+                            this.showError(`testimonial${i}Photo`, 'File size must be less than 2MB.');
+                            isValid = false;
+                        }
+                    }
                 }
+
+                // Validate trust indicators
+                const trustValueInputs = document.querySelectorAll('.trust-value-input');
+                const trustLabelInputs = document.querySelectorAll('.trust-label-input');
+
+                trustValueInputs.forEach((input, index) => {
+                    if (!input.value.trim()) {
+                        this.showError(`trust-value-${index}`, 'Trust indicator value is required.');
+                        isValid = false;
+                    }
+                });
+
+                trustLabelInputs.forEach((input, index) => {
+                    if (!input.value.trim()) {
+                        this.showError(`trust-label-${index}`, 'Trust indicator label is required.');
+                        isValid = false;
+                    }
+                });
 
                 if (!isValid) {
                     e.preventDefault();

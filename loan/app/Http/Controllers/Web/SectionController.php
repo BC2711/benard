@@ -342,6 +342,7 @@ class SectionController extends Controller
             'section' => $section
         ]);
     }
+
     public function about_section(Request $request)
     {
         // Get or create about section data
@@ -445,7 +446,7 @@ class SectionController extends Controller
                 'description' => 'Main about section of the website',
                 'section_type' => 'ABOUT_US',
                 'status' => 'ACTIVE',
-                'content' => json_encode($defaultContent),
+                'content' => $defaultContent,
                 'published_at' => now(),
                 'author' => 'system',
                 'last_modified_by' => 'system'
@@ -453,6 +454,7 @@ class SectionController extends Controller
         }
 
         if ($request->isMethod('post')) {
+            // First validate non-file fields
             $data = $request->validate([
                 'subheading' => 'required|string|max:255',
                 'heading' => 'required|string|max:255',
@@ -461,9 +463,9 @@ class SectionController extends Controller
                 'video_cta_text' => 'required|string|max:100',
                 'video_cta_aria_label' => 'required|string|max:255',
                 'images' => 'sometimes|array',
-                'images.*.alt' => 'sometimes|string|max:255',
-                'images.*.shape_alt' => 'sometimes|string|max:255',
-                'images.*.shape_position' => 'sometimes|in:top-left,top-right,bottom-left',
+                'images.*.alt' => 'nullable|string|max:255',
+                'images.*.shape_alt' => 'nullable|string|max:255',
+                'images.*.shape_position' => 'nullable|in:top-left,top-right,bottom-left',
                 'images.*.is_centered' => 'sometimes|boolean',
                 'features' => 'sometimes|array',
                 'features.*.title' => 'required|string|max:100',
@@ -472,11 +474,31 @@ class SectionController extends Controller
                 'stats' => 'sometimes|array',
                 'stats.*.value' => 'required|string|max:50',
                 'stats.*.label' => 'required|string|max:100',
-                'image_files' => 'sometimes|array',
-                'image_files.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'shape_files' => 'sometimes|array',
-                'shape_files.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:1024'
             ]);
+
+            // Manually validate files only if they exist and are not empty
+            if ($request->hasFile('image_files')) {
+                foreach ($request->file('image_files') as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        $request->validate([
+                            "image_files.{$index}" => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                        ]);
+                    }
+                }
+            }
+
+            if ($request->hasFile('shape_files')) {
+                foreach ($request->file('shape_files') as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        $request->validate([
+                            "shape_files.{$index}" => 'image|mimes:jpeg,png,jpg,gif,svg|max:1024'
+                        ]);
+                    }
+                }
+            }
+
+            // Get current content - ensure it's an array
+            $currentContent = $this->getContentAsArray($section->content);
 
             // Process images
             $images = [];
@@ -485,14 +507,16 @@ class SectionController extends Controller
                 foreach ($data['images'] as $index => $image) {
                     $images[] = [
                         'id' => $imageId++,
-                        'src' => $this->handleImageUpload($request, 'image_files', $index, $section->content['images'][$index]['src'] ?? null),
-                        'alt' => $image['alt'] ?? null,
-                        'shape' => $this->handleImageUpload($request, 'shape_files', $index, $section->content['images'][$index]['shape'] ?? null),
-                        'shape_alt' => $image['shape_alt'] ?? null,
+                        'src' => $this->handleImageUpload($request, 'image_files', $index, $currentContent['images'][$index]['src'] ?? null),
+                        'alt' => $image['alt'] ?? '',
+                        'shape' => $this->handleImageUpload($request, 'shape_files', $index, $currentContent['images'][$index]['shape'] ?? null),
+                        'shape_alt' => $image['shape_alt'] ?? '',
                         'shape_position' => $image['shape_position'] ?? null,
                         'is_centered' => $image['is_centered'] ?? false
                     ];
                 }
+            } else {
+                $images = $currentContent['images'] ?? [];
             }
 
             // Process features
@@ -509,6 +533,8 @@ class SectionController extends Controller
                         ];
                     }
                 }
+            } else {
+                $features = $currentContent['features'] ?? [];
             }
 
             // Process stats
@@ -524,10 +550,9 @@ class SectionController extends Controller
                         ];
                     }
                 }
+            } else {
+                $stats = $currentContent['stats'] ?? [];
             }
-
-            // Get current content and update it
-            $currentContent = $this->getContentAsArray($section->content);
 
             $aboutData = array_merge($currentContent, [
                 'subheading' => $data['subheading'],
@@ -565,15 +590,20 @@ class SectionController extends Controller
      */
     private function handleImageUpload($request, $field, $index, $currentPath = null)
     {
+        // Check if file exists and is valid
         if ($request->hasFile("{$field}.{$index}")) {
-            // Delete old image if exists
-            if ($currentPath && Storage::exists($currentPath)) {
-                Storage::delete($currentPath);
-            }
-
             $file = $request->file("{$field}.{$index}");
-            $folder = $field === 'image_files' ? 'about-images' : 'about-shapes';
-            return $file->store($folder, 'public');
+
+            // Only process if file is valid and not empty
+            if ($file && $file->isValid()) {
+                // Delete old image if exists
+                if ($currentPath && Storage::exists($currentPath)) {
+                    Storage::delete($currentPath);
+                }
+
+                $folder = $field === 'image_files' ? 'about-images' : 'about-shapes';
+                return $file->store($folder, 'public');
+            }
         }
 
         return $currentPath;
@@ -581,194 +611,249 @@ class SectionController extends Controller
 
     public function service_section(Request $request)
     {
+        // Get or create services section data
         $section = Section::where('section_type', 'SERVICES')->first();
 
-        // Corrected default content structure
-        $defaultContent = [
-            'sectionHeading' => 'Loan Solutions for Marketeers',
-            'sectionDescription' => 'We provide specialized financial solutions designed specifically for marketers and entrepreneurs to fuel your growth and marketing initiatives.',
-            'services' => [
-                [
-                    'id' => 1,
-                    'title' => 'Business Expansion Loans',
-                    'description' => 'Scale your marketing operations with flexible financing options tailored for growth.',
-                    'icon' => 'assets/images/service-icon-1.svg',
-                    'iconAlt' => 'Business growth icon',
-                    'borderColor' => 'primary',
-                    'linkUrl' => '#',
-                    'linkAriaLabel' => 'Learn more about Business Expansion Loans',
-                    'animationDelay' => '0.1s'
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'Marketing Campaign Funding',
-                    'description' => 'Get immediate funding for your marketing campaigns and client projects.',
-                    'icon' => 'assets/images/service-icon-2.svg',
-                    'iconAlt' => 'Marketing campaign icon',
-                    'borderColor' => 'secondary',
-                    'linkUrl' => '#',
-                    'linkAriaLabel' => 'Learn more about Marketing Campaign Funding',
-                    'animationDelay' => '0.2s'
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'Startup Capital',
-                    'description' => 'Launch your marketing agency with our specialized startup loan programs.',
-                    'icon' => 'assets/images/service-icon-3.svg',
-                    'iconAlt' => 'Startup capital icon',
-                    'borderColor' => 'primary',
-                    'linkUrl' => '#',
-                    'linkAriaLabel' => 'Learn more about Startup Capital',
-                    'animationDelay' => '0.3s'
-                ],
-                [
-                    'id' => 4,
-                    'title' => 'Equipment Financing',
-                    'description' => 'Finance your marketing tools and technology infrastructure.',
-                    'icon' => 'assets/images/service-icon-4.svg',
-                    'iconAlt' => 'Equipment financing icon',
-                    'borderColor' => 'secondary',
-                    'linkUrl' => '#',
-                    'linkAriaLabel' => 'Learn more about Equipment Financing',
-                    'animationDelay' => '0.4s'
-                ]
-            ],
-            'cta' => [
-                'heading' => 'Ready to grow your marketing business?',
-                'description' => 'Get the financial support you need to scale your marketing efforts',
-                'buttons' => [
+        if (!$section) {
+            $defaultContent = [
+                'sectionHeading' => 'Loan Solutions for Marketeers',
+                'sectionDescription' => 'We provide specialized financial solutions designed specifically for marketers and entrepreneurs to fuel your growth and marketing initiatives.',
+                'services' => [
                     [
-                        'text' => 'Apply Now',
-                        'url' => '/apply',
-                        'ariaLabel' => 'Apply for a loan',
-                        'style' => 'primary'
+                        'id' => 1,
+                        'title' => 'Business Expansion Loans',
+                        'description' => 'Scale your marketing operations with flexible financing options tailored for growth.',
+                        'icon' => 'assets/images/service-icon-1.svg',
+                        'iconAlt' => 'Business growth icon',
+                        'borderColor' => 'primary',
+                        'linkUrl' => '#',
+                        'linkAriaLabel' => 'Learn more about Business Expansion Loans',
+                        'animationDelay' => '0.1s'
                     ],
                     [
-                        'text' => 'Contact Us',
-                        'url' => '/contact',
-                        'ariaLabel' => 'Contact our team',
-                        'style' => 'secondary'
+                        'id' => 2,
+                        'title' => 'Marketing Campaign Funding',
+                        'description' => 'Get immediate funding for your marketing campaigns and client projects.',
+                        'icon' => 'assets/images/service-icon-2.svg',
+                        'iconAlt' => 'Marketing campaign icon',
+                        'borderColor' => 'secondary',
+                        'linkUrl' => '#',
+                        'linkAriaLabel' => 'Learn more about Marketing Campaign Funding',
+                        'animationDelay' => '0.2s'
+                    ],
+                    [
+                        'id' => 3,
+                        'title' => 'Startup Capital',
+                        'description' => 'Launch your marketing agency with our specialized startup loan programs.',
+                        'icon' => 'assets/images/service-icon-3.svg',
+                        'iconAlt' => 'Startup capital icon',
+                        'borderColor' => 'primary',
+                        'linkUrl' => '#',
+                        'linkAriaLabel' => 'Learn more about Startup Capital',
+                        'animationDelay' => '0.3s'
+                    ],
+                    [
+                        'id' => 4,
+                        'title' => 'Equipment Financing',
+                        'description' => 'Finance your marketing tools and technology infrastructure.',
+                        'icon' => 'assets/images/service-icon-4.svg',
+                        'iconAlt' => 'Equipment financing icon',
+                        'borderColor' => 'secondary',
+                        'linkUrl' => '#',
+                        'linkAriaLabel' => 'Learn more about Equipment Financing',
+                        'animationDelay' => '0.4s'
+                    ]
+                ],
+                'cta' => [
+                    'heading' => 'Ready to grow your marketing business?',
+                    'description' => 'Get the financial support you need to scale your marketing efforts',
+                    'buttons' => [
+                        [
+                            'text' => 'Apply Now',
+                            'url' => '/apply',
+                            'ariaLabel' => 'Apply for a loan',
+                            'style' => 'primary'
+                        ],
+                        [
+                            'text' => 'Contact Us',
+                            'url' => '/contact',
+                            'ariaLabel' => 'Contact our team',
+                            'style' => 'secondary'
+                        ]
                     ]
                 ]
-            ]
-        ];
+            ];
 
-        if (!$section) {
-            $servicesData = $defaultContent;
-        } else {
-            $servicesData = json_decode($section->content, true) ?? $defaultContent;
+            $section = Section::create([
+                'name' => 'Services Section',
+                'description' => 'Main services section content',
+                'section_type' => 'SERVICES',
+                'status' => 'ACTIVE',
+                'content' => $defaultContent,
+                'published_at' => now(),
+                'author' => 'system',
+                'last_modified_by' => 'system'
+            ]);
         }
 
         if ($request->isMethod('post')) {
-            return $this->handleServiceSectionUpdate($request, $section, $defaultContent);
-        }
+            // First validate non-file fields
+            $validator = Validator::make($request->all(), [
+                'sectionHeading' => 'required|string|max:255',
+                'sectionDescription' => 'required|string|max:500',
+                'services' => 'required|array|min:1',
+                'services.*.title' => 'required|string|max:255',
+                'services.*.description' => 'required|string|max:500',
+                'services.*.iconAlt' => 'required|string|max:255',
+                'services.*.borderColor' => 'required|in:primary,secondary',
+                'services.*.linkUrl' => 'required|string|max:500',
+                'services.*.linkAriaLabel' => 'required|string|max:255',
+                'services.*.animationDelay' => 'required|string|max:10',
+                'ctaHeading' => 'required|string|max:255',
+                'ctaDescription' => 'required|string|max:500',
+                'ctaButton1Text' => 'required|string|max:255',
+                'ctaButton1Url' => 'required|string|max:500',
+                'ctaButton1AriaLabel' => 'required|string|max:255',
+                'ctaButton2Text' => 'required|string|max:255',
+                'ctaButton2Url' => 'required|string|max:500',
+                'ctaButton2AriaLabel' => 'required|string|max:255',
+            ]);
 
-        return view('pages.website.service', compact('servicesData'));
-    }
+            // Add file validation only for files that are actually uploaded
+            $validator->after(function ($validator) use ($request) {
+                if ($request->hasFile('service_icons')) {
+                    foreach ($request->file('service_icons') as $index => $file) {
+                        if ($file && $file->isValid()) {
+                            $rules = [
+                                'service_icons.' . $index => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                            ];
 
-    private function handleServiceSectionUpdate(Request $request, $section, $defaultContent)
-    {
-        $validator = Validator::make($request->all(), [
-            'sectionHeading' => 'required|string|max:255',
-            'sectionDescription' => 'required|string|max:500',
-            'services' => 'required|array|min:1',
-            'services.*.title' => 'required|string|max:255',
-            'services.*.description' => 'required|string|max:500',
-            'services.*.iconAlt' => 'required|string|max:255',
-            'services.*.borderColor' => 'required|in:primary,secondary',
-            'services.*.linkUrl' => 'required|string|max:500',
-            'services.*.linkAriaLabel' => 'required|string|max:255',
-            'services.*.animationDelay' => 'required|string|max:10',
-            'cta.heading' => 'required|string|max:255',
-            'cta.description' => 'required|string|max:500',
-            'cta.buttons.0.text' => 'required|string|max:255',
-            'cta.buttons.0.url' => 'required|url|max:500',
-            'cta.buttons.0.ariaLabel' => 'required|string|max:255',
-            'cta.buttons.1.text' => 'required|string|max:255',
-            'cta.buttons.1.url' => 'required|url|max:500',
-            'cta.buttons.1.ariaLabel' => 'required|string|max:255',
-        ]);
+                            $fileValidator = Validator::make(
+                                ['service_icons' => [$index => $file]],
+                                $rules
+                            );
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+                            if ($fileValidator->fails()) {
+                                foreach ($fileValidator->errors()->all() as $error) {
+                                    $validator->errors()->add("service_icons.{$index}", $error);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
 
-        $validatedData = $validator->validated();
-
-        // Process service icons
-        $servicesData = [];
-        foreach ($validatedData['services'] as $index => $service) {
-            $serviceData = [
-                'id' => $index + 1,
-                'title' => $service['title'],
-                'description' => $service['description'],
-                'iconAlt' => $service['iconAlt'],
-                'borderColor' => $service['borderColor'],
-                'linkUrl' => $service['linkUrl'],
-                'linkAriaLabel' => $service['linkAriaLabel'],
-                'animationDelay' => $service['animationDelay'],
-            ];
-
-            // Handle icon file upload
-            if ($request->hasFile("services.{$index}.icon")) {
-                $iconFile = $request->file("services.{$index}.icon");
-                $iconPath = $iconFile->store('services/icons', 'public');
-                $serviceData['icon'] = 'storage/' . $iconPath;
-            } else {
-                // Keep existing icon or use default
-                $existingServices = $section ? json_decode($section->content, true)['services'] ?? [] : [];
-                $existingService = $existingServices[$index] ?? null;
-                $serviceData['icon'] = $existingService['icon'] ?? $defaultContent['services'][$index]['icon'] ?? 'assets/images/service-icon-default.svg';
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
             }
 
-            $servicesData[] = $serviceData;
-        }
+            $data = $validator->validated();
 
-        $content = [
-            'sectionHeading' => $validatedData['sectionHeading'],
-            'sectionDescription' => $validatedData['sectionDescription'],
-            'services' => $servicesData,
-            'cta' => [
-                'heading' => $validatedData['cta']['heading'],
-                'description' => $validatedData['cta']['description'],
-                'buttons' => [
-                    [
-                        'text' => $validatedData['cta']['buttons'][0]['text'],
-                        'url' => $validatedData['cta']['buttons'][0]['url'],
-                        'ariaLabel' => $validatedData['cta']['buttons'][0]['ariaLabel'],
-                        'style' => 'primary'
-                    ],
-                    [
-                        'text' => $validatedData['cta']['buttons'][1]['text'],
-                        'url' => $validatedData['cta']['buttons'][1]['url'],
-                        'ariaLabel' => $validatedData['cta']['buttons'][1]['ariaLabel'],
-                        'style' => 'secondary'
+            // Process services data
+            $services = [];
+            $currentContent = $this->getContentAsArray($section->content);
+
+            foreach ($data['services'] as $index => $service) {
+                $serviceData = [
+                    'id' => $index + 1,
+                    'title' => $service['title'],
+                    'description' => $service['description'],
+                    'iconAlt' => $service['iconAlt'],
+                    'borderColor' => $service['borderColor'],
+                    'linkUrl' => $service['linkUrl'],
+                    'linkAriaLabel' => $service['linkAriaLabel'],
+                    'animationDelay' => $service['animationDelay'],
+                ];
+
+                // Handle icon file upload - check if file exists for this index and is valid
+                if ($request->hasFile("service_icons.{$index}")) {
+                    $iconFile = $request->file("service_icons.{$index}");
+
+                    if ($iconFile && $iconFile->isValid()) {
+                        // Delete old icon if exists
+                        $oldIcon = $currentContent['services'][$index]['icon'] ?? null;
+                        if ($oldIcon && Storage::disk('public')->exists($oldIcon)) {
+                            Storage::disk('public')->delete($oldIcon);
+                        }
+
+                        // Store new icon
+                        $iconPath = $iconFile->store('services/icons', 'public');
+                        $serviceData['icon'] = $iconPath;
+                    } else {
+                        // File upload failed, keep existing icon
+                        $this->handleExistingIcon($currentContent, $serviceData, $index);
+                    }
+                } else {
+                    // No file uploaded, keep existing icon
+                    $this->handleExistingIcon($currentContent, $serviceData, $index);
+                }
+
+                $services[] = $serviceData;
+            }
+
+            $serviceData = array_merge($currentContent, [
+                'sectionHeading' => $data['sectionHeading'],
+                'sectionDescription' => $data['sectionDescription'],
+                'services' => $services,
+                'cta' => [
+                    'heading' => $data['ctaHeading'],
+                    'description' => $data['ctaDescription'],
+                    'buttons' => [
+                        [
+                            'text' => $data['ctaButton1Text'],
+                            'url' => $data['ctaButton1Url'],
+                            'ariaLabel' => $data['ctaButton1AriaLabel'],
+                            'style' => 'primary'
+                        ],
+                        [
+                            'text' => $data['ctaButton2Text'],
+                            'url' => $data['ctaButton2Url'],
+                            'ariaLabel' => $data['ctaButton2AriaLabel'],
+                            'style' => 'secondary'
+                        ]
                     ]
                 ]
-            ]
-        ];
+            ]);
 
-        $sectionData = [
-            'name' => 'Services Section',
-            'description' => 'Main services section content',
-            'section_type' => 'SERVICES',
-            'content' => json_encode($content),
-            'status' => 'ACTIVE',
-            'author' => Auth::user()->id,
-            'last_modified_by' => Auth::user()->id,
-        ];
+            $section->update([
+                'content' => $serviceData,
+                'last_modified_by' => Auth::user()->name ?? 'admin'
+            ]);
 
-        if ($section) {
-            $section->update($sectionData);
-        } else {
-            Section::create($sectionData);
+            return redirect()->back()->with('success', 'Services section updated successfully.');
         }
 
-        return redirect()->route('management.service-section')
-            ->with('success', 'Services section updated successfully!');
+        // Ensure content is always returned as array
+        $servicesData = $this->getContentAsArray($section->content);
+
+        return view('pages.website.service', [
+            'servicesData' => $servicesData,
+            'section' => $section
+        ]);
     }
+
+    /**
+     * Handle existing icon logic
+     */
+    private function handleExistingIcon($currentContent, &$serviceData, $index)
+    {
+        $existingService = $currentContent['services'][$index] ?? null;
+        if ($existingService && isset($existingService['icon'])) {
+            $serviceData['icon'] = $existingService['icon'];
+        } else {
+            // Use default icon based on index
+            $defaultIcons = [
+                'assets/images/service-icon-1.svg',
+                'assets/images/service-icon-2.svg',
+                'assets/images/service-icon-3.svg',
+                'assets/images/service-icon-4.svg'
+            ];
+            $serviceData['icon'] = $defaultIcons[$index] ?? 'assets/images/service-icon-default.svg';
+        }
+    }
+
 
     public function price_section(Request $request)
     {
@@ -925,7 +1010,7 @@ class SectionController extends Controller
             'plans.*.term.long' => 'required|string|max:100',
             'plans.*.note' => 'required|string|max:255',
             'plans.*.buttonText' => 'required|string|max:255',
-            'plans.*.buttonUrl' => 'required|url|max:500',
+            'plans.*.buttonUrl' => 'required|string|max:500',
             'plans.*.buttonAriaLabel' => 'required|string|max:255',
             'plans.*.features' => 'required|array|min:1',
             'plans.*.features.*.text' => 'required|string|max:255',
@@ -936,7 +1021,7 @@ class SectionController extends Controller
             'customLoan.term' => 'required|string|max:100',
             'customLoan.note' => 'required|string|max:255',
             'customLoan.buttonText' => 'required|string|max:255',
-            'customLoan.buttonUrl' => 'required|url|max:500',
+            'customLoan.buttonUrl' => 'required|string|max:500',
             'customLoan.buttonAriaLabel' => 'required|string|max:255',
             'customLoan.features' => 'required|array|min:1',
             'customLoan.features.*.text' => 'required|string|max:255',
@@ -1235,15 +1320,15 @@ class SectionController extends Controller
             'teamMembers.*.alt' => 'required|string|max:255',
             'teamMembers.*.socialLinks' => 'required|array|min:1',
             'teamMembers.*.socialLinks.*.platform' => 'required|in:facebook,twitter,linkedin',
-            'teamMembers.*.socialLinks.*.url' => 'required|url|max:500',
+            'teamMembers.*.socialLinks.*.url' => 'required|string|max:500',
             'teamMembers.*.socialLinks.*.ariaLabel' => 'required|string|max:255',
             'cta.heading' => 'required|string|max:255',
             'cta.description' => 'required|string|max:500',
             'cta.primaryButton.text' => 'required|string|max:255',
-            'cta.primaryButton.url' => 'required|url|max:500',
+            'cta.primaryButton.url' => 'required|string|max:500',
             'cta.primaryButton.ariaLabel' => 'required|string|max:255',
             'cta.secondaryButton.text' => 'required|string|max:255',
-            'cta.secondaryButton.url' => 'required|url|max:500',
+            'cta.secondaryButton.url' => 'required|string|max:500',
             'cta.secondaryButton.ariaLabel' => 'required|string|max:255',
         ]);
 
@@ -1349,7 +1434,7 @@ class SectionController extends Controller
             'description' => 'Team members section content',
             'section_type' => 'TEAM',
             'content' => json_encode($content),
-            'status' => 'active',
+            'status' => 'ACTIVE',
             'author' => Auth::user()->id,
             'last_modified_by' => Auth::user()->id,
         ];
@@ -1360,7 +1445,7 @@ class SectionController extends Controller
             Section::create($sectionData);
         }
 
-        return redirect()->route('admin.team')
+        return redirect()->route('management.team-section')
             ->with('success', 'Team section updated successfully!');
     }
 
@@ -1368,7 +1453,7 @@ class SectionController extends Controller
     public function project_section(Request $request)
     {
         // Use the scope method for safer querying
-        $section = Section::ofType('PROJECTS')->first();
+        $section = Section::ofType('PROJECT')->first();
 
         // Default content structure
         $defaultContent = $this->getDefaultProjectsContent();
@@ -1416,7 +1501,7 @@ class SectionController extends Controller
             'projects' => [
                 1 => [
                     'title' => 'Social Media Blitz Campaign',
-                    'loan' => '$25K Campaign Loan',
+                    'loan' => 'ZMW25K Campaign Loan',
                     'result' => '300% ROI achieved in 3 months',
                     'alt' => 'Social Media Campaign Success',
                     'categories' => ['campaign'],
@@ -1424,7 +1509,7 @@ class SectionController extends Controller
                 ],
                 2 => [
                     'title' => 'E-commerce Platform Launch',
-                    'loan' => '$50K Business Loan',
+                    'loan' => 'ZMW 50K Business Loan',
                     'result' => '500+ new customers acquired',
                     'alt' => 'E-commerce Platform Success',
                     'categories' => ['expansion', 'startup'],
@@ -1492,7 +1577,7 @@ class SectionController extends Controller
             // Categories validation
             'categories' => 'required|array|min:1',
             'categories.*.name' => 'required|string|max:50',
-            'categories.*.slug' => 'required|string|max:20|regex:/^[a-z0-9-]+$/',
+            'categories.*.slug' => 'required|string|max:20',
 
             // Projects validation
             'projects' => 'required|array|min:1',
@@ -1510,7 +1595,7 @@ class SectionController extends Controller
             'cta_primary_text' => 'nullable|string|max:50',
             'cta_secondary_text' => 'nullable|string|max:50',
         ], [
-            'categories.*.slug.regex' => 'Category slug must contain only lowercase letters, numbers, and hyphens.',
+            // 'categories.*.slug.regex' => 'Category slug must contain only lowercase letters, numbers, and hyphens.',
             'projects.*.image.image' => 'The project image must be a valid image file.',
             'projects.*.image.mimes' => 'The project image must be a JPEG, PNG, JPG, or WebP file.',
             'projects.*.image.max' => 'The project image must not be larger than 2MB.',
@@ -1599,9 +1684,9 @@ class SectionController extends Controller
             $sectionData = [
                 'name' => 'Projects Section',
                 'description' => 'Success stories and projects showcase section',
-                'section_type' => 'PROJECTS',
-                'content' => $content, // Laravel will automatically cast to JSON
-                'status' => 'active',
+                'section_type' => 'PROJECT',
+                'content' => $content,
+                'status' => 'ACTIVE',
                 'author' => Auth::id(),
                 'last_modified_by' => Auth::id(),
             ];
@@ -1613,7 +1698,7 @@ class SectionController extends Controller
                 Section::create($sectionData);
             }
 
-            return redirect()->route('admin.projects.show')
+            return redirect()->route('management.project-section')
                 ->with('success', 'Projects section updated successfully!');
         } catch (\Exception $e) {
             Log::error('Error updating projects section: ' . $e->getMessage());
@@ -1761,6 +1846,60 @@ class SectionController extends Controller
         }
 
         return view('pages.website.testimonials', compact('testimonialsData'));
+    }
+
+    // Add this new method for photo deletion
+    public function deletePhoto($index)
+    {
+        try {
+            $section = Section::ofType('TESTIMONIALS')->first();
+
+            if (!$section) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Section not found'
+                ], 404);
+            }
+
+            $content = $section->content;
+            $testimonials = $content['testimonials'] ?? [];
+
+            if (isset($testimonials[$index]['photo'])) {
+                $photoPath = $testimonials[$index]['photo'];
+
+                // Delete from storage
+                if (Storage::disk('public')->exists($photoPath)) {
+                    Storage::disk('public')->delete($photoPath);
+                }
+
+                // Remove photo reference from content
+                $testimonials[$index]['photo'] = null;
+                $content['testimonials'] = $testimonials;
+
+                // Update section
+                $section->update([
+                    'content' => $content,
+                    'last_modified_by' => Auth::id()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Photo deleted successfully'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Photo not found'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Error deleting testimonial photo: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete photo'
+            ], 500);
+        }
     }
 
     private function getDefaultTestimonialsContent()
@@ -1919,18 +2058,22 @@ class SectionController extends Controller
                     if ($request->hasFile("testimonials.{$index}.photo")) {
                         $photoFile = $request->file("testimonials.{$index}.photo");
 
-                        // Delete old photo if exists
-                        if ($section) {
-                            $existingTestimonials = $section->content['testimonials'] ?? [];
-                            $existingPhoto = $existingTestimonials[$index]['photo'] ?? null;
-                            if ($existingPhoto && Storage::disk('public')->exists($existingPhoto)) {
-                                Storage::disk('public')->delete($existingPhoto);
+                        // Validate file is valid
+                        if ($photoFile->isValid()) {
+                            // Delete old photo if exists
+                            if ($section) {
+                                $existingTestimonials = $section->content['testimonials'] ?? [];
+                                $existingPhoto = $existingTestimonials[$index]['photo'] ?? null;
+                                if ($existingPhoto && Storage::disk('public')->exists($existingPhoto)) {
+                                    Storage::disk('public')->delete($existingPhoto);
+                                }
                             }
-                        }
 
-                        // Store new photo
-                        $photoPath = $photoFile->store('testimonials/photos', 'public');
-                        $testimonialData['photo'] = $photoPath;
+                            // Store new photo with unique name
+                            $photoName = 'testimonial_' . $index . '_' . time() . '.' . $photoFile->getClientOriginalExtension();
+                            $photoPath = $photoFile->storeAs('testimonials/photos', $photoName, 'public');
+                            $testimonialData['photo'] = $photoPath;
+                        }
                     } else {
                         // Keep existing photo
                         if ($section) {
@@ -1990,7 +2133,7 @@ class SectionController extends Controller
                 Section::create($sectionData);
             }
 
-            return redirect()->route('admin.testimonials.show')
+            return redirect()->route('management.testimonial-section')
                 ->with('success', 'Testimonials section updated successfully!');
         } catch (\Exception $e) {
             Log::error('Error updating testimonials section: ' . $e->getMessage());
@@ -2000,61 +2143,6 @@ class SectionController extends Controller
                 ->withInput();
         }
     }
-
-    /**
-     * Delete a testimonial photo
-     */
-    public function deleteTestimonialPhoto(Request $request, $testimonialIndex)
-    {
-        try {
-            $section = Section::ofType('TESTIMONIALS')->first();
-
-            if (!$section) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Testimonials section not found'
-                ], 404);
-            }
-
-            $testimonialsData = $section->content;
-
-            if (isset($testimonialsData['testimonials'][$testimonialIndex]['photo'])) {
-                $photoPath = $testimonialsData['testimonials'][$testimonialIndex]['photo'];
-
-                // Delete from storage
-                if ($photoPath && Storage::disk('public')->exists($photoPath)) {
-                    Storage::disk('public')->delete($photoPath);
-                }
-
-                // Remove from data
-                unset($testimonialsData['testimonials'][$testimonialIndex]['photo']);
-
-                // Save updated data
-                $section->update([
-                    'content' => $testimonialsData,
-                    'last_modified_by' => Auth::id()
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Photo deleted successfully'
-                ]);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Photo not found'
-            ], 404);
-        } catch (\Exception $e) {
-            Log::error('Error deleting testimonial photo: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete photo'
-            ], 500);
-        }
-    }
-
     /**
      * Get testimonials data for API
      */
@@ -2320,8 +2408,6 @@ class SectionController extends Controller
             'section' => $section
         ]);
     }
-
-
 
     /**
      * Delete counter section image (if applicable)
@@ -2592,32 +2678,32 @@ class SectionController extends Controller
                 // Client logos (6 clients)
                 'client_1_name' => 'required|string|max:50',
                 'client_1_description' => 'nullable|string|max:100',
-                'client_1_url' => 'nullable|url|max:255',
+                'client_1_url' => 'nullable|string|max:255',
                 'client_1_animation_delay' => 'nullable|in:0.1,0.2,0.3,0.4,0.5,0.6',
 
                 'client_2_name' => 'required|string|max:50',
                 'client_2_description' => 'nullable|string|max:100',
-                'client_2_url' => 'nullable|url|max:255',
+                'client_2_url' => 'nullable|string|max:255',
                 'client_2_animation_delay' => 'nullable|in:0.1,0.2,0.3,0.4,0.5,0.6',
 
                 'client_3_name' => 'required|string|max:50',
                 'client_3_description' => 'nullable|string|max:100',
-                'client_3_url' => 'nullable|url|max:255',
+                'client_3_url' => 'nullable|string|max:255',
                 'client_3_animation_delay' => 'nullable|in:0.1,0.2,0.3,0.4,0.5,0.6',
 
                 'client_4_name' => 'required|string|max:50',
                 'client_4_description' => 'nullable|string|max:100',
-                'client_4_url' => 'nullable|url|max:255',
+                'client_4_url' => 'nullable|string|max:255',
                 'client_4_animation_delay' => 'nullable|in:0.1,0.2,0.3,0.4,0.5,0.6',
 
                 'client_5_name' => 'required|string|max:50',
                 'client_5_description' => 'nullable|string|max:100',
-                'client_5_url' => 'nullable|url|max:255',
+                'client_5_url' => 'nullable|string|max:255',
                 'client_5_animation_delay' => 'nullable|in:0.1,0.2,0.3,0.4,0.5,0.6',
 
                 'client_6_name' => 'required|string|max:50',
                 'client_6_description' => 'nullable|string|max:100',
-                'client_6_url' => 'nullable|url|max:255',
+                'client_6_url' => 'nullable|string|max:255',
                 'client_6_animation_delay' => 'nullable|in:0.1,0.2,0.3,0.4,0.5,0.6',
 
                 // Success highlights (3 highlights)
@@ -2835,9 +2921,9 @@ class SectionController extends Controller
                 'blog_1_category' => 'nullable|string|max:50',
                 'blog_1_category_color' => 'nullable|in:#db9123,#7a4603',
                 'blog_1_alt' => 'nullable|string|max:200',
-                'blog_1_url' => 'nullable|url|max:255',
+                'blog_1_url' => 'nullable|string|max:255',
                 'blog_1_animation_delay' => 'nullable|in:0.1,0.2,0.3',
-                'blog_1_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'blog_1_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
 
                 'blog_2_title' => 'required|string|max:200',
                 'blog_2_excerpt' => 'required|string|max:300',
@@ -2847,9 +2933,9 @@ class SectionController extends Controller
                 'blog_2_category' => 'nullable|string|max:50',
                 'blog_2_category_color' => 'nullable|in:#db9123,#7a4603',
                 'blog_2_alt' => 'nullable|string|max:200',
-                'blog_2_url' => 'nullable|url|max:255',
+                'blog_2_url' => 'nullable|string|max:255',
                 'blog_2_animation_delay' => 'nullable|in:0.1,0.2,0.3',
-                'blog_2_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'blog_2_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
 
                 'blog_3_title' => 'required|string|max:200',
                 'blog_3_excerpt' => 'required|string|max:300',
@@ -2859,9 +2945,9 @@ class SectionController extends Controller
                 'blog_3_category' => 'nullable|string|max:50',
                 'blog_3_category_color' => 'nullable|in:#db9123,#7a4603',
                 'blog_3_alt' => 'nullable|string|max:200',
-                'blog_3_url' => 'nullable|url|max:255',
+                'blog_3_url' => 'nullable|string|max:255',
                 'blog_3_animation_delay' => 'nullable|in:0.1,0.2,0.3',
-                'blog_3_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'blog_3_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
 
                 // CTA section
                 'cta_headline' => 'nullable|string|max:100',
@@ -2874,6 +2960,9 @@ class SectionController extends Controller
                 'order' => 'nullable|integer|min:0|max:100',
                 'status' => 'required|in:ACTIVE,INACTIVE,DRAFT'
             ]);
+
+            // Get current content - ensure it's an array
+            $currentContent = $this->getContentAsArray($section->content);
 
             // Process blog posts
             $posts = [];
@@ -2891,6 +2980,31 @@ class SectionController extends Controller
                         'url' => $data["blog_{$i}_url"] ?? '#!',
                         'animation_delay' => $data["blog_{$i}_animation_delay"] ?? '0.1'
                     ];
+
+                    // Handle image upload
+                    if ($request->hasFile("blog_{$i}_image")) {
+                        try {
+                            // Delete old image if exists
+                            if (isset($currentContent['posts'][$i - 1]['image']) && Storage::exists($currentContent['posts'][$i - 1]['image'])) {
+                                Storage::delete($currentContent['posts'][$i - 1]['image']);
+                            }
+
+                            $imagePath = $request->file("blog_{$i}_image")->store("blog-images", 'public');
+                            $post['image'] = $imagePath;
+                        } catch (\Exception $e) {
+                            Log::error("Failed to upload blog {$i} image: " . $e->getMessage());
+                            // Keep existing image if upload fails
+                            if (isset($currentContent['posts'][$i - 1]['image'])) {
+                                $post['image'] = $currentContent['posts'][$i - 1]['image'];
+                            }
+                        }
+                    } else {
+                        // Keep existing image if no new upload
+                        if (isset($currentContent['posts'][$i - 1]['image'])) {
+                            $post['image'] = $currentContent['posts'][$i - 1]['image'];
+                        }
+                    }
+
                     $posts[] = $post;
                 }
             }
@@ -2903,31 +3017,12 @@ class SectionController extends Controller
                 'secondary_text' => $data['cta_secondary_text'] ?? ''
             ];
 
-            // Get current content - ensure it's an array
-            $currentContent = $this->getContentAsArray($section->content);
-
             $blogData = array_merge($currentContent, [
                 'headline' => $data['headline'],
                 'subheadline' => $data['subheadline'] ?? '',
                 'posts' => $posts,
                 'cta' => $cta
             ]);
-
-            // Handle image uploads
-            for ($i = 1; $i <= 3; $i++) {
-                if ($request->hasFile("blog_{$i}_image")) {
-                    // Delete old image if exists
-                    if (isset($currentContent['posts'][$i - 1]['image']) && Storage::exists($currentContent['posts'][$i - 1]['image'])) {
-                        Storage::delete($currentContent['posts'][$i - 1]['image']);
-                    }
-
-                    $imagePath = $request->file("blog_{$i}_image")->store("blog-images/post-{$i}", 'public');
-                    $blogData['posts'][$i - 1]['image'] = $imagePath;
-                } elseif (isset($currentContent['posts'][$i - 1]['image'])) {
-                    // Keep existing image
-                    $blogData['posts'][$i - 1]['image'] = $currentContent['posts'][$i - 1]['image'];
-                }
-            }
 
             $section->update([
                 'name' => $data['title'],
@@ -3358,7 +3453,7 @@ class SectionController extends Controller
                 'buttons' => 'sometimes|array',
                 'buttons.*.text' => 'required|string|max:50',
                 'buttons.*.type' => 'required|in:primary,secondary',
-                'buttons.*.url' => 'required|url|max:255',
+                'buttons.*.url' => 'required|string|max:255',
                 'buttons.*.aria_label' => 'required|string|max:100',
 
                 // Background settings

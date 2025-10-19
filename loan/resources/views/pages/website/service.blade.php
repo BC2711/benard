@@ -14,6 +14,7 @@
             --text-color: #5a5a5a;
         }
 
+        /* Preview Styles */
         .services-preview-container {
             background: var(--white);
             border-radius: 12px;
@@ -351,22 +352,51 @@
             box-shadow: 0 6px 25px rgba(122, 70, 3, 0.5);
         }
 
-        .service-items-container .service-item-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            flex-wrap: wrap;
+        /* Service Items Grid */
+        .service-items-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .service-item-row .form-control {
-            flex: 1;
-            min-width: 150px;
-            margin-bottom: 0;
+        .service-item-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid #e9ecef;
+            transition: var(--transition);
+        }
+
+        .service-item-card:hover {
+            border-color: var(--primary-color);
+        }
+
+        .service-item-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .service-item-number {
+            background: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .service-item-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
         }
 
         .image-preview {
@@ -375,6 +405,7 @@
             background: #f8f9fa;
             border-radius: 8px;
             border: 2px dashed #dee2e6;
+            text-align: center;
         }
 
         .image-preview img {
@@ -473,9 +504,8 @@
                 padding: 1.5rem;
             }
 
-            .service-item-row {
-                flex-direction: column;
-                align-items: stretch;
+            .service-item-fields {
+                grid-template-columns: 1fr;
             }
 
             .form-actions {
@@ -504,14 +534,12 @@
                     <button
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2"
                         id="previewChanges">
-                        <i class="fas fa-eye"></i>
-                        Preview
+                        <i class="fas fa-eye"></i> Preview
                     </button>
                     <button
                         class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2"
                         id="resetToDefault">
-                        <i class="fas fa-sync-alt"></i>
-                        Reset
+                        <i class="fas fa-sync-alt"></i> Reset
                     </button>
                 </div>
             </div>
@@ -541,219 +569,246 @@
                 </ul>
             </div>
         @endif
-    </div>
 
-    <!-- Services Preview -->
-    <div class="services-preview-container">
-        <section class="services-section" aria-label="Services Section Preview">
-            <div class="services-container">
-                <div class="section-title" id="sectionTitle">
-                    <h2 class="section-heading" id="previewSectionHeading">{{ $servicesData['sectionHeading'] }}</h2>
-                    <p class="section-description" id="previewSectionDescription">
-                        {{ $servicesData['sectionDescription'] }}
-                    </p>
-                </div>
-                <div class="services-grid" id="servicesGrid">
-                    @foreach ($servicesData['services'] as $service)
-                        <div class="service-item border-{{ $service['borderColor'] }}"
-                            style="animation-delay: {{ $service['animationDelay'] }};" role="article">
-                            <div class="service-icon-container {{ $service['borderColor'] }}">
-                                <img src="{{ asset($service['icon']) }}" alt="{{ $service['iconAlt'] }}"
-                                    class="service-icon" />
+        <!-- Services Preview -->
+        <div class="services-preview-container">
+            <section class="services-section" aria-label="Services Section Preview">
+                <div class="services-container">
+                    <div class="section-title" id="sectionTitle">
+                        <h2 class="section-heading" id="previewSectionHeading">{{ $servicesData['sectionHeading'] }}</h2>
+                        <p class="section-description" id="previewSectionDescription">
+                            {{ $servicesData['sectionDescription'] }}</p>
+                    </div>
+
+                    <div class="services-grid" id="servicesGrid">
+                        @foreach ($servicesData['services'] as $service)
+                            <div class="service-item border-{{ $service['borderColor'] }}"
+                                style="animation-delay: {{ $service['animationDelay'] }};" role="article">
+                                <div class="service-icon-container {{ $service['borderColor'] }}">
+                                    <img src="{{ asset($service['icon']) }}" alt="{{ $service['iconAlt'] }}"
+                                        class="service-icon" />
+                                </div>
+                                <h4 class="service-title">{{ $service['title'] }}</h4>
+                                <p class="service-description">{{ $service['description'] }}</p>
+                                <a href="{{ $service['linkUrl'] }}" class="service-link"
+                                    aria-label="{{ $service['linkAriaLabel'] }}">
+                                    Learn More <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
                             </div>
-                            <h4 class="service-title">{{ $service['title'] }}</h4>
-                            <p class="service-description">{{ $service['description'] }}</p>
-                            <a href="{{ $service['linkUrl'] }}" class="service-link"
-                                aria-label="{{ $service['linkAriaLabel'] }}">
-                                Learn More <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
+                        @endforeach
+                    </div>
+
+                    <div class="cta-section" id="ctaSection">
+                        <h3 class="cta-heading" id="previewCtaHeading">{{ $servicesData['cta']['heading'] }}</h3>
+                        <p class="cta-description" id="previewCtaDescription">{{ $servicesData['cta']['description'] }}</p>
+                        <div class="cta-buttons">
+                            @foreach ($servicesData['cta']['buttons'] as $button)
+                                <a href="{{ $button['url'] }}" class="cta-button {{ $button['style'] }}"
+                                    aria-label="{{ $button['ariaLabel'] }}">{{ $button['text'] }}</a>
+                            @endforeach
                         </div>
-                    @endforeach
+                    </div>
                 </div>
-                <div class="cta-section" id="ctaSection">
-                    <h3 class="cta-heading" id="previewCtaHeading">{{ $servicesData['cta']['heading'] }}</h3>
-                    <p class="cta-description" id="previewCtaDescription">
-                        {{ $servicesData['cta']['description'] }}
-                    </p>
-                    <div class="cta-buttons">
-                        @foreach ($servicesData['cta']['buttons'] as $button)
-                            <a href="{{ $button['url'] }}" class="cta-button {{ $button['style'] }}"
-                                aria-label="{{ $button['ariaLabel'] }}">{{ $button['text'] }}</a>
+            </section>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel" role="dialog" aria-labelledby="adminPanelTitle" aria-modal="true">
+            <h3 id="adminPanelTitle">
+                <i class="fas fa-edit"></i> Manage Services Content
+            </h3>
+
+            <form id="servicesForm" method="POST" action="{{ route('management.service-section') }}"
+                enctype="multipart/form-data" novalidate>
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Section Content -->
+                    <div class="space-y-6">
+                        <div class="form-group">
+                            <label for="sectionHeading">Section Heading *</label>
+                            <input type="text" id="sectionHeading" name="sectionHeading"
+                                value="{{ old('sectionHeading', $servicesData['sectionHeading']) }}" class="form-control"
+                                placeholder="Enter section heading..." required>
+                            <span class="error-message" id="sectionHeadingError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sectionDescription">Section Description *</label>
+                            <textarea id="sectionDescription" name="sectionDescription" class="form-control" rows="4"
+                                placeholder="Describe your services..." required>{{ old('sectionDescription', $servicesData['sectionDescription']) }}</textarea>
+                            <span class="error-message" id="sectionDescriptionError"></span>
+                        </div>
+                    </div>
+
+                    <!-- CTA Content -->
+                    <div class="space-y-6">
+                        <div class="form-group">
+                            <label for="ctaHeading">CTA Heading *</label>
+                            <input type="text" id="ctaHeading" name="ctaHeading"
+                                value="{{ old('ctaHeading', $servicesData['cta']['heading']) }}" class="form-control"
+                                placeholder="Enter CTA heading..." required>
+                            <span class="error-message" id="ctaHeadingError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctaDescription">CTA Description *</label>
+                            <textarea id="ctaDescription" name="ctaDescription" class="form-control" rows="4"
+                                placeholder="Enter CTA description..." required>{{ old('ctaDescription', $servicesData['cta']['description']) }}</textarea>
+                            <span class="error-message" id="ctaDescriptionError"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Items -->
+                <div class="form-group">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="!mb-0">Service Items</label>
+                        <button type="button" class="admin-btn btn-save" id="addServiceItem">
+                            <i class="fas fa-plus"></i> Add Service Item
+                        </button>
+                    </div>
+
+                    <div id="serviceItemsContainer" class="service-items-grid">
+                        @foreach ($servicesData['services'] as $index => $service)
+                            <div class="service-item-card" data-index="{{ $index }}">
+                                <div class="service-item-header">
+                                    <div class="service-item-number">{{ $index + 1 }}</div>
+                                    <button type="button" class="admin-btn btn-danger remove-service"
+                                        aria-label="Remove service item">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
+
+                                <div class="service-item-fields">
+                                    <div class="form-group">
+                                        <label>Service Title *</label>
+                                        <input type="text" name="services[{{ $index }}][title]"
+                                            value="{{ old("services.$index.title", $service['title']) }}"
+                                            class="form-control" placeholder="Service Title" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Service Description *</label>
+                                        <textarea name="services[{{ $index }}][description]" class="form-control" placeholder="Service Description"
+                                            required>{{ old("services.$index.description", $service['description']) }}</textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Service Icon</label>
+                                        <input type="file" name="service_icons[{{ $index }}]"
+                                            class="form-control" accept="image/*">
+                                        @if ($service['icon'])
+                                            <div class="image-preview">
+                                                <img src="{{ asset($service['icon']) }}" alt="Current icon">
+                                                <p class="text-sm text-gray-600 mt-2">Current icon</p>
+                                            </div>
+                                        @endif
+                                        <small class="text-gray-500 text-xs">Accepted formats: JPEG, PNG, JPG, GIF, SVG.
+                                            Max size: 2MB</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Icon Alt Text *</label>
+                                        <input type="text" name="services[{{ $index }}][iconAlt]"
+                                            value="{{ old("services.$index.iconAlt", $service['iconAlt']) }}"
+                                            class="form-control" placeholder="Icon Alt Text" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Border Color *</label>
+                                        <select name="services[{{ $index }}][borderColor]" class="form-control">
+                                            <option value="primary"
+                                                {{ $service['borderColor'] == 'primary' ? 'selected' : '' }}>Primary Color
+                                            </option>
+                                            <option value="secondary"
+                                                {{ $service['borderColor'] == 'secondary' ? 'selected' : '' }}>Secondary
+                                                Color</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Link URL *</label>
+                                        <input type="text" name="services[{{ $index }}][linkUrl]"
+                                            value="{{ old("services.$index.linkUrl", $service['linkUrl']) }}"
+                                            class="form-control" placeholder="Learn More URL" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Link ARIA Label *</label>
+                                        <input type="text" name="services[{{ $index }}][linkAriaLabel]"
+                                            value="{{ old("services.$index.linkAriaLabel", $service['linkAriaLabel']) }}"
+                                            class="form-control" placeholder="Learn More ARIA Label" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Animation Delay *</label>
+                                        <input type="text" name="services[{{ $index }}][animationDelay]"
+                                            value="{{ old("services.$index.animationDelay", $service['animationDelay']) }}"
+                                            class="form-control" placeholder="Animation Delay" required>
+                                    </div>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
-            </div>
-        </section>
-    </div>
 
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel" role="dialog" aria-labelledby="adminPanelTitle" aria-modal="true">
-        <h3 id="adminPanelTitle">
-            <i class="fas fa-edit"></i>
-            Manage Services Content
-        </h3>
+                <!-- CTA Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach ([0, 1] as $buttonIndex)
+                        @php
+                            $button = $servicesData['cta']['buttons'][$buttonIndex];
+                            $buttonNum = $buttonIndex + 1;
+                        @endphp
+                        <div class="space-y-4 p-4 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-gray-800">CTA Button {{ $buttonNum }}</h4>
 
-        <form id="servicesForm" method="POST" action="{{ route('management.service-section') }}" enctype="multipart/form-data"
-            novalidate>
-            @csrf
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left Column -->
-                <div class="space-y-6">
-                    <div class="form-group">
-                        <label for="sectionHeading">Section Heading *</label>
-                        <input type="text" id="sectionHeading" name="sectionHeading"
-                            value="{{ old('sectionHeading', $servicesData['sectionHeading']) }}" class="form-control"
-                            placeholder="Enter section heading..." required>
-                        <span class="error-message" id="sectionHeadingError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sectionDescription">Section Description *</label>
-                        <textarea id="sectionDescription" name="sectionDescription" class="form-control" rows="4"
-                            placeholder="Describe your services..." required>{{ old('sectionDescription', $servicesData['sectionDescription']) }}</textarea>
-                        <span class="error-message" id="sectionDescriptionError"></span>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="space-y-6">
-                    <div class="form-group">
-                        <label for="ctaHeading">CTA Heading *</label>
-                        <input type="text" id="ctaHeading" name="cta[heading]"
-                            value="{{ old('cta.heading', $servicesData['cta']['heading']) }}" class="form-control"
-                            placeholder="Enter CTA heading..." required>
-                        <span class="error-message" id="ctaHeadingError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ctaDescription">CTA Description *</label>
-                        <textarea id="ctaDescription" name="cta[description]" class="form-control" rows="4"
-                            placeholder="Enter CTA description..." required>{{ old('cta.description', $servicesData['cta']['description']) }}</textarea>
-                        <span class="error-message" id="ctaDescriptionError"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Service Items -->
-            <div class="form-group">
-                <label>Service Items</label>
-                <div id="serviceItemsContainer" class="service-items-container">
-                    @foreach ($servicesData['services'] as $index => $service)
-                        <div class="service-item-row">
-                            <input type="text" name="services[{{ $index }}][title]"
-                                class="form-control service-title-input"
-                                value="{{ old("services.$index.title", $service['title']) }}" placeholder="Service Title"
-                                required>
-                            <textarea name="services[{{ $index }}][description]" class="form-control service-description-input"
-                                placeholder="Service Description" required>{{ old("services.$index.description", $service['description']) }}</textarea>
-                            <input type="file" name="services[{{ $index }}][icon]"
-                                class="form-control service-icon-input" accept="image/*">
-                            <div class="image-preview">
-                                <img src="{{ asset($service['icon']) }}" alt="Current icon">
-                                <p class="text-sm text-gray-600 mt-2 text-center">Current icon</p>
+                            <div class="form-group">
+                                <label for="ctaButton{{ $buttonNum }}Text">Button Text *</label>
+                                <input type="text" id="ctaButton{{ $buttonNum }}Text"
+                                    name="ctaButton{{ $buttonNum }}Text"
+                                    value="{{ old("ctaButton{$buttonNum}Text", $button['text']) }}" class="form-control"
+                                    placeholder="Button text..." required>
+                                <span class="error-message" id="ctaButton{{ $buttonNum }}TextError"></span>
                             </div>
-                            <input type="text" name="services[{{ $index }}][iconAlt]"
-                                class="form-control service-icon-alt-input"
-                                value="{{ old("services.$index.iconAlt", $service['iconAlt']) }}"
-                                placeholder="Icon Alt Text" required>
-                            <select name="services[{{ $index }}][borderColor]"
-                                class="form-control service-border-color-input">
-                                <option value="primary" {{ $service['borderColor'] == 'primary' ? 'selected' : '' }}>
-                                    Primary Color</option>
-                                <option value="secondary" {{ $service['borderColor'] == 'secondary' ? 'selected' : '' }}>
-                                    Secondary Color</option>
-                            </select>
-                            <input type="text" name="services[{{ $index }}][linkUrl]"
-                                class="form-control service-link-url-input"
-                                value="{{ old("services.$index.linkUrl", $service['linkUrl']) }}"
-                                placeholder="Learn More URL" required>
-                            <input type="text" name="services[{{ $index }}][linkAriaLabel]"
-                                class="form-control service-link-aria-label-input"
-                                value="{{ old("services.$index.linkAriaLabel", $service['linkAriaLabel']) }}"
-                                placeholder="Learn More ARIA Label" required>
-                            <input type="text" name="services[{{ $index }}][animationDelay]"
-                                class="form-control service-animation-delay-input"
-                                value="{{ old("services.$index.animationDelay", $service['animationDelay']) }}"
-                                placeholder="Animation Delay" required>
-                            <button type="button" class="admin-btn btn-danger remove-service"
-                                aria-label="Remove service item">
-                                <i class="fas fa-trash"></i>
-                            </button>
+
+                            <div class="form-group">
+                                <label for="ctaButton{{ $buttonNum }}Url">Button URL *</label>
+                                <input type="url" id="ctaButton{{ $buttonNum }}Url"
+                                    name="ctaButton{{ $buttonNum }}Url"
+                                    value="{{ old("ctaButton{$buttonNum}Url", $button['url']) }}" class="form-control"
+                                    placeholder="https://..." required>
+                                <span class="error-message" id="ctaButton{{ $buttonNum }}UrlError"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ctaButton{{ $buttonNum }}AriaLabel">ARIA Label *</label>
+                                <input type="text" id="ctaButton{{ $buttonNum }}AriaLabel"
+                                    name="ctaButton{{ $buttonNum }}AriaLabel"
+                                    value="{{ old("ctaButton{$buttonNum}AriaLabel", $button['ariaLabel']) }}"
+                                    class="form-control" placeholder="ARIA label..." required>
+                                <span class="error-message" id="ctaButton{{ $buttonNum }}AriaLabelError"></span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
-                <button type="button" class="admin-btn btn-save mt-3" id="addServiceItem">
-                    <i class="fas fa-plus"></i> Add Service Item
-                </button>
-            </div>
 
-            <!-- CTA Buttons -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="ctaButton1Text">CTA Button 1 Text *</label>
-                    <input type="text" id="ctaButton1Text" name="cta[buttons][0][text]"
-                        value="{{ old('cta.buttons.0.text', $servicesData['cta']['buttons'][0]['text']) }}"
-                        class="form-control" placeholder="Button text..." required>
-                    <span class="error-message" id="ctaButton1TextError"></span>
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="admin-btn btn-cancel" id="cancelEdit">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="admin-btn btn-save">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
                 </div>
+            </form>
+        </div>
 
-                <div class="form-group">
-                    <label for="ctaButton1Url">CTA Button 1 URL *</label>
-                    <input type="url" id="ctaButton1Url" name="cta[buttons][0][url]"
-                        value="{{ old('cta.buttons.0.url', $servicesData['cta']['buttons'][0]['url']) }}"
-                        class="form-control" placeholder="https://..." required>
-                    <span class="error-message" id="ctaButton1UrlError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="ctaButton1AriaLabel">CTA Button 1 ARIA Label *</label>
-                    <input type="text" id="ctaButton1AriaLabel" name="cta[buttons][0][ariaLabel]"
-                        value="{{ old('cta.buttons.0.ariaLabel', $servicesData['cta']['buttons'][0]['ariaLabel']) }}"
-                        class="form-control" placeholder="ARIA label..." required>
-                    <span class="error-message" id="ctaButton1AriaLabelError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="ctaButton2Text">CTA Button 2 Text *</label>
-                    <input type="text" id="ctaButton2Text" name="cta[buttons][1][text]"
-                        value="{{ old('cta.buttons.1.text', $servicesData['cta']['buttons'][1]['text']) }}"
-                        class="form-control" placeholder="Button text..." required>
-                    <span class="error-message" id="ctaButton2TextError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="ctaButton2Url">CTA Button 2 URL *</label>
-                    <input type="url" id="ctaButton2Url" name="cta[buttons][1][url]"
-                        value="{{ old('cta.buttons.1.url', $servicesData['cta']['buttons'][1]['url']) }}"
-                        class="form-control" placeholder="https://..." required>
-                    <span class="error-message" id="ctaButton2UrlError"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="ctaButton2AriaLabel">CTA Button 2 ARIA Label *</label>
-                    <input type="text" id="ctaButton2AriaLabel" name="cta[buttons][1][ariaLabel]"
-                        value="{{ old('cta.buttons.1.ariaLabel', $servicesData['cta']['buttons'][1]['ariaLabel']) }}"
-                        class="form-control" placeholder="ARIA label..." required>
-                    <span class="error-message" id="ctaButton2AriaLabelError"></span>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="admin-btn btn-cancel" id="cancelEdit">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <button type="submit" class="admin-btn btn-save">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-            </div>
-        </form>
+        <button class="toggle-admin" id="toggleAdmin" aria-label="Toggle admin panel">
+            <i class="fas fa-cog"></i>
+        </button>
     </div>
-
-    <button class="toggle-admin" id="toggleAdmin" aria-label="Toggle admin panel">
-        <i class="fas fa-cog"></i>
-    </button>
 @endsection
 
 @push('scripts')
@@ -771,43 +826,33 @@
                     resetToDefaultBtn: document.getElementById('resetToDefault')
                 };
 
+                this.serviceCount = {{ count($servicesData['services']) }};
                 this.init();
             }
 
             init() {
                 this.setupEventListeners();
                 this.setupRealTimePreview();
+                this.setupImagePreviews();
             }
 
             setupEventListeners() {
-                // Toggle admin panel
                 this.elements.toggleAdminBtn.addEventListener('click', () => this.toggleAdminPanel());
-
-                // Cancel edit
                 this.elements.cancelEditBtn.addEventListener('click', () => this.hideAdminPanel());
-
-                // Add service item
                 this.elements.addServiceItemBtn.addEventListener('click', () => this.addServiceItem());
-
-                // Form submission
                 this.elements.servicesForm.addEventListener('submit', (e) => this.validateForm(e));
+                this.elements.resetToDefaultBtn.addEventListener('click', () => this.resetToDefault());
+                this.elements.previewChangesBtn.addEventListener('click', () => this.previewChanges());
 
                 // Remove service item delegation
                 this.elements.serviceItemsContainer.addEventListener('click', (e) => {
                     if (e.target.closest('.remove-service')) {
-                        this.removeServiceItem(e.target.closest('.remove-service'));
+                        this.removeServiceItem(e.target.closest('.service-item-card'));
                     }
                 });
-
-                // Reset to default
-                this.elements.resetToDefaultBtn.addEventListener('click', () => this.resetToDefault());
-
-                // Preview changes
-                this.elements.previewChangesBtn.addEventListener('click', () => this.previewChanges());
             }
 
             setupRealTimePreview() {
-                // Real-time preview updates
                 const previewFields = [{
                         input: 'sectionHeading',
                         preview: 'previewSectionHeading'
@@ -869,8 +914,27 @@
                 previewFields.forEach(field => {
                     const input = document.getElementById(field.input);
                     if (input) {
-                        input.addEventListener('input', () => {
-                            this.updatePreview(field);
+                        input.addEventListener('input', () => this.updatePreview(field));
+                    }
+                });
+            }
+
+            setupImagePreviews() {
+                document.querySelectorAll('.service-item-card').forEach(card => {
+                    const fileInput = card.querySelector('input[type="file"]');
+                    const preview = card.querySelector('.image-preview');
+
+                    if (fileInput && preview) {
+                        fileInput.addEventListener('change', (e) => {
+                            if (e.target.files && e.target.files[0]) {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    const img = preview.querySelector('img');
+                                    if (img) img.src = e.target.result;
+                                    preview.style.display = 'block';
+                                };
+                                reader.readAsDataURL(e.target.files[0]);
+                            }
                         });
                     }
                 });
@@ -878,6 +942,7 @@
 
             updatePreview(field) {
                 const input = document.getElementById(field.input);
+                if (!input) return;
 
                 if (field.isButton) {
                     const buttons = document.querySelectorAll('.cta-buttons .cta-button');
@@ -913,83 +978,96 @@
             }
 
             addServiceItem() {
-                const serviceRows = document.querySelectorAll('.service-item-row');
-                const newIndex = serviceRows.length;
+                const newIndex = this.serviceCount++;
                 const newDelay = `${(newIndex * 0.1 + 0.1).toFixed(1)}s`;
 
                 const serviceHtml = `
-                    <div class="service-item-row">
-                        <input type="text" name="services[${newIndex}][title]" 
-                               class="form-control service-title-input" 
-                               placeholder="Service Title" required>
-                        <textarea name="services[${newIndex}][description]" 
-                                  class="form-control service-description-input" 
-                                  placeholder="Service Description" required></textarea>
-                        <input type="file" name="services[${newIndex}][icon]" 
-                               class="form-control service-icon-input" accept="image/*">
+            <div class="service-item-card" data-index="${newIndex}">
+                <div class="service-item-header">
+                    <div class="service-item-number">${newIndex + 1}</div>
+                    <button type="button" class="admin-btn btn-danger remove-service" aria-label="Remove service item">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+                
+                <div class="service-item-fields">
+                    <div class="form-group">
+                        <label>Service Title *</label>
+                        <input type="text" name="services[${newIndex}][title]" class="form-control" placeholder="Service Title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Service Description *</label>
+                        <textarea name="services[${newIndex}][description]" class="form-control" placeholder="Service Description" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Service Icon</label>
+                        <input type="file" name="service_icons[${newIndex}]" class="form-control" accept="image/*">
                         <div class="image-preview" style="display: none;">
                             <img src="" alt="Icon preview">
-                            <p class="text-sm text-gray-600 mt-2 text-center">New icon</p>
+                            <p class="text-sm text-gray-600 mt-2">New icon</p>
                         </div>
-                        <input type="text" name="services[${newIndex}][iconAlt]" 
-                               class="form-control service-icon-alt-input" 
-                               placeholder="Icon Alt Text" required>
-                        <select name="services[${newIndex}][borderColor]" 
-                                class="form-control service-border-color-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Icon Alt Text *</label>
+                        <input type="text" name="services[${newIndex}][iconAlt]" class="form-control" placeholder="Icon Alt Text" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Border Color *</label>
+                        <select name="services[${newIndex}][borderColor]" class="form-control">
                             <option value="primary">Primary Color</option>
                             <option value="secondary">Secondary Color</option>
                         </select>
-                        <input type="text" name="services[${newIndex}][linkUrl]" 
-                               class="form-control service-link-url-input" 
-                               placeholder="Learn More URL" required>
-                        <input type="text" name="services[${newIndex}][linkAriaLabel]" 
-                               class="form-control service-link-aria-label-input" 
-                               placeholder="Learn More ARIA Label" required>
-                        <input type="text" name="services[${newIndex}][animationDelay]" 
-                               class="form-control service-animation-delay-input" 
-                               value="${newDelay}" placeholder="Animation Delay" required>
-                        <button type="button" class="admin-btn btn-danger remove-service" 
-                                aria-label="Remove service item">
-                            <i class="fas fa-trash"></i>
-                        </button>
                     </div>
-                `;
+                    
+                    <div class="form-group">
+                        <label>Link URL *</label>
+                        <input type="text" name="services[${newIndex}][linkUrl]" class="form-control" placeholder="Learn More URL" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Link ARIA Label *</label>
+                        <input type="text" name="services[${newIndex}][linkAriaLabel]" class="form-control" placeholder="Learn More ARIA Label" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Animation Delay *</label>
+                        <input type="text" name="services[${newIndex}][animationDelay]" value="${newDelay}" class="form-control" placeholder="Animation Delay" required>
+                    </div>
+                </div>
+            </div>
+        `;
 
                 this.elements.serviceItemsContainer.insertAdjacentHTML('beforeend', serviceHtml);
-
-                // Setup image preview for the new item
-                this.setupImagePreview(this.elements.serviceItemsContainer.lastElementChild);
+                this.setupImagePreviews();
             }
 
-            setupImagePreview(row) {
-                const fileInput = row.querySelector('.service-icon-input');
-                const preview = row.querySelector('.image-preview');
-                const previewImg = preview.querySelector('img');
-
-                fileInput.addEventListener('change', (e) => {
-                    if (e.target.files && e.target.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            previewImg.src = e.target.result;
-                            preview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(e.target.files[0]);
-                    } else {
-                        preview.style.display = 'none';
-                    }
-                });
-            }
-
-            removeServiceItem(button) {
-                if (confirm('Are you sure you want to remove this service item?')) {
-                    button.closest('.service-item-row').remove();
+            removeServiceItem(card) {
+                if (this.elements.serviceItemsContainer.children.length <= 1) {
+                    this.showNotification('At least one service item is required.', 'error');
+                    return;
                 }
+
+                if (confirm('Are you sure you want to remove this service item?')) {
+                    card.remove();
+                    this.renumberServiceItems();
+                }
+            }
+
+            renumberServiceItems() {
+                const cards = this.elements.serviceItemsContainer.querySelectorAll('.service-item-card');
+                cards.forEach((card, index) => {
+                    const number = card.querySelector('.service-item-number');
+                    if (number) number.textContent = index + 1;
+                });
+                this.serviceCount = cards.length;
             }
 
             validateForm(e) {
                 let isValid = true;
-
-                // Clear previous errors
                 this.clearErrors();
 
                 // Validate required fields
@@ -1007,55 +1085,23 @@
                     }
                 });
 
-                // Validate URL format
-                const urlFields = ['ctaButton1Url', 'ctaButton2Url'];
-                urlFields.forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field.value && !this.isValidUrl(field.value)) {
-                        this.showError(fieldId, 'Please enter a valid URL.');
-                        isValid = false;
-                    }
-                });
-
                 // Validate service items
-                const serviceRows = document.querySelectorAll('.service-item-row');
-                if (serviceRows.length === 0) {
+                const serviceCards = document.querySelectorAll('.service-item-card');
+                if (serviceCards.length === 0) {
                     this.showError('serviceItemsContainer', 'At least one service item is required.');
                     isValid = false;
                 }
 
-                serviceRows.forEach((row, index) => {
-                    const titleInput = row.querySelector('.service-title-input');
-                    const descriptionInput = row.querySelector('.service-description-input');
-                    const iconAltInput = row.querySelector('.service-icon-alt-input');
-                    const linkUrlInput = row.querySelector('.service-link-url-input');
-                    const linkAriaLabelInput = row.querySelector('.service-link-aria-label-input');
-                    const animationDelayInput = row.querySelector('.service-animation-delay-input');
-
-                    if (!titleInput.value.trim()) {
-                        this.showError(`services[${index}][title]`, 'Service title is required.');
-                        isValid = false;
-                    }
-                    if (!descriptionInput.value.trim()) {
-                        this.showError(`services[${index}][description]`, 'Service description is required.');
-                        isValid = false;
-                    }
-                    if (!iconAltInput.value.trim()) {
-                        this.showError(`services[${index}][iconAlt]`, 'Icon alt text is required.');
-                        isValid = false;
-                    }
-                    if (!linkUrlInput.value.trim()) {
-                        this.showError(`services[${index}][linkUrl]`, 'Link URL is required.');
-                        isValid = false;
-                    }
-                    if (!linkAriaLabelInput.value.trim()) {
-                        this.showError(`services[${index}][linkAriaLabel]`, 'Link ARIA label is required.');
-                        isValid = false;
-                    }
-                    if (!animationDelayInput.value.trim()) {
-                        this.showError(`services[${index}][animationDelay]`, 'Animation delay is required.');
-                        isValid = false;
-                    }
+                serviceCards.forEach((card, index) => {
+                    const inputs = card.querySelectorAll(
+                        'input[required], textarea[required], select[required]');
+                    inputs.forEach(input => {
+                        if (!input.value.trim()) {
+                            const fieldName = input.getAttribute('name');
+                            this.showError(fieldName, 'This field is required.');
+                            isValid = false;
+                        }
+                    });
                 });
 
                 if (!isValid) {
@@ -1087,15 +1133,6 @@
                 }
             }
 
-            isValidUrl(string) {
-                try {
-                    new URL(string);
-                    return true;
-                } catch (_) {
-                    return false;
-                }
-            }
-
             resetToDefault() {
                 if (confirm('Are you sure you want to reset all changes to default values?')) {
                     this.elements.servicesForm.reset();
@@ -1104,40 +1141,31 @@
             }
 
             previewChanges() {
-                // In a real implementation, this would show a preview modal
                 this.showNotification('Preview functionality would show how changes look before saving.', 'info');
             }
 
             showNotification(message, type) {
                 const notification = document.createElement('div');
                 notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                    type === 'success' ? 'bg-green-500 text-white' : 
-                    type === 'error' ? 'bg-red-500 text-white' : 
-                    'bg-blue-500 text-white'
-                }`;
+            type === 'success' ? 'bg-green-500 text-white' : 
+            type === 'error' ? 'bg-red-500 text-white' : 
+            'bg-blue-500 text-white'
+        }`;
                 notification.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
+            <div class="flex items-center gap-2">
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
 
                 document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
+                setTimeout(() => notification.remove(), 3000);
             }
         }
 
         // Initialize the services section manager
         document.addEventListener('DOMContentLoaded', () => {
-            const manager = new ServicesSectionManager();
-
-            // Setup image previews for existing items
-            document.querySelectorAll('.service-item-row').forEach(row => {
-                manager.setupImagePreview(row);
-            });
+            new ServicesSectionManager();
         });
     </script>
 @endpush

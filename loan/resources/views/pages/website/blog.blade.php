@@ -603,12 +603,12 @@
                         your website.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button
+                    <button type="button" id="previewBtn"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
                         <i class="fas fa-eye"></i>
                         Preview
                     </button>
-                    <button
+                    <button type="button" id="resetBtn"
                         class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 flex items-center gap-2">
                         <i class="fas fa-sync-alt"></i>
                         Reset
@@ -984,6 +984,8 @@
                     toggleAdminBtn: document.getElementById('toggleAdmin'),
                     blogForm: document.getElementById('blogForm'),
                     cancelEditBtn: document.getElementById('cancelEdit'),
+                    previewBtn: document.getElementById('previewBtn'),
+                    resetBtn: document.getElementById('resetBtn'),
                     tabButtons: document.querySelectorAll('.tab-button'),
                     tabContents: document.querySelectorAll('.tab-content')
                 };
@@ -995,17 +997,47 @@
                 this.setupEventListeners();
                 this.setupRealTimePreview();
                 this.setupTabNavigation();
+                this.setupButtonFunctionality();
             }
 
             setupEventListeners() {
                 // Toggle admin panel
-                this.elements.toggleAdminBtn.addEventListener('click', () => this.toggleAdminPanel());
+                if (this.elements.toggleAdminBtn) {
+                    this.elements.toggleAdminBtn.addEventListener('click', () => this.toggleAdminPanel());
+                }
 
                 // Cancel edit
-                this.elements.cancelEditBtn.addEventListener('click', () => this.hideAdminPanel());
+                if (this.elements.cancelEditBtn) {
+                    this.elements.cancelEditBtn.addEventListener('click', () => this.hideAdminPanel());
+                }
 
                 // Form submission
-                this.elements.blogForm.addEventListener('submit', (e) => this.validateForm(e));
+                if (this.elements.blogForm) {
+                    this.elements.blogForm.addEventListener('submit', (e) => this.validateForm(e));
+                }
+            }
+
+            setupButtonFunctionality() {
+                // Preview button
+                if (this.elements.previewBtn) {
+                    this.elements.previewBtn.addEventListener('click', () => {
+                        const previewContainer = document.querySelector('.blog-preview-container');
+                        if (previewContainer) {
+                            previewContainer.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+
+                // Reset button
+                if (this.elements.resetBtn) {
+                    this.elements.resetBtn.addEventListener('click', () => {
+                        if (confirm('Are you sure you want to reset all changes? This will reload the page.')) {
+                            window.location.reload();
+                        }
+                    });
+                }
             }
 
             setupTabNavigation() {
@@ -1059,6 +1091,8 @@
                         input.addEventListener('input', () => {
                             this.updatePreview(field);
                         });
+                        // Initialize preview on load
+                        this.updatePreview(field);
                     }
                 });
 
@@ -1071,6 +1105,9 @@
                         input.addEventListener('change', () => this.updateBlogPostsPreview());
                     });
                 }
+
+                // Initialize previews on load
+                this.updateBlogPostsPreview();
             }
 
             updatePreview(field) {
@@ -1078,12 +1115,14 @@
                 const preview = document.getElementById(field.preview);
 
                 if (input && preview) {
-                    preview.textContent = input.value;
+                    preview.textContent = input.value || preview.textContent;
                 }
             }
 
             updateBlogPostsPreview() {
                 const previewContainer = document.getElementById('previewBlogPosts');
+                if (!previewContainer) return;
+
                 let html = '';
 
                 for (let i = 1; i <= 3; i++) {
@@ -1111,9 +1150,9 @@
                         html += `
                             <article class="blog-post" style="animation-delay: ${animationDelay}s">
                                 <div class="post-image">
-                                    ${title}
+                                    ${this.escapeHtml(title)}
                                     <span class="post-category" style="background-color: ${categoryColor}">
-                                        ${category}
+                                        ${this.escapeHtml(category)}
                                     </span>
                                     <div class="post-overlay">
                                         <a href="${url}" class="cta-button">Read More</a>
@@ -1122,22 +1161,22 @@
                                 <div class="post-content">
                                     <div class="post-meta">
                                         <div class="author-info">
-                                            <div class="author-avatar">${author.charAt(0)}</div>
-                                            <p class="text-sm text-gray-600">${author}</p>
+                                            <div class="author-avatar">${this.escapeHtml(author.charAt(0))}</div>
+                                            <p class="text-sm text-gray-600">${this.escapeHtml(author)}</p>
                                         </div>
                                         <div class="date-info">
                                             <div class="date-icon">📅</div>
-                                            <p class="text-sm text-gray-600">${date}</p>
+                                            <p class="text-sm text-gray-600">${this.escapeHtml(date)}</p>
                                         </div>
                                     </div>
                                     <h3 class="post-title">
-                                        <a href="${url}">${title}</a>
+                                        <a href="${url}">${this.escapeHtml(title)}</a>
                                     </h3>
-                                    <p class="post-excerpt">${excerpt}</p>
+                                    <p class="post-excerpt">${this.escapeHtml(excerpt)}</p>
                                     <div class="post-footer">
-                                        <span class="read-time">${readTime}</span>
+                                        <span class="read-time">${this.escapeHtml(readTime)}</span>
                                         <span class="text-gray-400">•</span>
-                                        <span class="post-category-tag">${category}</span>
+                                        <span class="post-category-tag">${this.escapeHtml(category)}</span>
                                     </div>
                                 </div>
                             </article>
@@ -1159,7 +1198,19 @@
                 return date.toLocaleDateString('en-US', options);
             }
 
+            escapeHtml(unsafe) {
+                if (!unsafe) return '';
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
             toggleAdminPanel() {
+                if (!this.elements.adminPanel) return;
+
                 this.elements.adminPanel.classList.toggle('show');
                 const isVisible = this.elements.adminPanel.classList.contains('show');
 
@@ -1172,7 +1223,9 @@
             }
 
             hideAdminPanel() {
-                this.elements.adminPanel.classList.remove('show');
+                if (this.elements.adminPanel) {
+                    this.elements.adminPanel.classList.remove('show');
+                }
             }
 
             validateForm(e) {
@@ -1186,7 +1239,7 @@
 
                 requiredFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
-                    if (!field.value.trim()) {
+                    if (field && !field.value.trim()) {
                         this.showError(fieldId, 'This field is required.');
                         isValid = false;
                     }
@@ -1210,9 +1263,11 @@
 
                 if (!isValid) {
                     e.preventDefault();
-                    this.elements.adminPanel.scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    if (this.elements.adminPanel) {
+                        this.elements.adminPanel.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             }
 
@@ -1239,7 +1294,7 @@
         }
 
         // Initialize the blog section manager
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             new BlogSectionManager();
         });
     </script>
