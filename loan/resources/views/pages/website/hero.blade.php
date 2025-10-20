@@ -932,7 +932,7 @@
 
                 // Validate URL format
                 const urlField = document.getElementById('ctaButtonUrl');
-                if (urlField.value && !this.isValidUrl(urlField.value)) {
+                if (!urlField.value) {
                     this.showError('ctaButtonUrl', 'Please enter a valid URL.');
                     isValid = false;
                 }

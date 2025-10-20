@@ -19,7 +19,7 @@
                             alt="{{ $card['title'] }} Icon" class="feature-icon" />
                     </div>
                     <h4 class="feature-heading">{{ $card['title'] }}</h4>
-                    <p class="feature-description">{{ $card['description'] }}</p>
+                    <p class="feature-description" style="color: #110101;">{{ $card['description'] }}</p>
                 </div>
             @endforeach
 
@@ -188,6 +188,19 @@
         </div>
     </div>
     <style>
+        .feature-heading {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #7a4603;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

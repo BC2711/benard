@@ -27,7 +27,7 @@ class SectionController extends Controller
                 'description' => 'Fast, flexible financing solutions designed specifically for marketers and entrepreneurs. Grow your business with our tailored loan programs.',
                 'ctaButton' => [
                     'text' => 'Get Started Now',
-                    'url' => '#!'
+                    'url' => '/#support'
                 ],
                 'ctaPhone' => '+123456789',
                 'ctaPhoneSubtext' => 'For any question or concern',

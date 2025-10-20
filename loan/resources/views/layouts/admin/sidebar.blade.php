@@ -1,17 +1,7 @@
 <div id="sidebar"
     class="sidebar-transition bg-white dark:bg-gray-800 w-64 shadow-xl flex flex-col border-r border-gray-200 dark:border-gray-700 relative z-40"
-    role="navigation" aria-label="Main navigation" x-data="{
-        collapsed: localStorage.getItem('sidebarCollapsed') === 'true',
-        userMenuOpen: false,
-        activeSubmenu: null,
-        searchQuery: '',
-        get filteredMenuItems() {
-            if (!this.searchQuery) return [];
-            // Implement search functionality here
-            return [];
-        }
-    }" :class="{ 'w-20': collapsed }"
-    @keydown.escape="userMenuOpen = false; activeSubmenu = null">
+    role="navigation" aria-label="Main navigation" x-data="sidebarData()" :class="{ 'w-20': collapsed }"
+    @keydown.escape="userMenuOpen = false; activeSubmenu = null;">
 
     <!-- Sidebar Resize Handle -->
     <div class="absolute -right-2 top-1/2 transform -translate-y-1/2 w-1 h-16 bg-gray-300 dark:bg-gray-600 rounded-full cursor-col-resize opacity-0 hover:opacity-100 transition-opacity duration-200 hidden lg:block"
@@ -49,7 +39,7 @@
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <i class="fas fa-search text-gray-400 text-sm"></i>
             </div>
-            <input type="text" x-model="searchQuery"
+            <input type="text" x-model="searchQuery" @input="debouncedSearch()"
                 class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-londa-orange focus:border-londa-orange dark:focus:ring-londa-400 dark:focus:border-londa-400 text-sm transition-all duration-200"
                 placeholder="Search menu..." aria-label="Search menu items">
         </div>
@@ -68,10 +58,12 @@
                     </div>
                     <div class="space-y-1">
                         <template x-for="item in filteredMenuItems" :key="item.id">
-                            <a :href="item.url"
-                                class="nav-item flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-londa-50 dark:hover:bg-gray-700 hover:text-londa-orange dark:hover:text-londa-300 transition-all duration-200 ease-in-out group">
-                                <i class="fas fa-search w-5 text-center text-gray-400 group-hover:text-londa-orange transition-colors duration-200"
-                                    aria-hidden="true"></i>
+                            <a :href="item.url" @click="closeAllMenus()"
+                                class="nav-item flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-londa-50 dark:hover:bg-gray-700 hover:text-londa-orange dark:hover:text-londa-300 transition-all duration-200 ease-in-out group"
+                                :class="{ 'bg-londa-50 text-londa-orange border-l-4 border-londa-orange': item.isActive }">
+                                <i class="fas" :class="item.icon || 'fa-circle'"
+                                    class="w-5 text-center transition-colors duration-200"
+                                    :class="item.isActive ? 'text-londa-orange' : 'text-gray-400 group-hover:text-londa-orange'"></i>
                                 <span class="ml-3 font-medium text-sm" x-text="item.name"></span>
                             </a>
                         </template>
@@ -84,9 +76,103 @@
             </template>
 
             <!-- Dynamic Menu Content -->
-            <div x-show="searchQuery.length === 0">
-                {!! $menu_html !!}
-            </div>
+            <template x-if="searchQuery.length === 0">
+                <div>
+                    <template x-for="menuGroup in menuData" :key="menuGroup.id">
+                        <div class="mb-4">
+                            <!-- Menu Group Header -->
+                            <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider transition-all duration-300"
+                                :class="{ 'opacity-0 h-0 hidden': collapsed }" x-text="menuGroup.name"></h3>
+
+                            <!-- Menu Items -->
+                            <div class="mt-2 space-y-1" :class="{ 'mt-0': collapsed }">
+                                <template x-for="menuItem in menuGroup.children" :key="menuItem.id">
+                                    <div x-data="{
+                                        isOpen: activeSubmenu === menuItem.id,
+                                        hasChildren: menuItem.children && menuItem.children.length > 0
+                                    }">
+                                        <!-- Parent Menu Item with Children -->
+                                        <template x-if="hasChildren">
+                                            <div>
+                                                <button @click="toggleSubmenu(menuItem.id)"
+                                                    class="nav-item w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 ease-in-out group"
+                                                    :class="{
+                                                        'bg-londa-50 text-londa-orange border-l-4 border-londa-orange': isMenuItemActive(
+                                                            menuItem),
+                                                        'text-gray-700 hover:bg-londa-50 hover:text-londa-orange border-l-4 border-transparent':
+                                                            !isMenuItemActive(menuItem)
+                                                    }"
+                                                    aria-expanded="isOpen">
+                                                    <i class="w-5 text-center transition-colors duration-200"
+                                                        :class="[
+                                                            menuItem.icon || 'fas fa-folder',
+                                                            isMenuItemActive(menuItem) ? 'text-londa-orange' :
+                                                            'text-gray-400 group-hover:text-londa-orange'
+                                                        ]"></i>
+                                                    <span
+                                                        class="ml-3 font-medium transition-all duration-300 flex-1 text-left"
+                                                        :class="{ 'opacity-0 w-0 hidden': collapsed }"
+                                                        x-text="menuItem.name"></span>
+                                                    <i class="fas fa-chevron-down text-xs transition-transform duration-200 ml-2"
+                                                        :class="{
+                                                            'transform rotate-180': isOpen,
+                                                            'opacity-0': collapsed
+                                                        }"></i>
+                                                </button>
+
+                                                <!-- Submenu Items -->
+                                                <div x-show="isOpen" x-collapse
+                                                    class="ml-4 mt-1 space-y-1 border-l border-gray-200 dark:border-gray-700">
+                                                    <template x-for="child in menuItem.children"
+                                                        :key="child.id">
+                                                        <a :href="child.url" @click="closeAllMenus()"
+                                                            class="nav-item flex items-center px-3 py-2 rounded-lg transition-all duration-200 ease-in-out group"
+                                                            :class="{
+                                                                'bg-londa-50 text-londa-orange border-l-2 border-londa-orange': isMenuItemActive(
+                                                                    child),
+                                                                'text-gray-600 hover:bg-londa-50 hover:text-londa-orange border-l-2 border-transparent':
+                                                                    !isMenuItemActive(child)
+                                                            }">
+                                                            <i class="fas fa-chevron-right text-xs w-4 text-center transition-colors duration-200"
+                                                                :class="isMenuItemActive(child) ? 'text-londa-orange' :
+                                                                    'text-gray-400 group-hover:text-londa-orange'"></i>
+                                                            <span class="ml-3 text-sm" x-text="child.name"></span>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Single Menu Item -->
+                                        <template x-if="!hasChildren">
+                                            <a :href="menuItem.url" @click="closeAllMenus()"
+                                                class="nav-item flex items-center px-4 py-3 rounded-lg transition-all duration-200 ease-in-out group"
+                                                :class="{
+                                                    'bg-londa-50 text-londa-orange border-l-4 border-londa-orange': isMenuItemActive(
+                                                        menuItem),
+                                                    'text-gray-700 hover:bg-londa-50 hover:text-londa-orange border-l-4 border-transparent':
+                                                        !isMenuItemActive(menuItem)
+                                                }">
+                                                <i class="w-5 text-center transition-colors duration-200"
+                                                    :class="[
+                                                        menuItem.icon || 'fas fa-circle',
+                                                        isMenuItemActive(menuItem) ? 'text-londa-orange' :
+                                                        'text-gray-400 group-hover:text-londa-orange'
+                                                    ]"></i>
+                                                <span class="ml-3 font-medium transition-all duration-300"
+                                                    :class="{ 'opacity-0 w-0 hidden': collapsed }"
+                                                    x-text="menuItem.name"></span>
+                                                <span x-show="isMenuItemActive(menuItem) && !collapsed"
+                                                    class="ml-auto w-2 h-2 bg-londa-orange rounded-full animate-pulse"></span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
 
             <!-- Quick Actions -->
             <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 transition-all duration-300"
@@ -123,22 +209,22 @@
                     <a href="{{ route('management.users.index') }}"
                         class="nav-item group flex items-center px-3 py-2.5 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-londa-50 dark:hover:bg-gray-700 hover:text-londa-orange dark:hover:text-londa-300 transition-all duration-200 ease-in-out border-l-4"
                         :class="{
-                                                   'bg-londa-50 dark:bg-gray-700 text-londa-orange dark:text-londa-300 border-l-4 border-londa-orange': request()->routeIs('management.users.*'),
-                                                   'border-transparent': !request()->routeIs('management.users.*')
-                                               }">
+                                                                                                                                                               'bg-londa-50 dark:bg-gray-700 text-londa-orange dark:text-londa-300 border-l-4 border-londa-orange': request()->routeIs('management.users.*'),
+                                                                                                                                                               'border-transparent': !request()->routeIs('management.users.*')
+                                                                                                                                                           }">
                         <i class="fas fa-user-shield w-5 text-center transition-colors duration-200"
                             :class="{
-                                                           'text-londa-orange': request()->routeIs('management.users.*'),
-                                                           'text-gray-400 group-hover:text-londa-orange': !request()->routeIs('management.users.*')
-                                                       }"
+                                                                                                                                                                                           'text-londa-orange': request()->routeIs('management.users.*'),
+                                                                                                                                                                                           'text-gray-400 group-hover:text-londa-orange': !request()->routeIs('management.users.*')
+                                                                                                                                                                                       }"
                             aria-hidden="true"></i>
                         <span class="ml-3 font-medium text-sm transition-all duration-300"
                             :class="{ 'opacity-0 w-0 hidden': collapsed }">Admin Users</span>
                         <span class="ml-auto transition-all duration-200"
                             :class="{
-                                                              'opacity-100': !collapsed && (request()->routeIs('management.users.*') || group.hover),
-                                                              'opacity-0': collapsed || (!request()->routeIs('management.users.*') && !group.hover)
-                                                          }">
+                                                                                                                                         'opacity-100': !collapsed && (request()->routeIs('management.users.*') || group.hover),
+                                                                                                                                        'opacity-0': collapsed || (!request()->routeIs('management.users.*') && !group.hover)
+                                                                                                                                                                                          }">
                             <i class="fas fa-chevron-right text-xs text-gray-400" aria-hidden="true"></i>
                         </span>
                     </a>
@@ -243,378 +329,197 @@
     </div>
 </div>
 
-<style>
-    .sidebar-transition {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Custom scrollbar styling */
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: 3px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-    }
-
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #4b5563;
-    }
-
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #6b7280;
-    }
-
-    /* Active state for navigation items */
-    .nav-item.active {
-        background-color: #fef6e6;
-        color: #db9123;
-        border-left-color: #db9123;
-    }
-
-    .dark .nav-item.active {
-        background-color: rgba(219, 145, 35, 0.1);
-        color: #fbd895;
-    }
-
-    .nav-item.active i {
-        color: #db9123;
-    }
-
-    /* Smooth hover effects */
-    .nav-item {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .nav-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(219, 145, 35, 0.1), transparent);
-        transition: left 0.5s ease-in-out;
-    }
-
-    .nav-item:hover::before {
-        left: 100%;
-    }
-
-    /* Active state dot indicator */
-    .nav-item.active::after {
-        content: '';
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 6px;
-        height: 6px;
-        background-color: #db9123;
-        border-radius: 50%;
-        animation: pulse-dot 2s infinite;
-    }
-
-    @keyframes pulse-dot {
-
-        0%,
-        100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0.5;
-        }
-    }
-
-    /* Shimmer effect for loading */
-    .shimmer {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-        0% {
-            background-position: -200% 0;
-        }
-
-        100% {
-            background-position: 200% 0;
-        }
-    }
-
-    /* Soft pulse animation */
-    .animate-pulse-soft {
-        animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse-soft {
-
-        0%,
-        100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0.7;
-        }
-    }
-</style>
-
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    initializeSidebar();
-    initializeActiveStates();
-    initializeResizeHandler();
-});
+    function sidebarData() {
+        return {
+            collapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+            userMenuOpen: false,
+            activeSubmenu: null,
+            searchQuery: '',
+            searchTimeout: null,
+            filteredMenuItems: [],
+            menuData: @json($menu_data), 
+            isResizing: false,
+            startX: 0,
+            startWidth: 0,
 
-function initializeSidebar() {
-    // Sidebar resize functionality
-    let isResizing = false;
+            init() {
+                this.setupResizeHandler();
+                this.updateActiveStates();
+                this.setupEventListeners();
+            },
 
-    function startResize(e) {
-        isResizing = true;
-        document.addEventListener('mousemove', handleResize);
-        document.addEventListener('mouseup', stopResize);
-        e.preventDefault();
-    }
+            // Resize functionality
+            setupResizeHandler() {
+                // This will be called when component initializes
+            },
 
-    function handleResize(e) {
-        if (!isResizing) return;
+            startResize(e) {
+                this.isResizing = true;
+                this.startX = e.clientX;
+                this.startWidth = parseInt(document.getElementById('sidebar').offsetWidth, 10);
 
-        const sidebar = document.getElementById('sidebar');
-        const newWidth = Math.max(200, Math.min(400, e.clientX - sidebar.getBoundingClientRect().left));
-        sidebar.style.width = `${newWidth}px`;
-    }
+                document.addEventListener('mousemove', this.handleResize.bind(this));
+                document.addEventListener('mouseup', this.stopResize.bind(this));
+                e.preventDefault();
+            },
 
-    function stopResize() {
-        isResizing = false;
-        document.removeEventListener('mousemove', handleResize);
-        document.removeEventListener('mouseup', stopResize);
-    }
+            handleResize(e) {
+                if (!this.isResizing) return;
 
-    // CORRECTED: Use a proper CSS selector
-    const resizeHandle = document.querySelector('[data-resize-handle]');
-    if (resizeHandle) {
-        resizeHandle.addEventListener('mousedown', startResize);
-    }
+                const width = this.startWidth + e.clientX - this.startX;
+                const newWidth = Math.max(200, Math.min(400, width));
 
-    // Update the HTML to include the data attribute
-    if (!resizeHandle) {
-        // Add the resize handle if it doesn't exist
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            const resizeElement = document.createElement('div');
-            resizeElement.className = 'absolute -right-2 top-1/2 transform -translate-y-1/2 w-1 h-16 bg-gray-300 dark:bg-gray-600 rounded-full cursor-col-resize opacity-0 hover:opacity-100 transition-opacity duration-200 hidden lg:block';
-            resizeElement.setAttribute('data-resize-handle', 'true');
-            resizeElement.setAttribute('title', 'Resize sidebar');
-            sidebar.appendChild(resizeElement);
-            
-            // Add event listener to the newly created element
-            resizeElement.addEventListener('mousedown', startResize);
-        }
-    }
+                document.getElementById('sidebar').style.width = `${newWidth}px`;
+            },
 
-    // Keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
-        
-        const data = Alpine.$data(sidebar);
-        if (e.key === 'Escape') {
-            // Close all open menus
-            if (data) {
-                data.userMenuOpen = false;
-                data.activeSubmenu = null;
+            stopResize() {
+                this.isResizing = false;
+                document.removeEventListener('mousemove', this.handleResize.bind(this));
+                document.removeEventListener('mouseup', this.stopResize.bind(this));
+            },
+
+            // Menu functionality
+            toggleSubmenu(menuId) {
+                this.activeSubmenu = this.activeSubmenu === menuId ? null : menuId;
+            },
+
+            closeAllMenus() {
+                this.userMenuOpen = false;
+                this.activeSubmenu = null;
+            },
+
+            isMenuItemActive(menuItem) {
+                const currentPath = window.location.pathname;
+                const currentRoute = window.location.href;
+
+                try {
+                    let menuPath = menuItem.url;
+                    if (menuItem.url.startsWith('http')) {
+                        const menuUrl = new URL(menuItem.url);
+                        menuPath = menuUrl.pathname;
+                    } else {
+                        const fullUrl = new URL(menuItem.url, window.location.origin);
+                        menuPath = fullUrl.pathname;
+                    }
+
+                    if (currentPath === menuPath) return true;
+                    if (menuPath !== '/' && currentPath.startsWith(menuPath + '/')) return true;
+                    if (menuPath === '/' && currentPath === '/') return true;
+
+                    return false;
+                } catch (e) {
+                    console.warn('Error checking active menu:', e);
+                    return false;
+                }
+            },
+
+            // Search functionality
+            debouncedSearch() {
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(() => {
+                    this.performSearch();
+                }, 300);
+            },
+
+            performSearch() {
+                if (!this.searchQuery.trim()) {
+                    this.filteredMenuItems = [];
+                    return;
+                }
+
+                const searchTerm = this.searchQuery.toLowerCase();
+                const allItems = this.flattenMenuItems(this.menuData);
+
+                this.filteredMenuItems = allItems.filter(item =>
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    (item.description && item.description.toLowerCase().includes(searchTerm))
+                );
+            },
+
+            flattenMenuItems(menuGroups) {
+                let items = [];
+                menuGroups.forEach(group => {
+                    if (group.children) {
+                        group.children.forEach(item => {
+                            items.push(item);
+                            if (item.children) {
+                                items = items.concat(item.children);
+                            }
+                        });
+                    }
+                });
+                return items;
+            },
+
+            // Active state management
+            updateActiveStates() {
+                // This will automatically update through isMenuItemActive
+            },
+
+            setupEventListeners() {
+                // Handle browser navigation
+                window.addEventListener('popstate', () => {
+                    this.updateActiveStates();
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                        e.preventDefault();
+                        this.collapsed = !this.collapsed;
+                        localStorage.setItem('sidebarCollapsed', this.collapsed);
+                    }
+
+                    if (e.key === 'Escape') {
+                        this.closeAllMenus();
+                    }
+                });
             }
-        }
+        };
+    }
 
-        // Ctrl/Cmd + B to toggle sidebar
-        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-            e.preventDefault();
+    // Global sidebar manager
+    window.SidebarManager = {
+        toggle() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+
+            const data = Alpine.$data(sidebar);
             if (data) {
                 data.collapsed = !data.collapsed;
                 localStorage.setItem('sidebarCollapsed', data.collapsed);
             }
-        }
-    });
-}
+        },
 
-function initializeActiveStates() {
-    // Enhanced active state detection with route matching
-    function updateActiveStates() {
-        const currentPath = window.location.pathname;
-        const currentRoute = window.location.href;
-
-        document.querySelectorAll('.nav-item').forEach(item => {
-            const href = item.getAttribute('href');
-            if (href) {
-                // Remove existing active classes
-                item.classList.remove('active', 'bg-londa-50', 'text-londa-orange', 'border-l-4', 'border-londa-orange');
-
-                // Check for exact or partial route matches
-                if (isActiveRoute(href, currentPath, currentRoute)) {
-                    item.classList.add('active', 'bg-londa-50', 'text-londa-orange', 'border-l-4', 'border-londa-orange');
-                    item.setAttribute('aria-current', 'page');
-                } else {
-                    item.removeAttribute('aria-current');
-                }
-            }
-        });
-    }
-
-    function isActiveRoute(menuHref, currentPath, currentRoute) {
-        try {
-            // Handle relative URLs
-            let menuPath = menuHref;
-            if (menuHref.startsWith('http')) {
-                const menuUrl = new URL(menuHref);
-                menuPath = menuUrl.pathname;
-            } else {
-                // For relative URLs, construct full URL
-                const fullUrl = new URL(menuHref, window.location.origin);
-                menuPath = fullUrl.pathname;
-            }
-
-            // Exact match
-            if (currentPath === menuPath) return true;
-
-            // Parent route match (e.g., /admin/users matches /admin/users/1)
-            if (menuPath !== '/' && currentPath.startsWith(menuPath + '/')) return true;
-
-            // Exact match for root
-            if (menuPath === '/' && currentPath === '/') return true;
-
-            return false;
-        } catch (e) {
-            console.warn('Error checking active route:', e);
-            return false;
-        }
-    }
-
-    // Initial update
-    updateActiveStates();
-
-    // Update on navigation
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a.nav-item');
-        if (link) {
-            setTimeout(updateActiveStates, 100);
-        }
-    });
-
-    // Update on browser history changes
-    window.addEventListener('popstate', updateActiveStates);
-}
-
-function initializeResizeHandler() {
-    let resizeTimer;
-
-    function handleResize() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
+        expand() {
             const sidebar = document.getElementById('sidebar');
             if (!sidebar) return;
-            
-            const data = Alpine.$data(sidebar);
-            if (!data) return;
 
-            // Auto-collapse on very small screens
-            if (window.innerWidth < 768 && !data.collapsed) {
+            const data = Alpine.$data(sidebar);
+            if (data) {
+                data.collapsed = false;
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        },
+
+        collapse() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+
+            const data = Alpine.$data(sidebar);
+            if (data) {
                 data.collapsed = true;
                 localStorage.setItem('sidebarCollapsed', 'true');
             }
+        },
 
-            // Auto-expand on larger screens if previously collapsed for mobile
-            if (window.innerWidth >= 1024 && data.collapsed && localStorage.getItem('sidebarCollapsed') !== 'true') {
-                data.collapsed = false;
-            }
-        }, 250);
-    }
+        isCollapsed() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return true;
 
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Initial check
-}
-
-// Safe Alpine.js data access utility
-function getAlpineData(element) {
-    if (!element || !element.__x) return null;
-    return element.__x;
-}
-
-// Export sidebar utilities to global scope with error handling
-window.SidebarManager = {
-    toggle() {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
-        
-        const data = getAlpineData(sidebar);
-        if (data) {
-            data.collapsed = !data.collapsed;
-            localStorage.setItem('sidebarCollapsed', data.collapsed);
+            const data = Alpine.$data(sidebar);
+            return data ? data.collapsed : true;
         }
-    },
-
-    expand() {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
-        
-        const data = getAlpineData(sidebar);
-        if (data) {
-            data.collapsed = false;
-            localStorage.setItem('sidebarCollapsed', 'false');
-        }
-    },
-
-    collapse() {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
-        
-        const data = getAlpineData(sidebar);
-        if (data) {
-            data.collapsed = true;
-            localStorage.setItem('sidebarCollapsed', 'true');
-        }
-    },
-
-    isCollapsed() {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return true;
-        
-        const data = getAlpineData(sidebar);
-        return data ? data.collapsed : true;
-    }
-};
-
-// Error handling for the entire application
-window.addEventListener('error', function(e) {
-    console.error('Global error caught:', e.error);
-    
-    // Don't show error notifications for Alpine.js initialization errors
-    if (e.error && e.error.message && e.error.message.includes('Alpine')) {
-        return;
-    }
-    
-    // Show user-friendly error message
-    if (window.LondaAdmin && window.LondaAdmin.notify) {
-        window.LondaAdmin.notify('An unexpected error occurred. Please refresh the page.', 'error');
-    }
-});
-
-// Alpine.js initialization safety
-document.addEventListener('alpine:init', function() {
-    console.log('Alpine.js initialized successfully');
-});
+    };
 </script>

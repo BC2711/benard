@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('pages.website.index');
 });
 
+Route::get('/calculator', function () {
+    return view('pages.website.calculator');
+});
+
 Route::get('/londa', function () {
     return view('pages.website.index');
 });

@@ -124,12 +124,21 @@
         }
 
         .hero-main-image {
+            z-index: 1;
             position: absolute;
             top: 10%;
             right: 0;
             max-width: 100%;
             height: auto;
             max-height: 80%;
+            transform-style: inherit;
+            transparency: inherit;
+        }
+
+        .hero-main-image {
+            margin-right: 20%;
+            color: #7a4603;
+            background: linear-gradient(135deg, #7a4603 0%, #db9123 100%);
         }
 
         .hero-container {
@@ -261,6 +270,7 @@
         .trust-label {
             font-size: 0.9rem;
             opacity: 0.8;
+            color: white !important;
         }
 
         @keyframes float {
