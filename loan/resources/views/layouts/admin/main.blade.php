@@ -261,7 +261,7 @@
                                     @endif
 
                                     <!-- Page Title & Description -->
-                                    <div class="flex items-center">
+                                    <div class="flex items-center sticky top-0 bg-white dark:bg-gray-800">
                                         @hasSection('page-icon')
                                             <div class="flex-shrink-0 mr-3">
                                                 @yield('page-icon')
@@ -297,7 +297,7 @@
                     <!-- Notification Area -->
                     <div class="px-4 sm:px-6 lg:px-8 py-2">
                         <!-- System Alerts -->
-                        @if (app()->environment('local'))
+                        {{-- @if (app()->environment('local'))
                             <div
                                 class="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 flex items-center">
                                 <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 mr-3"></i>
@@ -310,7 +310,7 @@
                                     </p>
                                 </div>
                             </div>
-                        @endif
+                        @endif --}}
 
                         <!-- Flash Messages -->
                         <div id="flash-messages">
@@ -385,7 +385,7 @@
                     <!-- Main Content Container -->
                     <div class="px-4 sm:px-6 lg:px-8 py-6">
                         <!-- Content Wrapper -->
-                        <div class="max-w-7xl mx-auto">
+                        <div class="max-w-8xl mx-auto">
                             <!-- Content Section -->
                             <div class="space-y-6">
                                 @yield('content')

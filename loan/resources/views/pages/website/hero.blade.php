@@ -524,17 +524,29 @@
         }
     </style>
 @endpush
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">Hero Section</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-home fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">Hero Section Management</h1>
+    <p class="text-gray-600 text-sm mt-1">Customize and manage the hero section for your website. Changes are
+        reflected in real-time.</p>
+@endsection
 
+@section('title', 'Hero Section Management')
 @section('content')
     <div class="main-content">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Hero Section Management</h1>
-                    <p class="text-gray-600 text-sm mt-1">Customize and manage the hero section for your website. Changes are
-                        reflected in real-time.</p>
-                </div>
+
                 <div class="flex gap-2">
                     <button
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
@@ -549,31 +561,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Success/Error Messages -->
-        @if (session('success'))
-            <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center gap-3">
-                <i class="fas fa-check-circle text-green-500"></i>
-                <div>
-                    <p class="font-medium">Success!</p>
-                    <p class="text-sm">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                <div class="flex items-center gap-3 mb-2">
-                    <i class="fas fa-exclamation-circle text-red-500"></i>
-                    <p class="font-medium">Please fix the following errors:</p>
-                </div>
-                <ul class="list-disc list-inside text-sm space-y-1">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
     </div>
 
     <!-- Hero Preview -->

@@ -598,16 +598,26 @@
     </style>
 @endpush
 
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Dashboard</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">About Section</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-info-circle fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">About Section Management</h1>
+    <p class="text-gray-600 text-sm mt-1">Customize and manage the about section for your website. Changes
+        are reflected in real-time.</p>
+@endsection
 @section('content')
     <div class="main-content">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">About Section Management</h1>
-                    <p class="text-gray-600 text-sm mt-1">Customize and manage the about section for your website. Changes
-                        are reflected in real-time.</p>
-                </div>
                 <div class="flex gap-2">
                     <button
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2"
@@ -624,31 +634,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Success/Error Messages -->
-        @if (session('success'))
-            <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center gap-3">
-                <i class="fas fa-check-circle text-green-500"></i>
-                <div>
-                    <p class="font-medium">Success!</p>
-                    <p class="text-sm">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                <div class="flex items-center gap-3 mb-2">
-                    <i class="fas fa-exclamation-circle text-red-500"></i>
-                    <p class="font-medium">Please fix the following errors:</p>
-                </div>
-                <ul class="list-disc list-inside text-sm space-y-1">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
     </div>
 
     <!-- About Preview -->
@@ -961,15 +946,15 @@
                 this.elements.aboutImages.innerHTML = `
                     <div class="about-images-grid">
                         ${this.aboutData.images.map(image => `
-                                                                <div class="about-image-container ${image.is_centered ? 'about-image--center' : ''}" ${image.is_centered ? 'style="grid-column: span 2;"' : ''}>
-                                                                    ${image.shape ? `
+                                                                                <div class="about-image-container ${image.is_centered ? 'about-image--center' : ''}" ${image.is_centered ? 'style="grid-column: span 2;"' : ''}>
+                                                                                    ${image.shape ? `
                                     <img src="${this.getImageUrl(image.shape)}" alt="${this.sanitizeInput(image.shape_alt)}" class="shape shape--${image.shape_position}" />
                                 ` : ''}
-                                                                    ${image.src ? `
+                                                                                    ${image.src ? `
                                     <img src="${this.getImageUrl(image.src)}" alt="${this.sanitizeInput(image.alt)}" class="about-image" />
                                 ` : ''}
-                                                                </div>
-                                                            `).join('')}
+                                                                                </div>
+                                                                            `).join('')}
                     </div>
                 `;
 
@@ -980,24 +965,24 @@
                     <p class="about-description">${this.sanitizeInput(this.aboutData.description)}</p>
                     <div class="features-list" role="list">
                         ${this.aboutData.features.map(feature => `
-                                                                <div class="feature-item" role="listitem">
-                                                                    <div class="feature-icon-container ${feature.bg_color === 'secondary' ? 'secondary' : ''}">
-                                                                        <img src="{{ asset('assets/images/icon-check.svg') }}" alt="Check mark for ${this.sanitizeInput(feature.title)}" class="feature-icon" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <h4 class="feature-title">${this.sanitizeInput(feature.title)}</h4>
-                                                                        <p class="feature-description">${this.sanitizeInput(feature.description)}</p>
-                                                                    </div>
-                                                                </div>
-                                                            `).join('')}
+                                                                                <div class="feature-item" role="listitem">
+                                                                                    <div class="feature-icon-container ${feature.bg_color === 'secondary' ? 'secondary' : ''}">
+                                                                                        <img src="{{ asset('assets/images/icon-check.svg') }}" alt="Check mark for ${this.sanitizeInput(feature.title)}" class="feature-icon" />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <h4 class="feature-title">${this.sanitizeInput(feature.title)}</h4>
+                                                                                        <p class="feature-description">${this.sanitizeInput(feature.description)}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            `).join('')}
                     </div>
                     <div class="stats" role="list">
                         ${this.aboutData.stats.map(stat => `
-                                                                <div class="stat-item" role="listitem">
-                                                                    <span class="stat-value">${this.sanitizeInput(stat.value)}</span>
-                                                                    <span class="stat-label">${this.sanitizeInput(stat.label)}</span>
-                                                                </div>
-                                                            `).join('')}
+                                                                                <div class="stat-item" role="listitem">
+                                                                                    <span class="stat-value">${this.sanitizeInput(stat.value)}</span>
+                                                                                    <span class="stat-label">${this.sanitizeInput(stat.label)}</span>
+                                                                                </div>
+                                                                            `).join('')}
                     </div>
                     <a href="${this.sanitizeInput(this.aboutData.video_cta.url)}" data-fslightbox class="video-cta" aria-label="${this.sanitizeInput(this.aboutData.video_cta.aria_label)}">
                         <span class="video-cta-icon-container">

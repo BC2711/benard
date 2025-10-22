@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -46,9 +47,9 @@ class UserController extends Controller
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
             'date_of_birth' => 'required|date|before:today',
-            'gender' => 'required|in:male,female,other',
-            'role' => 'required|in:admin,user,manager',
-            'status' => 'required|in:active,inactive,suspended',
+            'gender' => 'required|in:MALE,FEMALE,OTHER',
+            'role' => 'required|in:ADMIN,USER,MANAGER',
+            'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -64,9 +65,10 @@ class UserController extends Controller
 
             User::create($validated);
 
-            return redirect()->route('profile.users.index')
+            return redirect()->route('management.users.index')
                 ->with('success', 'User created successfully.');
         } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Error creating user: ' . $e->getMessage())
                 ->withInput();
@@ -115,9 +117,9 @@ class UserController extends Controller
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
             'date_of_birth' => 'required|date|before:today',
-            'gender' => 'required|in:male,female,other',
-            'role' => 'required|in:admin,user,manager',
-            'status' => 'required|in:active,inactive,suspended',
+            'gender' => 'required|in:MALE,FEMALE,OTHER',
+            'role' => 'required|in:ADMIN,USER,MANAGER',
+            'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
@@ -141,7 +143,7 @@ class UserController extends Controller
 
             $user->update($validated);
 
-            return redirect()->route('profile.users.index')
+            return redirect()->route('management.users.index')
                 ->with('success', 'User updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -169,7 +171,7 @@ class UserController extends Controller
 
             $user->delete();
 
-            return redirect()->route('profile.users.index')
+            return redirect()->route('management.users.index')
                 ->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -248,7 +250,7 @@ class UserController extends Controller
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
             'date_of_birth' => 'required|date|before:today',
-            'gender' => 'required|in:male,female,other',
+            'gender' => 'required|in:MALE,FEMALE,OTHER',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -264,7 +266,7 @@ class UserController extends Controller
 
             $user->update($validated);
 
-            return redirect()->route('profile.users.profile')
+            return redirect()->route('management.users.profile')
                 ->with('success', 'Profile updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -300,12 +302,10 @@ class UserController extends Controller
                     ->with('error', 'Current password is incorrect.')
                     ->withInput();
             }
+            $user->password = Hash::make($validated['password']);
+            $user->save();
 
-            $user->update([
-                'password' => Hash::make($validated['password'])
-            ]);
-
-            return redirect()->route('profile.users.profile')
+            return redirect()->route('management.users.profile')
                 ->with('success', 'Password changed successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
