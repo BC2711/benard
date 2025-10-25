@@ -19,7 +19,8 @@ class Notification extends Model
         'subject',
         'status',
         'response',
-        'sent_at'
+        'sent_at',
+        'read'
     ];
 
     protected $casts = [

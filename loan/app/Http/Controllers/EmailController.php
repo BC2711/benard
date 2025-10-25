@@ -10,6 +10,36 @@ use Illuminate\Support\Facades\Mail;
 
 class EmailController extends Controller
 {
+
+    public function subscribe(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+        try {
+            $notification = Notification::create([
+                'type' => 'SUBSCRIBE',
+                'email' => $request->email,
+                'status' => 'PENDING'
+            ]);
+            $this->sendSubscribeEmail($request->all());
+
+            // Update status to sent
+            $notification->update(['status' => 'SENT']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you for subscribing to our newsletter ! Our team will be sending updates.'
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('subscriber failed: ' . $th->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to submit subscriber. Please try again later.'
+            ], 500);
+        }
+    }
     public function send_loan_application_email(Request $request): JsonResponse
     {
         $request->validate([
@@ -72,13 +102,28 @@ class EmailController extends Controller
     {
         try {
             Mail::send('emails.loan_application', $data, function ($message) use ($data) {
-                $message->to('binesschama1127@gmail.com')
-                    ->subject('New Loan Application - ' . $data['fullname']);
+                $message->to($data['email'])
+                    ->subject('Londa Loan Application - ');
             });
 
             return count(Mail::failures()) === 0;
         } catch (\Exception $e) {
             Log::error('Loan application email failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function sendSubscribeEmail(array $data): bool
+    {
+        try {
+            Mail::send('emails.newslatter', $data, function ($message) use ($data) {
+                $message->to($data['email'])
+                    ->subject('LondaLoan Subscriber');
+            });
+
+            return count(Mail::failures()) === 0;
+        } catch (\Exception $e) {
+            Log::error('Subscriber email failed: ' . $e->getMessage());
             return false;
         }
     }

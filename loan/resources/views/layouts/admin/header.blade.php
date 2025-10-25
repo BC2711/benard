@@ -486,7 +486,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         initializeHeader();
         initializeSearch();
-        initializeNotifications();
+        setTimeout(
+            function() {
+                initializeNotifications();
+            }, 3000
+        )
     });
 
     function initializeHeader() {
@@ -588,7 +592,7 @@
 
         try {
             // Fetch real notifications from your backend
-            const response = await fetch('/notifications?type=EMAIL', {
+            const response = await fetch('/notifications?type=EMAIL&read=0', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -599,9 +603,9 @@
 
             if (response.ok) {
                 const result = await response.json();
-                // console.log("notification data:",result.data.data)
+                // console.log("notification data:",result)
                 data.notifications = result.data.data || [];
-                data.unreadNotifications = result.unread_count || 0;
+                data.unreadNotifications = result.count || 0;
             } else {
                 throw new Error('Failed to fetch notifications');
             }
@@ -614,7 +618,7 @@
 
         try {
             // Fetch messages from your backend
-            const response = await fetch('/notifications?type=MESSAGE', {
+            const response = await fetch('/notifications?type=SUBSCRIBE&read=0', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -625,8 +629,9 @@
 
             if (response.ok) {
                 const result = await response.json();
+                // console.log('message data:',result.data.data);
                 data.messages = result.data.data || [];
-                data.unreadMessages = result.unread_count || 0;
+                data.unreadMessages = result.count || 0;
             } else {
                 throw new Error('Failed to fetch messages');
             }
@@ -665,7 +670,7 @@
             this.unreadNotifications = 0;
 
             // API call to mark all as read
-            fetch('/api/notifications/mark-all-read', {
+            fetch('/notifications/mark-all-read', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

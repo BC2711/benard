@@ -166,4 +166,9 @@ class NotificationManagerService
             'failed' => Notification::recent($days)->where('status', Notification::STATUS_FAILED)->count(),
         ];
     }
+
+    public function get_all($days = 30)
+    {
+        return  Notification::where('type', 'EMAIL')->orderBy('created_at', 'desc')->get();
+    }
 }

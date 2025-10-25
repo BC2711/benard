@@ -654,10 +654,10 @@
         };
 
         // Error boundary for JavaScript errors
-        window.addEventListener('error', (e) => {
-            console.error('JavaScript Error:', e.error);
-            LondaAdmin.notify('An unexpected error occurred. Please refresh the page.', 'error');
-        });
+        // window.addEventListener('error', (e) => {
+        //     console.error('JavaScript Error:', e.error);
+        //     LondaAdmin.notify('An unexpected error occurred. Please refresh the page.', 'error');
+        // });
 
         // Offline detection
         window.addEventListener('online', () => {

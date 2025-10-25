@@ -223,8 +223,8 @@ class NotificationController extends Controller
             $type = $request->get('type', 'EMAIL');
 
             Notification::where('type', $type)
-                ->where('status', 'PENDING')
-                ->update(['status' => 'SENT']);
+                ->where('read', 0)
+                ->update(['read' => 1]);
 
             return response()->json([
                 'success' => true,
@@ -295,12 +295,20 @@ class NotificationController extends Controller
                 $query->where('status', $request->status);
             }
 
+            if ($request->has('read')) {
+                $query->where('read', $request->boolean('read'));
+            }
+
             $notifications = $query->orderBy('created_at', 'desc')
                 ->paginate($request->get('per_page', 20));
 
+            // Get total count with the same filters
+            $count = (clone $query)->count();
+
             return response()->json([
                 'success' => true,
-                'data' => $notifications
+                'data' => $notifications,
+                'count' => $count
             ]);
         } catch (\Exception $e) {
             return response()->json([

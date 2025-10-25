@@ -26,7 +26,7 @@ Route::middleware('guest')->group(function () {
 
 Route::prefix('notifications')->group(function () {
     Route::post('/send', [NotificationController::class, 'sendNotification']);
-    Route::post('/subscribe', [NotificationController::class, 'subscribeNewsletter']);
+    Route::post('/subscribe', [EmailController::class, 'subscribe']);
     Route::get('/statistics', [NotificationController::class, 'statistics']);
     Route::post('/process-pending', [NotificationController::class, 'processPending']);
     Route::get('/', [NotificationController::class, 'index']);

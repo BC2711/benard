@@ -9,7 +9,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Total Loans</h3>
-                    <p class="text-2xl font-bold text-gray-900">1,248</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['email'] }}</p>
                 </div>
             </div>
             <div class="mt-4">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Approved</h3>
-                    <p class="text-2xl font-bold text-gray-900">892</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['sent'] }}</p>
                 </div>
             </div>
             <div class="mt-4">
@@ -41,7 +41,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Pending</h3>
-                    <p class="text-2xl font-bold text-gray-900">156</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['pending'] }}</p>
                 </div>
             </div>
             <div class="mt-4">
@@ -57,7 +57,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Rejected</h3>
-                    <p class="text-2xl font-bold text-gray-900">42</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['failed'] }}</p>
                 </div>
             </div>
             <div class="mt-4">
@@ -77,23 +77,27 @@
             <div class="p-6">
                 <div class="space-y-4">
                     <!-- Activity Item -->
-                    <div class="flex items-start space-x-4">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-londa-light rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-londa-orange"></i>
+                    @foreach ($data as $item)
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-londa-light rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-londa-orange"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900">Sarah Johnson</p>
-                            <p class="text-sm text-gray-500">Applied for Business Expansion Loan - $75,000</p>
-                            <p class="text-xs text-gray-400">2 hours ago</p>
-                        </div>
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                    </div>
 
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">{{$item['full_name']}}</p>
+                                <p class="text-sm text-gray-500">{{$item['message']}}</p>
+                                <p class="text-xs text-gray-400">2 hours ago</p>
+                            </div>
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{{$item['status']}}</span>
+
+
+                        </div>
+                    @endforeach
                     <!-- Activity Item -->
-                    <div class="flex items-start space-x-4">
+                    {{-- <div class="flex items-start space-x-4">
                         <div class="flex-shrink-0">
                             <div class="w-10 h-10 bg-londa-light rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-londa-orange"></i>
@@ -106,10 +110,10 @@
                         </div>
                         <span
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Approved</span>
-                    </div>
+                    </div> --}}
 
                     <!-- Activity Item -->
-                    <div class="flex items-start space-x-4">
+                    {{-- <div class="flex items-start space-x-4">
                         <div class="flex-shrink-0">
                             <div class="w-10 h-10 bg-londa-light rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-londa-orange"></i>
@@ -122,7 +126,7 @@
                         </div>
                         <span
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Review</span>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
