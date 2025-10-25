@@ -263,6 +263,53 @@
         margin-top: 1.25rem;
     }
 
+    /* Message Styles */
+    .form-message {
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1rem 0;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .form-message.success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .form-message.error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .form-message.info {
+        background-color: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+    }
+
+    /* Loading State */
+    .submit-btn.loading {
+        position: relative;
+        color: transparent;
+    }
+
+    .submit-btn.loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid transparent;
+        border-top: 2px solid #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
     /* Animations */
     @keyframes fadeIn {
         from {
@@ -295,6 +342,16 @@
 
         50% {
             transform: translateY(-10px);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
         }
     }
 
@@ -540,8 +597,10 @@
 
             <!-- Contact Form -->
             <div class="contact-form">
-                <form action="{{ $sectionData['form_config']['action'] ?? '/submit-application' }}" method="POST">
+                <form id="loanApplicationForm">
                     @csrf
+                    <div id="formMessage" class="form-message" style="display: none;"></div>
+
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="fullname">Full Name</label>
@@ -557,8 +616,8 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
-                            <input type="tel" name="phone" id="phone" placeholder="+1 (555) 000-0000"
-                                pattern="[0-9]{10,}" class="form-control">
+                            <input type="tel" name="phone" id="phone" placeholder="" {{-- pattern="[0-9]{10,}"  --}}
+                                class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="business">Business Type</label>
@@ -580,7 +639,7 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="loan-amount">Desired Loan Amount</label>
-                            <select name="loan-amount" id="loan-amount" class="form-control" required>
+                            <select name="loan_amount" id="loan-amount" class="form-control" required>
                                 <option value="" disabled selected>Select amount range</option>
                                 @foreach ($sectionData['form_options']['loan_amounts'] ?? [] as $loanAmount)
                                     <option value="{{ Str::slug($loanAmount) }}">{{ $loanAmount }}</option>
@@ -616,7 +675,8 @@
                             id="message" class="form-control"></textarea>
                     </div>
                     <div class="form-submit">
-                        <button type="submit" class="submit-btn" aria-label="Submit loan application">
+                        <button type="submit" class="submit-btn" id="submitBtn"
+                            aria-label="Submit loan application">
                             {{ $sectionData['form_config']['submit_text'] ?? 'Submit Application' }}
                         </button>
                         <p class="form-note">
@@ -628,3 +688,116 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('loanApplicationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formMessage = document.getElementById('formMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Validate required fields
+            if (!data.fullname || !data.email || !data.business || !data.loan_amount || !data
+                .purpose) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            // Validate email format
+            if (!isValidEmail(data.email)) {
+                showMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            // Show loading state
+            setLoadingState(true);
+
+            try {
+                const response = await fetch('/notifications/loan-application', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage(result.message ||
+                        'Application submitted successfully! We will contact you soon.',
+                        'success');
+                    form.reset(); 
+                } else {
+                    showMessage(result.message || 'Failed to submit application. Please try again.',
+                        'error');
+                }
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                showMessage('An error occurred. Please try again later.', 'error');
+            } finally {
+                setLoadingState(false);
+            }
+        });
+
+        function showMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type}`;
+            formMessage.style.display = 'block';
+
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    formMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function setLoadingState(loading) {
+            if (loading) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+                submitBtn.innerHTML = 'Submitting...';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+                submitBtn.innerHTML =
+                    '{{ $sectionData['form_config']['submit_text'] ?? 'Submit Application' }}';
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Phone number formatting
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                const value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 10) {
+                    e.target.value = formatPhoneNumber(value);
+                }
+            });
+        }
+
+        function formatPhoneNumber(phoneNumber) {
+            const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+            const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+                return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+            }
+            return phoneNumber;
+        }
+    });
+</script>

@@ -492,7 +492,10 @@
     function initializeHeader() {
         // Update current page title
         const pageTitle = document.querySelector('h1')?.textContent || 'Dashboard';
-        Alpine.$data(document.querySelector('header')).currentPage = pageTitle;
+        const header = document.querySelector('header');
+        if (header && header._x_dataStack) {
+            header._x_dataStack[0].currentPage = pageTitle;
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -502,34 +505,33 @@
                 const searchInput = document.querySelector('input[type="text"]');
                 if (searchInput) {
                     searchInput.focus();
-                    Alpine.$data(document.querySelector('header')).searchOpen = true;
+                    const header = document.querySelector('header');
+                    if (header && header._x_dataStack) {
+                        header._x_dataStack[0].searchOpen = true;
+                    }
                 }
             }
 
-            // Cmd/Ctrl + / for help
-            if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-                e.preventDefault();
-                showKeyboardShortcuts();
-            }
-        });
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            const header = document.querySelector('header');
-            const data = Alpine.$data(header);
-            if (!e.target.closest('[x-data]')) {
-                data.searchOpen = false;
-                data.notificationsOpen = false;
-                data.messagesOpen = false;
-                data.userMenuOpen = false;
-                data.quickActionsOpen = false;
+            // Escape key to close all dropdowns
+            if (e.key === 'Escape') {
+                const header = document.querySelector('header');
+                if (header && header._x_dataStack) {
+                    const data = header._x_dataStack[0];
+                    data.searchOpen = false;
+                    data.notificationsOpen = false;
+                    data.messagesOpen = false;
+                    data.userMenuOpen = false;
+                    data.quickActionsOpen = false;
+                }
             }
         });
     }
 
     function initializeSearch() {
         const header = document.querySelector('header');
-        const data = Alpine.$data(header);
+        if (!header || !header._x_dataStack) return;
+
+        const data = header._x_dataStack[0];
 
         // Sample search data
         data.searchResults = [{
@@ -559,25 +561,127 @@
         ];
 
         data.performSearch = function() {
-            if (this.searchQuery.length < 2) return;
+            if (this.searchQuery.length < 2) {
+                this.searchResults = [];
+                return;
+            }
 
             this.isLoading = true;
 
-            // Simulate API call
+            // Simulate API call - replace with actual API call
             setTimeout(() => {
                 this.isLoading = false;
-                // In real implementation, you would fetch from your backend
-                // this.searchResults = await fetchSearchResults(this.searchQuery);
+                // Filter results based on search query
+                this.searchResults = this.searchResults.filter(item =>
+                    item.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                    item.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+                );
             }, 300);
         };
     }
 
-    function initializeNotifications() {
+    async function initializeNotifications() {
         const header = document.querySelector('header');
-        const data = Alpine.$data(header);
+        if (!header || !header._x_dataStack) return;
 
-        // Sample notifications
-        data.notifications = [{
+        const data = header._x_dataStack[0];
+
+        try {
+            // Fetch real notifications from your backend
+            const response = await fetch('/notifications?type=EMAIL', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                // console.log("notification data:",result.data.data)
+                data.notifications = result.data.data || [];
+                data.unreadNotifications = result.unread_count || 0;
+            } else {
+                throw new Error('Failed to fetch notifications');
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            // Fallback to sample data
+            data.notifications = getSampleNotifications();
+            data.unreadNotifications = data.notifications.filter(n => n.unread).length;
+        }
+
+        try {
+            // Fetch messages from your backend
+            const response = await fetch('/notifications?type=MESSAGE', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                data.messages = result.data.data || [];
+                data.unreadMessages = result.unread_count || 0;
+            } else {
+                throw new Error('Failed to fetch messages');
+            }
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+            // Fallback to sample data for messages
+            data.messages = getSampleMessages();
+            data.unreadMessages = data.messages.filter(m => m.unread).length;
+        }
+
+        data.markAsRead = function(notificationId) {
+            const notification = this.notifications.find(n => n.id === notificationId);
+            if (notification && notification.unread) {
+                notification.unread = false;
+                this.unreadNotifications--;
+
+                // API call to mark as read
+                fetch(`/notifications/${notificationId}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }).catch(console.error);
+            }
+        };
+
+        data.markAllAsRead = function() {
+            this.notifications.forEach(notification => {
+                if (notification.unread) {
+                    notification.unread = false;
+                }
+            });
+
+            const previousUnread = this.unreadNotifications;
+            this.unreadNotifications = 0;
+
+            // API call to mark all as read
+            fetch('/api/notifications/mark-all-read', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).catch(error => {
+                // Revert if API call fails
+                this.unreadNotifications = previousUnread;
+                this.notifications.forEach(n => n.unread = true);
+                console.error('Failed to mark all as read:', error);
+            });
+        };
+    }
+
+    function getSampleNotifications() {
+        return [{
                 id: 1,
                 title: 'New Loan Application',
                 message: 'John Smith submitted a loan application for $25,000',
@@ -603,11 +707,21 @@
                 time: '5 hours ago',
                 unread: true,
                 url: '/documents'
+            },
+            {
+                id: 4,
+                title: 'System Maintenance',
+                message: 'Scheduled maintenance this weekend',
+                type: 'info',
+                time: '1 day ago',
+                unread: false,
+                url: '/announcements'
             }
         ];
+    }
 
-        // Sample messages
-        data.messages = [{
+    function getSampleMessages() {
+        return [{
                 id: 1,
                 name: 'Sarah Johnson',
                 avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
@@ -624,24 +738,19 @@
                 time: 'Yesterday',
                 unread: false,
                 url: '/messages/2'
+            },
+            {
+                id: 3,
+                name: 'Emily Rodriguez',
+                avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                preview: 'Thank you for the quick approval! When can I expect...',
+                time: '2 days ago',
+                unread: false,
+                url: '/messages/3'
             }
         ];
-
-        data.markAsRead = function(notificationId) {
-            const notification = this.notifications.find(n => n.id === notificationId);
-            if (notification && notification.unread) {
-                notification.unread = false;
-                this.unreadNotifications--;
-            }
-        };
-
-        data.markAllAsRead = function() {
-            this.notifications.forEach(notification => {
-                notification.unread = false;
-            });
-            this.unreadNotifications = 0;
-        };
     }
+
 
     function showKeyboardShortcuts() {
         const shortcuts = [{
@@ -666,32 +775,91 @@
             }
         ];
 
-        // You can implement a proper modal here
-        console.log('Keyboard Shortcuts:', shortcuts);
-        // For now, we'll use a simple alert
-        alert('Keyboard Shortcuts:\n\n' + shortcuts.map(s => `${s.key} - ${s.action}`).join('\n'));
+        // Create a beautiful modal for shortcuts
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Keyboard Shortcuts</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-3">
+                    ${shortcuts.map(shortcut => `
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">${shortcut.action}</span>
+                            <kbd class="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">${shortcut.key}</kbd>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-xl">
+                <button onclick="this.closest('.fixed').remove()" class="w-full px-4 py-2 bg-londa-orange text-white rounded-lg hover:bg-orange-600 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
     }
 
     // Export header utilities
     window.HeaderManager = {
         toggleSearch() {
             const header = document.querySelector('header');
-            const data = Alpine.$data(header);
-            data.searchOpen = !data.searchOpen;
-            if (data.searchOpen) {
-                const searchInput = document.querySelector('input[type="text"]');
-                searchInput?.focus();
+            if (header && header._x_dataStack) {
+                const data = header._x_dataStack[0];
+                data.searchOpen = !data.searchOpen;
+                if (data.searchOpen) {
+                    const searchInput = document.querySelector('input[type="text"]');
+                    setTimeout(() => searchInput?.focus(), 100);
+                }
             }
         },
 
         showNotification(message, type = 'info') {
-            // Implementation for showing toast notifications
-            console.log(`Notification (${type}):`, message);
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-transform duration-300 ${
+            type === 'success' ? 'bg-green-500 text-white' :
+            type === 'error' ? 'bg-red-500 text-white' :
+            type === 'warning' ? 'bg-yellow-500 text-white' :
+            'bg-blue-500 text-white'
+        }`;
+            toast.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <i class="fas ${
+                    type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' :
+                    type === 'warning' ? 'fa-exclamation-triangle' :
+                    'fa-info-circle'
+                }"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
         },
 
         updateNotificationCount(count) {
             const header = document.querySelector('header');
-            Alpine.$data(header).unreadNotifications = count;
+            if (header && header._x_dataStack) {
+                header._x_dataStack[0].unreadNotifications = count;
+            }
+        },
+
+        refreshNotifications() {
+            initializeNotifications();
         }
     };
 </script>

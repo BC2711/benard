@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\SectionController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,18 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
+
+Route::prefix('notifications')->group(function () {
+    Route::post('/send', [NotificationController::class, 'sendNotification']);
+    Route::post('/subscribe', [NotificationController::class, 'subscribeNewsletter']);
+    Route::get('/statistics', [NotificationController::class, 'statistics']);
+    Route::post('/process-pending', [NotificationController::class, 'processPending']);
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/loan-application',[EmailController::class,'send_loan_application_email']);
+});
+
 Route::prefix('management')->name('management.')->group(function () {
     Route::middleware('guest:management')->group(function () {
         Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
