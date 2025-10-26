@@ -806,7 +806,7 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
 img {
   max-width: 100%;
   height: auto;
-  border-radius: 50px;
+  border-radius: inherit;
 }
 
 video {

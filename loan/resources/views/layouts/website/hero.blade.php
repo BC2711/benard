@@ -126,20 +126,23 @@
         .hero-main-image {
             z-index: 1;
             position: absolute;
-            top: 10%;
+            top: 28%;
             right: 0;
             max-width: 100%;
             height: auto;
             max-height: 80%;
-            transform-style: inherit;
-            transparency: inherit;
+            margin-right: 20%;
+            /* Completely transparent */
+            opacity: 1;
+            /* Or completely hidden */
+            /* display: none; */
         }
 
-        .hero-main-image {
+        /* .hero-main-image {
             margin-right: 20%;
             color: #7a4603;
             background: linear-gradient(135deg, #7a4603 0%, #db9123 100%);
-        }
+        } */
 
         .hero-container {
             max-width: 1200px;

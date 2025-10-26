@@ -49,8 +49,17 @@
             right: 0;
             max-width: 100%;
             max-height: 80%;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            /* Remove all visible boundaries */
+            border-radius: none;
+            box-shadow: none;
+            border: none;
+            outline: none;
+            /* Make it blend with background */
+            opacity: 0.15;
+            /* Very subtle presence */
+            mix-blend-mode: soft-light;
+            /* Optional: apply color tint */
+            filter: sepia(0.3) hue-rotate(350deg) saturate(1.5);
         }
 
         .hero-image--shape1 {

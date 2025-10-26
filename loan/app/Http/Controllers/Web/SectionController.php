@@ -61,7 +61,7 @@ class SectionController extends Controller
                 'trustIndicators' => 'sometimes|array',
                 'trustIndicators.*.value' => 'required|string|max:50',
                 'trustIndicators.*.label' => 'required|string|max:100',
-                'hero_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048'
+                'hero_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
             ]);
 
             // Process trust indicators
@@ -481,7 +481,7 @@ class SectionController extends Controller
                 foreach ($request->file('image_files') as $index => $file) {
                     if ($file && $file->isValid()) {
                         $request->validate([
-                            "image_files.{$index}" => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                            "image_files.{$index}" => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
                         ]);
                     }
                 }
@@ -491,7 +491,7 @@ class SectionController extends Controller
                 foreach ($request->file('shape_files') as $index => $file) {
                     if ($file && $file->isValid()) {
                         $request->validate([
-                            "shape_files.{$index}" => 'image|mimes:jpeg,png,jpg,gif,svg|max:1024'
+                            "shape_files.{$index}" => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024'
                         ]);
                     }
                 }
