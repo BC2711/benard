@@ -4,14 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ $title ?? 'Loan Calculator - Londa Loans' }}</title>
-    <!-- Laravel Asset Helper for static files -->
-    <script defer src="{{ asset('assets/js/tailwind.js') }}"></script>
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
-
-    <!-- Include Alpine.js for x-data functionality -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+    
 </head>
 
 <style>
@@ -677,12 +671,9 @@
     }
 </style>
 
-<body x-data="loanCalculator()" x-init="init()" :class="{ 'dark': darkMode }">
+<body >
 
-    <!-- Header -->
-    @include('layouts.website.header')
-
-    <main>
+  
         <!-- Hero Section -->
         <section class="calculator-hero">
             <div class="container">
@@ -839,17 +830,9 @@
             </section>
         </div>
 
-        <!-- Contact -->
-        @include('layouts.website.contact')
+       
 
-        <!-- CTA -->
-        @include('layouts.website.cta')
-    </main>
 
-    <!-- Footer -->
-    @include('layouts.website.footer')
-
-    <script defer src="{{ asset('assets/js/bundle.js') }}"></script>
     <script>
         function loanCalculator() {
             return {

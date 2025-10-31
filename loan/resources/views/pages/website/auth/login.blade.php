@@ -158,6 +158,9 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            /* margin-top: 10px; */
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .login-header {
@@ -653,7 +656,7 @@
                     </span>
                 </button>
 
-                <div class="divider">
+                {{-- <div class="divider">
                     <span>Or continue with</span>
                 </div>
 
@@ -668,7 +671,7 @@
                         <i class="fab fa-linkedin"></i>
                         <span>LinkedIn</span>
                     </button>
-                </div>
+                </div> --}}
 
                 <div class="register-link">
                     Don't have an account?

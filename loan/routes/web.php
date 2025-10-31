@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FooterController;
+use App\Http\Controllers\Admin\HeroSectionController;
+use App\Http\Controllers\Admin\LoanCalculatorController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\EmailController;
@@ -8,12 +12,31 @@ use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\SectionController;
 use Illuminate\Support\Facades\Route;
 
+
+
+Route::get('/web', function () {
+    return view('website.index');
+});
+
+Route::get('/web/calculator', function () {
+    return view('website.calculator');
+});
+
 Route::get('/', function () {
     return view('pages.website.index');
 });
 
+
+
 Route::get('/calculator', function () {
     return view('pages.website.calculator');
+});
+Route::get('/stories', function () {
+    return view('pages.website.project_details');
+});
+
+Route::get('/service-details', function () {
+    return view('pages.website.service_detail');
 });
 
 Route::get('/londa', function () {
@@ -32,7 +55,7 @@ Route::prefix('notifications')->group(function () {
     Route::get('/', [NotificationController::class, 'index']);
     Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
-    Route::post('/loan-application',[EmailController::class,'send_loan_application_email']);
+    Route::post('/loan-application', [EmailController::class, 'send_loan_application_email']);
 });
 
 Route::prefix('management')->name('management.')->group(function () {
@@ -65,8 +88,8 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // website management routes
-        Route::get('/hero-section', [SectionController::class, 'hero_section'])->name('hero-section');
-        Route::post('/hero-section', [SectionController::class, 'hero_section'])->name('hero-section');
+        Route::match(['get', 'post'], '/hero-section', [SectionController::class, 'hero_section'])->name('hero-section');
+        // Route::post('/hero-section', [SectionController::class, 'hero_section'])->name('hero-section');
 
         Route::get('/feature-section', [SectionController::class, 'feature_section'])->name('feature-section');
         Route::post('/feature-section', [SectionController::class, 'feature_section'])->name('feature-section');
@@ -109,4 +132,14 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::get('/footer-section', [SectionController::class, 'footer_section'])->name('footer-section');
         Route::post('/footer-section', [SectionController::class, 'footer_section'])->name('footer-section');
     });
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+
+    // Other routes...
+    Route::resource('hero', HeroSectionController::class);
+    Route::resource('calculator', LoanCalculatorController::class);
+    Route::resource('footer', FooterController::class);
+    // ...
 });

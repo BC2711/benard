@@ -13,111 +13,312 @@ use Illuminate\Support\Facades\Validator;
 
 class SectionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function hero_section(Request $request)
     {
-        // Get or create hero section data
-        $section = Section::where('section_type', 'HERO')->first();
-
-        if (!$section) {
-            $defaultContent = [
-                'heading' => 'Get a Loan for Your Business Growth or Startup',
-                'description' => 'Fast, flexible financing solutions designed specifically for marketers and entrepreneurs. Grow your business with our tailored loan programs.',
-                'ctaButton' => [
-                    'text' => 'Get Started Now',
-                    'url' => '/#support'
-                ],
-                'ctaPhone' => '+123456789',
-                'ctaPhoneSubtext' => 'For any question or concern',
-                'trustIndicators' => [
-                    ['value' => '500+', 'label' => 'Marketeers Funded'],
-                    ['value' => '$10M+', 'label' => 'Amount Disbursed'],
-                    ['value' => '24/7', 'label' => 'Customer Support']
+        try {
+            // 1 Retrieve or create the HERO section
+            $section = Section::firstOrCreate(
+                ['section_type' => 'HERO'],
+                [
+                    'name' => 'Hero Section',
+                    'description' => 'Main hero section of the website',
+                    'status' => 'ACTIVE',
+                    'content' => [
+                        'heading' => 'Get a Loan for Your Business Growth or Startup',
+                        'description' => 'Fast, flexible financing solutions designed specifically for marketers and entrepreneurs. Grow your business with our tailored loan programs.',
+                        'ctaButton' => [
+                            'text' => 'Get Started Now',
+                            'url' => '/#support'
+                        ],
+                        'ctaPhone' => '+123456789',
+                        'ctaPhoneSubtext' => 'For any question or concern',
+                        'trustIndicators' => [
+                            ['value' => '500+', 'label' => 'Marketeers Funded'],
+                            ['value' => '$10M+', 'label' => 'Amount Disbursed'],
+                            ['value' => '24/7', 'label' => 'Customer Support']
+                        ]
+                    ],
+                    'published_at' => now(),
+                    'author' => 'system',
+                    'last_modified_by' => 'system'
                 ]
-            ];
+            );
 
-            $section = Section::create([
-                'name' => 'Hero Section',
-                'description' => 'Main hero section of the website',
-                'section_type' => 'HERO',
-                'status' => 'ACTIVE',
-                'content' => $defaultContent,
-                'published_at' => now(),
-                'author' => 'system',
-                'last_modified_by' => 'system'
-            ]);
-        }
+            // 2 Handle POST request (update)
+            if ($request->isMethod('post')) {
+                // ✅ Enhanced file upload debugging
+                Log::info('File upload debug', [
+                    'hasFile_hero_image' => $request->hasFile('hero_image'),
+                    'files' => $request->allFiles(),
+                    'all_inputs' => array_keys($request->all()),
+                    'file_details' => $request->file('hero_image') ? [
+                        'name' => $request->file('hero_image')->getClientOriginalName(),
+                        'size' => $request->file('hero_image')->getSize(),
+                        'mime' => $request->file('hero_image')->getMimeType(),
+                        'extension' => $request->file('hero_image')->getClientOriginalExtension(),
+                    ] : null,
+                ]);
 
-        if ($request->isMethod('post')) {
-            $data = $request->validate([
-                'heading' => 'required|string|max:255',
-                'description' => 'required|string|max:500',
-                'ctaButtonText' => 'required|string|max:50',
-                'ctaButtonUrl' => 'required|max:255',
-                'ctaPhone' => 'required|string|max:20',
-                'ctaPhoneSubtext' => 'required|string|max:100',
-                'trustIndicators' => 'sometimes|array',
-                'trustIndicators.*.value' => 'required|string|max:50',
-                'trustIndicators.*.label' => 'required|string|max:100',
-                'hero_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
-            ]);
+                // ✅ Fixed validation rules - make hero_image optional
+                $validator = Validator::make($request->all(), [
+                    'heading' => 'required|string|max:255',
+                    'description' => 'required|string|max:500',
+                    'ctaButtonText' => 'required|string|max:50',
+                    'ctaButtonUrl' => 'required|string|max:255',
+                    'ctaPhone' => 'required|string|max:20',
+                    'ctaPhoneSubtext' => 'required|string|max:100',
+                    'trustIndicators' => 'nullable|array',
+                    'trustIndicators.*.value' => 'nullable|string|max:50',
+                    'trustIndicators.*.label' => 'nullable|string|max:100',
+                    'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:4096', // 4MB max
+                ], [
+                    'hero_image.image' => 'The hero image must be a valid image file.',
+                    'hero_image.mimes' => 'The hero image must be a JPEG, PNG, JPG, GIF, WEBP, or SVG file.',
+                    'hero_image.max' => 'The hero image must not exceed 4MB.',
+                ]);
 
-            // Process trust indicators
-            $trustIndicators = [];
-            if (isset($data['trustIndicators'])) {
-                foreach ($data['trustIndicators'] as $indicator) {
-                    if (!empty($indicator['value']) && !empty($indicator['label'])) {
-                        $trustIndicators[] = [
-                            'value' => $indicator['value'],
-                            'label' => $indicator['label']
-                        ];
+                if ($validator->fails()) {
+                    Log::error('Validation failed', ['errors' => $validator->errors()->toArray()]);
+                    return back()->withErrors($validator)->withInput();
+                }
+
+                $validated = $validator->validated();
+
+                // ✅ Normalize trust indicators
+                $trustIndicators = collect($validated['trustIndicators'] ?? [])
+                    ->filter(fn($item) => !empty($item['value']) && !empty($item['label']))
+                    ->values()
+                    ->toArray();
+
+                // ✅ Merge updated content
+                $currentContent = (array) $section->content;
+                $heroData = array_merge($currentContent, [
+                    'heading' => $validated['heading'],
+                    'description' => $validated['description'],
+                    'ctaButton' => [
+                        'text' => $validated['ctaButtonText'],
+                        'url' => $validated['ctaButtonUrl']
+                    ],
+                    'ctaPhone' => $validated['ctaPhone'],
+                    'ctaPhoneSubtext' => $validated['ctaPhoneSubtext'],
+                    'trustIndicators' => $trustIndicators
+                ]);
+
+                // ✅ Enhanced image upload handling with better error reporting
+                if ($request->hasFile('hero_image') && $request->file('hero_image')->isValid()) {
+                    $file = $request->file('hero_image');
+
+                    Log::info('Processing hero image upload', [
+                        'filename' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType()
+                    ]);
+
+                    $uploadResult = $this->handleImageUploadHero($file, $currentContent['hero_image'] ?? null);
+
+                    if ($uploadResult['success']) {
+                        $heroData['hero_image'] = $uploadResult['path'];
+                        Log::info('Hero image uploaded successfully', [
+                            'path' => $uploadResult['path'],
+                            'full_url' => Storage::disk('public')->url($uploadResult['path'])
+                        ]);
+                    } else {
+                        Log::error('Image upload failed', ['error' => $uploadResult['error']]);
+                        return back()->with('error', 'Image upload failed: ' . $uploadResult['error'])->withInput();
+                    }
+                } else {
+                    Log::info('No valid hero image file provided or file upload error', [
+                        'has_file' => $request->hasFile('hero_image'),
+                        'is_valid' => $request->hasFile('hero_image') ? $request->file('hero_image')->isValid() : false,
+                        'error' => $request->hasFile('hero_image') ? $request->file('hero_image')->getError() : 'No file'
+                    ]);
+
+                    // Keep existing image if no new one uploaded
+                    if (isset($currentContent['hero_image'])) {
+                        $heroData['hero_image'] = $currentContent['hero_image'];
                     }
                 }
+
+                // ✅ Save update
+                $section->update([
+                    'content' => $heroData,
+                    'last_modified_by' => Auth::user()->name ?? 'admin'
+                ]);
+
+                return back()->with('success', 'Hero section updated successfully.');
             }
 
-            // Get current content - ensure it's an array
-            $currentContent = $this->getContentAsArray($section->content);
+            // 3 Return view (always with array)
+            $heroData = (array) $section->content;
 
-            $heroData = array_merge($currentContent, [
-                'heading' => $data['heading'],
-                'description' => $data['description'],
-                'ctaButton' => [
-                    'text' => $data['ctaButtonText'],
-                    'url' => $data['ctaButtonUrl']
-                ],
-                'ctaPhone' => $data['ctaPhone'],
-                'ctaPhoneSubtext' => $data['ctaPhoneSubtext'],
-                'trustIndicators' => $trustIndicators
+            return view('pages.website.hero', compact('heroData', 'section'));
+        } catch (\Throwable $th) {
+            Log::error('Hero section error', [
+                'message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine()
             ]);
+            return back()->with('error', 'Something went wrong: ' . $th->getMessage());
+        }
+    }
 
-            // Handle image upload
-            if ($request->hasFile('hero_image')) {
-                // Delete old image if exists
-                if (isset($currentContent['hero_image']) && Storage::exists($currentContent['hero_image'])) {
-                    Storage::delete($currentContent['hero_image']);
+    /**
+     * Enhanced image upload with better error handling and SVG support
+     */
+    private function handleImageUploadHero($file, $oldImagePath = null)
+    {
+        try {
+            // 1. Basic file validation
+            if (!$file->isValid()) {
+                $errorCode = $file->getError();
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'File too large (server limit)',
+                    UPLOAD_ERR_FORM_SIZE => 'File too large (form limit)',
+                    UPLOAD_ERR_PARTIAL => 'File partially uploaded',
+                    UPLOAD_ERR_NO_FILE => 'No file uploaded',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write to disk',
+                    UPLOAD_ERR_EXTENSION => 'PHP extension stopped upload',
+                ];
+
+                return [
+                    'success' => false,
+                    'error' => $errorMessages[$errorCode] ?? 'Upload error: ' . $errorCode
+                ];
+            }
+
+            // 2. File size validation (4MB limit)
+            $maxSize = 8 * 1024 * 1024; // 4MB in bytes
+            if ($file->getSize() > $maxSize) {
+                return [
+                    'success' => false,
+                    'error' => 'File size must be less than 4MB. Current size: ' . round($file->getSize() / 1024 / 1024, 2) . 'MB'
+                ];
+            }
+
+            // 3. MIME type and extension validation
+            $allowedMimes = [
+                'image/jpeg' => 'jpg',
+                'image/jpg' => 'jpg',
+                'image/png' => 'png',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+                'image/svg+xml' => 'svg',
+                'text/html' => 'svg', // Sometimes SVG is detected as text/html
+            ];
+
+            $fileMime = $file->getMimeType();
+            $fileExtension = strtolower($file->getClientOriginalExtension());
+
+            // Special handling for SVG files
+            if ($fileExtension === 'svg' || $fileMime === 'image/svg+xml' || $fileMime === 'text/html') {
+                $fileMime = 'image/svg+xml';
+                $fileExtension = 'svg';
+            }
+
+            if (!array_key_exists($fileMime, $allowedMimes)) {
+                return [
+                    'success' => false,
+                    'error' => 'Invalid file type. Allowed: JPEG, PNG, GIF, WEBP, SVG. Detected: ' . $fileMime
+                ];
+            }
+
+            // 4. Prepare storage
+            $storagePath = 'hero-images';
+            $storage = Storage::disk('public');
+
+            // Ensure directory exists and is writable
+            if (!$storage->exists($storagePath)) {
+                $storage->makeDirectory($storagePath, 0755, true);
+            }
+
+            // Check if directory is writable
+            $fullPath = $storage->path($storagePath);
+            if (!is_writable($fullPath)) {
+                // Try to fix permissions
+                @chmod($fullPath, 0755);
+                if (!is_writable($fullPath)) {
+                    return [
+                        'success' => false,
+                        'error' => 'Storage directory not writable. Please check permissions.'
+                    ];
+                }
+            }
+
+            // 5. Delete old image if it exists
+            if ($oldImagePath && $storage->exists($oldImagePath)) {
+                try {
+                    $storage->delete($oldImagePath);
+                    Log::info('Old hero image deleted', ['path' => $oldImagePath]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to delete old hero image', [
+                        'path' => $oldImagePath,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // 6. Generate secure filename
+            $filename = 'hero-' . time() . '-' . bin2hex(random_bytes(8)) . '.' . $fileExtension;
+
+            // 7. Handle different image types appropriately
+            try {
+                if ($fileMime === 'image/svg+xml') {
+                    // For SVG files, use simple copy with validation
+                    $svgContent = file_get_contents($file->getRealPath());
+
+                    // Basic SVG validation
+                    if (strpos($svgContent, '<svg') === false) {
+                        return [
+                            'success' => false,
+                            'error' => 'Invalid SVG file - missing SVG tag'
+                        ];
+                    }
+
+                    // Store SVG file
+                    $storage->put($storagePath . '/' . $filename, $svgContent);
+                } else {
+                    // For raster images, use Laravel's store method
+                    $storedPath = $file->storeAs($storagePath, $filename, 'public');
+                    if (!$storedPath) {
+                        throw new \Exception('Failed to store image file');
+                    }
                 }
 
-                $imagePath = $request->file('hero_image')->store('hero-images', 'public');
-                $heroData['hero_image'] = $imagePath;
-            }
+                Log::info('Image stored successfully', [
+                    'path' => $storagePath . '/' . $filename,
+                    'type' => $fileMime
+                ]);
 
-            $section->update([
-                'content' => $heroData,
-                'last_modified_by' => Auth::user()->name ?? 'admin'
+                return [
+                    'success' => true,
+                    'path' => $storagePath . '/' . $filename,
+                    'url' => $storage->url($storagePath . '/' . $filename)
+                ];
+            } catch (\Exception $e) {
+                Log::error('Failed to store image file', [
+                    'error' => $e->getMessage(),
+                    'filename' => $filename
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'Failed to store image: ' . $e->getMessage()
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Image upload processing failed', [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName(),
+                'mime' => $file->getMimeType()
             ]);
 
-            return redirect()->back()->with('success', 'Hero section updated successfully.');
+            return [
+                'success' => false,
+                'error' => 'Image processing failed: ' . $e->getMessage()
+            ];
         }
-
-        // Ensure content is always returned as array
-        $heroData = $this->getContentAsArray($section->content);
-
-        return view('pages.website.hero', [
-            'heroData' => $heroData,
-            'section' => $section
-        ]);
     }
 
     /**

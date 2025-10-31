@@ -1,0 +1,17 @@
+@include('components.website.header')
+@include('components.website.menu')
+<div class="h-20"></div>
+@include('components.website.hero')
+@include('components.website.about')
+@include('components.website.features')
+@include('components.website.service')
+@include('components.website.price')
+@include('components.website.team')
+@include('components.website.project')
+@include('components.website.testimonial')
+@include('components.website.counter')
+@include('components.website.client')
+{{-- @include('components.website.blog') --}}
+@include('components.website.contact')
+@include('components.website.footer')
+@include('components.website.closing_header')

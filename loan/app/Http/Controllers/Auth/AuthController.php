@@ -114,15 +114,15 @@ class AuthController extends Controller
             $credentials = $request->only('email', 'password');
 
             // Attempt to authenticate the user
-            if (Auth::guard('management')->attempt($credentials)) {
-                if (Auth::guard('management')->user()->role !== 'ADMIN') {
-                    Auth::guard('management')->logout();
+            if (Auth::guard('admin')->attempt($credentials)) {
+                if (Auth::guard('admin')->user()->role !== 'ADMIN') {
+                    Auth::guard('admin')->logout();
                     return back()->withErrors(['email' => __('auth.unauthorized')]);
                 }
 
                 $user->update(['attempts' => 0, 'locked_at' => null]);
                 $request->session()->regenerate();
-                return redirect()->intended(route('management.dashboard'));
+                return redirect()->intended(route('admin.dashboard'));
             }
 
             // Handle failed login attempt
@@ -159,10 +159,10 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::guard('management')->logout();
+        Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('management.login');
+        return redirect()->route('admin.login');
     }
 
     // Show registration form
@@ -196,7 +196,7 @@ class AuthController extends Controller
         }
 
         try {
-            $status = Password::broker('management')->sendResetLink(
+            $status = Password::broker('admin')->sendResetLink(
                 $request->only('email')
             );
 
@@ -221,7 +221,7 @@ class AuthController extends Controller
             return back()->withErrors(['email' => __('auth.failed')]);
         }
         try {
-            $status = Password::broker('management')->reset(
+            $status = Password::broker('admin')->reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
                 function ($user, $password) {
                     $user->forceFill([
@@ -237,7 +237,7 @@ class AuthController extends Controller
             );
 
             return $status === Password::PASSWORD_RESET
-                ? redirect()->route('management.login')->with('status', __($status))
+                ? redirect()->route('admin.login')->with('status', __($status))
                 : back()->withErrors(['email' => __($status)]);
         } catch (\Throwable $th) {
             //throw $th;

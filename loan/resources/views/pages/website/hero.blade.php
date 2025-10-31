@@ -410,6 +410,26 @@
             border-top: 1px solid #e5e7eb;
         }
 
+        /* Success/Error Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #7f1d1d;
+        }
+
         /* Animations */
         @keyframes float {
 
@@ -533,6 +553,7 @@
         }
     </style>
 @endpush
+
 @section('breadcrumbs')
     <nav class="flex items-center space-x-2">
         <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
@@ -540,9 +561,11 @@
         <span class="text-sm text-gray-500">Hero Section</span>
     </nav>
 @endsection
+
 @section('page-icon')
     <i class="fas fa-home fa-lg text-gray-700"></i>
 @endsection
+
 @section('page-title')
     <h1 class="text-2xl font-bold text-gray-900">Hero Section Management</h1>
     <p class="text-gray-600 text-sm mt-1">Customize and manage the hero section for your website. Changes are
@@ -550,12 +573,25 @@
 @endsection
 
 @section('title', 'Hero Section Management')
+
 @section('content')
     <div class="main-content">
+        <!-- Success/Error Messages -->
+        @if (session('success'))
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+            </div>
+        @endif
+
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-
                 <div class="flex gap-2">
                     <button
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
@@ -570,191 +606,201 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Hero Preview -->
-    <div class="hero-preview-container">
-        <section class="hero-section" aria-label="Hero Section Preview">
-            <div class="hero-images" id="heroImages">
-                <img src="{{ asset('assets/images/shape-01.svg') }}" alt="Decorative shape"
-                    class="hero-image hero-image--shape1">
-                <img src="{{ asset('assets/images/shape-02.svg') }}" alt="Decorative shape"
-                    class="hero-image hero-image--shape2">
-                <img src="{{ asset('assets/images/shape-03.svg') }}" alt="Decorative shape"
-                    class="hero-image hero-image--shape3">
-                <img src="{{ asset('assets/images/shape-04.svg') }}" alt="Decorative shape"
-                    class="hero-image hero-image--shape4">
+        <!-- Hero Preview -->
+        <div class="hero-preview-container">
+            <section class="hero-section" aria-label="Hero Section Preview">
+                <div class="hero-images" id="heroImages">
+                    <img src="{{ asset('assets/images/shape-01.svg') }}" alt="Decorative shape"
+                        class="hero-image hero-image--shape1">
+                    <img src="{{ asset('assets/images/shape-02.svg') }}" alt="Decorative shape"
+                        class="hero-image hero-image--shape2">
+                    <img src="{{ asset('assets/images/shape-03.svg') }}" alt="Decorative shape"
+                        class="hero-image hero-image--shape3">
+                    <img src="{{ asset('assets/images/shape-04.svg') }}" alt="Decorative shape"
+                        class="hero-image hero-image--shape4">
 
-                @if (isset($heroData['hero_image']) && $heroData['hero_image'])
-                    <img src="{{ Storage::url($heroData['hero_image']) }}" alt="Woman representing business growth"
-                        class="hero-image hero-image--main">
-                @else
-                    <img src="{{ asset('assets/images/hero.png') }}" alt="Woman representing business growth"
-                        class="hero-image hero-image--main">
-                @endif
-            </div>
+                    @if (isset($heroData['hero_image']) && $heroData['hero_image'])
+                        <img src="{{ Storage::disk('public')->url($heroData['hero_image']) }}"
+                            alt="Woman representing business growth" class="hero-image hero-image--main">
+                    @else
+                        <img src="{{ asset('assets/images/hero.png') }}" alt="Woman representing business growth"
+                            class="hero-image hero-image--main">
+                    @endif
+                </div>
 
-            <div class="hero-content">
-                <div class="hero-text" id="heroText">
-                    <a href="{{ route('management.dashboard') }}" class="logo-container">
-                        <div class="logo-text">
-                            <span class="logo-londa">Londa</span>
-                            <span class="logo-loans">Loans</span>
-                        </div>
-                        <span class="logo-tagline">empowering marketeers</span>
-                    </a>
-                    <h1 class="hero-heading" id="previewHeading">
-                        {{ $heroData['heading'] ?? 'Get a Loan for Your Business Growth or Startup' }}
-                    </h1>
-                    <p class="hero-description" id="previewDescription">
-                        {{ $heroData['description'] ?? 'Fast, flexible financing solutions designed specifically for marketers and entrepreneurs. Grow your business with our tailored loan programs.' }}
-                    </p>
-                    <div class="hero-cta">
-                        <a href="{{ $heroData['ctaButton']['url'] ?? '#!' }}" class="cta-button" id="previewCtaButton">
-                            {{ $heroData['ctaButton']['text'] ?? 'Get Started Now' }}
+                <div class="hero-content">
+                    <div class="hero-text" id="heroText">
+                        <a href="{{ route('management.dashboard') }}" class="logo-container">
+                            <div class="logo-text">
+                                <span class="logo-londa">Londa</span>
+                                <span class="logo-loans">Loans</span>
+                            </div>
+                            <span class="logo-tagline">empowering marketeers</span>
                         </a>
-                        <div class="cta-contact">
-                            <a href="tel:{{ $heroData['ctaPhone'] ?? '+123456789' }}" class="cta-phone"
-                                id="previewCtaPhone">
-                                {{ $heroData['ctaPhone'] ?? '+123456789' }}
+                        <h1 class="hero-heading" id="previewHeading">
+                            {{ $heroData['heading'] ?? 'Get a Loan for Your Business Growth or Startup' }}
+                        </h1>
+                        <p class="hero-description" id="previewDescription">
+                            {{ $heroData['description'] ?? 'Fast, flexible financing solutions designed specifically for marketers and entrepreneurs. Grow your business with our tailored loan programs.' }}
+                        </p>
+                        <div class="hero-cta">
+                            <a href="{{ $heroData['ctaButton']['url'] ?? '#!' }}" class="cta-button" id="previewCtaButton">
+                                {{ $heroData['ctaButton']['text'] ?? 'Get Started Now' }}
                             </a>
-                            <span class="cta-phone-subtext" id="previewCtaPhoneSubtext">
-                                {{ $heroData['ctaPhoneSubtext'] ?? 'For any question or concern' }}
-                            </span>
+                            <div class="cta-contact">
+                                <a href="tel:{{ $heroData['ctaPhone'] ?? '+123456789' }}" class="cta-phone"
+                                    id="previewCtaPhone">
+                                    {{ $heroData['ctaPhone'] ?? '+123456789' }}
+                                </a>
+                                <span class="cta-phone-subtext" id="previewCtaPhoneSubtext">
+                                    {{ $heroData['ctaPhoneSubtext'] ?? 'For any question or concern' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="trust-indicators" role="list" id="previewTrustIndicators">
+                            @foreach ($heroData['trustIndicators'] ?? [] as $indicator)
+                                <div class="trust-indicator" role="listitem">
+                                    <span class="trust-value">{{ $indicator['value'] ?? '' }}</span>
+                                    <span class="trust-label">{{ $indicator['label'] ?? '' }}</span>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
-                    <div class="trust-indicators" role="list" id="previewTrustIndicators">
-                        @foreach ($heroData['trustIndicators'] ?? [] as $indicator)
-                            <div class="trust-indicator" role="listitem">
-                                <span class="trust-value">{{ $indicator['value'] ?? '' }}</span>
-                                <span class="trust-label">{{ $indicator['label'] ?? '' }}</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel" role="dialog" aria-labelledby="adminPanelTitle" aria-modal="true">
+            <h3 id="adminPanelTitle">
+                <i class="fas fa-edit"></i>
+                Manage Hero Content
+            </h3>
+
+            <form id="heroForm" action="{{ route('management.hero-section') }}" method="POST" novalidate
+                enctype="multipart/form-data">
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-6">
+                        <div class="form-group">
+                            <label for="heroHeading">Heading *</label>
+                            <input type="text" id="heroHeading" name="heading" class="form-control"
+                                value="{{ old('heading', $heroData['heading'] ?? '') }}"
+                                placeholder="Enter compelling heading..." required>
+                            <span class="error-message" id="heroHeadingError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="heroDescription">Description *</label>
+                            <textarea id="heroDescription" name="description" class="form-control" rows="4"
+                                placeholder="Describe your services..." required>{{ old('description', $heroData['description'] ?? '') }}</textarea>
+                            <span class="error-message" id="heroDescriptionError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctaButtonText">CTA Button Text *</label>
+                            <input type="text" id="ctaButtonText" name="ctaButtonText" class="form-control"
+                                value="{{ old('ctaButtonText', $heroData['ctaButton']['text'] ?? '') }}"
+                                placeholder="e.g., Get Started Now" required>
+                            <span class="error-message" id="ctaButtonTextError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctaButtonUrl">CTA Button URL *</label>
+                            <input type="url" id="ctaButtonUrl" name="ctaButtonUrl" class="form-control"
+                                value="{{ old('ctaButtonUrl', $heroData['ctaButton']['url'] ?? '') }}"
+                                placeholder="https://example.com/apply" required>
+                            <span class="error-message" id="ctaButtonUrlError"></span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-6">
+                        <div class="form-group">
+                            <label for="ctaPhone">Phone Number *</label>
+                            <input type="tel" id="ctaPhone" name="ctaPhone" class="form-control"
+                                value="{{ old('ctaPhone', $heroData['ctaPhone'] ?? '') }}" placeholder="+1234567890"
+                                required pattern="[0-9+\-\s()]{10,}">
+                            <span class="error-message" id="ctaPhoneError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctaPhoneSubtext">Phone Subtext *</label>
+                            <input type="text" id="ctaPhoneSubtext" name="ctaPhoneSubtext" class="form-control"
+                                value="{{ old('ctaPhoneSubtext', $heroData['ctaPhoneSubtext'] ?? '') }}"
+                                placeholder="e.g., Available 24/7" required>
+                            <span class="error-message" id="ctaPhoneSubtextError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="heroImage">Hero Image</label>
+                            <input type="file" id="heroImage" name="hero_image" class="form-control"
+                                accept="image/*">
+                            @if (isset($heroData['hero_image']) && $heroData['hero_image'])
+                                <div class="image-preview">
+                                    <img src="{{ Storage::disk('public')->url($heroData['hero_image']) }}"
+                                        alt="Current hero image">
+                                    <p class="text-sm text-gray-600 mt-2 text-center">Current image</p>
+                                </div>
+                            @endif
+                            <span class="error-message" id="heroImageError"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trust Indicators -->
+                <div class="form-group">
+                    <label>Trust Indicators</label>
+                    <div id="trustIndicatorsContainer" class="trust-indicators-container">
+                        @php
+                            $trustIndicators = $heroData['trustIndicators'] ?? [];
+                            // Ensure we have at least one empty row if no data exists
+                            if (empty($trustIndicators)) {
+                                $trustIndicators = [['value' => '', 'label' => '']];
+                            }
+                        @endphp
+
+                        @foreach ($trustIndicators as $index => $indicator)
+                            <div class="trust-item-row">
+                                <input type="text" name="trustIndicators[{{ $index }}][value]"
+                                    class="form-control trust-value-input"
+                                    value="{{ old("trustIndicators.$index.value", $indicator['value'] ?? '') }}"
+                                    data-id="{{ $index }}" placeholder="Value (e.g., 500+)">
+                                <input type="text" name="trustIndicators[{{ $index }}][label]"
+                                    class="form-control trust-label-input"
+                                    value="{{ old("trustIndicators.$index.label", $indicator['label'] ?? '') }}"
+                                    data-id="{{ $index }}" placeholder="Label (e.g., Marketeers Funded)">
+                                <button type="button" class="admin-btn btn-danger remove-trust-indicator"
+                                    data-id="{{ $index }}" aria-label="Remove trust indicator">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         @endforeach
                     </div>
+                    <button type="button" class="admin-btn btn-save mt-3" id="addTrustIndicator">
+                        <i class="fas fa-plus"></i> Add Trust Indicator
+                    </button>
                 </div>
-            </div>
-        </section>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="admin-btn btn-cancel" id="cancelEdit">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="admin-btn btn-save">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <button class="toggle-admin" id="toggleAdmin" aria-label="Toggle admin panel">
+            <i class="fas fa-cog"></i>
+        </button>
     </div>
-
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel" role="dialog" aria-labelledby="adminPanelTitle" aria-modal="true">
-        <h3 id="adminPanelTitle">
-            <i class="fas fa-edit"></i>
-            Manage Hero Content
-        </h3>
-
-        <form id="heroForm" action="{{ route('management.hero-section') }}" method="POST" novalidate
-            enctype="multipart/form-data">
-            @csrf
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left Column -->
-                <div class="space-y-6">
-                    <div class="form-group">
-                        <label for="heroHeading">Heading *</label>
-                        <input type="text" id="heroHeading" name="heading" class="form-control"
-                            value="{{ old('heading', $heroData['heading'] ?? '') }}"
-                            placeholder="Enter compelling heading..." required>
-                        <span class="error-message" id="heroHeadingError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="heroDescription">Description *</label>
-                        <textarea id="heroDescription" name="description" class="form-control" rows="4"
-                            placeholder="Describe your services..." required>{{ old('description', $heroData['description'] ?? '') }}</textarea>
-                        <span class="error-message" id="heroDescriptionError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ctaButtonText">CTA Button Text *</label>
-                        <input type="text" id="ctaButtonText" name="ctaButtonText" class="form-control"
-                            value="{{ old('ctaButtonText', $heroData['ctaButton']['text'] ?? '') }}"
-                            placeholder="e.g., Get Started Now" required>
-                        <span class="error-message" id="ctaButtonTextError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ctaButtonUrl">CTA Button URL *</label>
-                        <input type="url" id="ctaButtonUrl" name="ctaButtonUrl" class="form-control"
-                            value="{{ old('ctaButtonUrl', $heroData['ctaButton']['url'] ?? '') }}"
-                            placeholder="https://example.com/apply" required>
-                        <span class="error-message" id="ctaButtonUrlError"></span>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="space-y-6">
-                    <div class="form-group">
-                        <label for="ctaPhone">Phone Number *</label>
-                        <input type="tel" id="ctaPhone" name="ctaPhone" class="form-control"
-                            value="{{ old('ctaPhone', $heroData['ctaPhone'] ?? '') }}" placeholder="+1234567890" required
-                            pattern="[0-9+\-\s()]{10,}">
-                        <span class="error-message" id="ctaPhoneError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ctaPhoneSubtext">Phone Subtext *</label>
-                        <input type="text" id="ctaPhoneSubtext" name="ctaPhoneSubtext" class="form-control"
-                            value="{{ old('ctaPhoneSubtext', $heroData['ctaPhoneSubtext'] ?? '') }}"
-                            placeholder="e.g., Available 24/7" required>
-                        <span class="error-message" id="ctaPhoneSubtextError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="heroImage">Hero Image</label>
-                        <input type="file" id="heroImage" name="hero_image" class="form-control" accept="image/*">
-                        @if (isset($heroData['hero_image']) && $heroData['hero_image'])
-                            <div class="image-preview">
-                                <img src="{{ Storage::url($heroData['hero_image']) }}" alt="Current hero image">
-                                <p class="text-sm text-gray-600 mt-2 text-center">Current image</p>
-                            </div>
-                        @endif
-                        <span class="error-message" id="heroImageError"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trust Indicators -->
-            <div class="form-group">
-                <label>Trust Indicators</label>
-                <div id="trustIndicatorsContainer" class="trust-indicators-container">
-                    @foreach ($heroData['trustIndicators'] ?? [] as $index => $indicator)
-                        <div class="trust-item-row">
-                            <input type="text" name="trustIndicators[{{ $index }}][value]"
-                                class="form-control trust-value-input"
-                                value="{{ old("trustIndicators.$index.value", $indicator['value'] ?? '') }}"
-                                data-id="{{ $index }}" placeholder="Value (e.g., 500+)">
-                            <input type="text" name="trustIndicators[{{ $index }}][label]"
-                                class="form-control trust-label-input"
-                                value="{{ old("trustIndicators.$index.label", $indicator['label'] ?? '') }}"
-                                data-id="{{ $index }}" placeholder="Label (e.g., Marketeers Funded)">
-                            <button type="button" class="admin-btn btn-danger remove-trust-indicator"
-                                data-id="{{ $index }}" aria-label="Remove trust indicator">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    @endforeach
-                </div>
-                <button type="button" class="admin-btn btn-save mt-3" id="addTrustIndicator">
-                    <i class="fas fa-plus"></i> Add Trust Indicator
-                </button>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="admin-btn btn-cancel" id="cancelEdit">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <button type="submit" class="admin-btn btn-save">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <button class="toggle-admin" id="toggleAdmin" aria-label="Toggle admin panel">
-        <i class="fas fa-cog"></i>
-    </button>
 @endsection
 
 @push('scripts')
@@ -770,12 +816,15 @@
                     addTrustIndicatorBtn: document.getElementById('addTrustIndicator')
                 };
 
+                this.trustIndicatorCount = {{ count($heroData['trustIndicators'] ?? []) }};
+
                 this.init();
             }
 
             init() {
                 this.setupEventListeners();
                 this.setupRealTimePreview();
+                this.updateTrustIndicatorCount();
             }
 
             setupEventListeners() {
@@ -797,6 +846,12 @@
                         this.removeTrustIndicator(e.target.closest('.remove-trust-indicator'));
                     }
                 });
+
+                // Image preview
+                const heroImageInput = document.getElementById('heroImage');
+                if (heroImageInput) {
+                    heroImageInput.addEventListener('change', (e) => this.previewImage(e));
+                }
             }
 
             setupRealTimePreview() {
@@ -842,6 +897,14 @@
                         });
                     }
                 });
+
+                // Trust indicators real-time update
+                this.elements.trustIndicatorsContainer.addEventListener('input', (e) => {
+                    if (e.target.classList.contains('trust-value-input') ||
+                        e.target.classList.contains('trust-label-input')) {
+                        this.updateTrustIndicatorsPreview();
+                    }
+                });
             }
 
             updatePreview(field) {
@@ -861,6 +924,43 @@
                 }
             }
 
+            updateTrustIndicatorsPreview() {
+                const previewContainer = document.getElementById('previewTrustIndicators');
+                if (!previewContainer) return;
+
+                const trustRows = this.elements.trustIndicatorsContainer.querySelectorAll('.trust-item-row');
+                let previewHtml = '';
+
+                trustRows.forEach((row, index) => {
+                    const valueInput = row.querySelector('.trust-value-input');
+                    const labelInput = row.querySelector('.trust-label-input');
+
+                    if (valueInput && labelInput && valueInput.value && labelInput.value) {
+                        previewHtml += `
+                            <div class="trust-indicator" role="listitem">
+                                <span class="trust-value">${valueInput.value}</span>
+                                <span class="trust-label">${labelInput.value}</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                previewContainer.innerHTML = previewHtml || `
+                    <div class="trust-indicator" role="listitem">
+                        <span class="trust-value">500+</span>
+                        <span class="trust-label">Marketeers Funded</span>
+                    </div>
+                    <div class="trust-indicator" role="listitem">
+                        <span class="trust-value">$10M+</span>
+                        <span class="trust-label">Amount Disbursed</span>
+                    </div>
+                    <div class="trust-indicator" role="listitem">
+                        <span class="trust-value">24/7</span>
+                        <span class="trust-label">Customer Support</span>
+                    </div>
+                `;
+            }
+
             toggleAdminPanel() {
                 this.elements.adminPanel.classList.toggle('show');
                 const isVisible = this.elements.adminPanel.classList.contains('show');
@@ -878,9 +978,7 @@
             }
 
             addTrustIndicator() {
-                const trustRows = document.querySelectorAll('.trust-item-row');
-                const newId = trustRows.length > 0 ?
-                    parseInt(trustRows[trustRows.length - 1].querySelector('.trust-value-input').dataset.id) + 1 : 0;
+                const newId = this.trustIndicatorCount++;
 
                 const indicatorHtml = `
                     <div class="trust-item-row">
@@ -898,11 +996,44 @@
                 `;
 
                 this.elements.trustIndicatorsContainer.insertAdjacentHTML('beforeend', indicatorHtml);
+                this.updateTrustIndicatorCount();
             }
 
             removeTrustIndicator(button) {
+                if (this.elements.trustIndicatorsContainer.querySelectorAll('.trust-item-row').length <= 1) {
+                    alert('You must have at least one trust indicator.');
+                    return;
+                }
+
                 if (confirm('Are you sure you want to remove this trust indicator?')) {
                     button.closest('.trust-item-row').remove();
+                    this.updateTrustIndicatorCount();
+                    this.updateTrustIndicatorsPreview();
+                }
+            }
+
+            updateTrustIndicatorCount() {
+                const count = this.elements.trustIndicatorsContainer.querySelectorAll('.trust-item-row').length;
+                this.trustIndicatorCount = count;
+            }
+
+            previewImage(event) {
+                const file = event.target.files[0];
+                const previewContainer = document.querySelector('.image-preview');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (!previewContainer) {
+                            const imagePreview = document.createElement('div');
+                            imagePreview.className = 'image-preview';
+                            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image preview">`;
+                            event.target.parentNode.appendChild(imagePreview);
+                        } else {
+                            previewContainer.innerHTML = `<img src="${e.target.result}" alt="Image preview">`;
+                        }
+                    };
+                    reader.readAsDataURL(file);
                 }
             }
 
@@ -928,15 +1059,37 @@
 
                 // Validate URL format
                 const urlField = document.getElementById('ctaButtonUrl');
-                if (!urlField.value) {
-                    this.showError('ctaButtonUrl', 'Please enter a valid URL.');
-                    isValid = false;
-                }
+                // if (urlField.value && !this.isValidUrl(urlField.value)) {
+                //     this.showError('ctaButtonUrl', 'Please enter a valid URL.');
+                //     isValid = false;
+                // }
 
                 // Validate phone format
                 const phoneField = document.getElementById('ctaPhone');
                 if (phoneField.value && !this.isValidPhone(phoneField.value)) {
                     this.showError('ctaPhone', 'Please enter a valid phone number.');
+                    isValid = false;
+                }
+
+                // Validate trust indicators
+                const trustRows = this.elements.trustIndicatorsContainer.querySelectorAll('.trust-item-row');
+                let hasValidTrustIndicator = false;
+
+                trustRows.forEach((row, index) => {
+                    const valueInput = row.querySelector('.trust-value-input');
+                    const labelInput = row.querySelector('.trust-label-input');
+
+                    if (valueInput.value && labelInput.value) {
+                        hasValidTrustIndicator = true;
+                    } else if (valueInput.value || labelInput.value) {
+                        this.showError('trustIndicators',
+                            'Both value and label are required for trust indicators.');
+                        isValid = false;
+                    }
+                });
+
+                if (!hasValidTrustIndicator) {
+                    this.showError('trustIndicators', 'At least one trust indicator is required.');
                     isValid = false;
                 }
 

@@ -36,7 +36,7 @@
         <!-- Left Section: Menu Toggle, Breadcrumb & Search -->
         <div class="flex items-center space-x-4 flex-1">
             <!-- Menu Toggle -->
-            <button @click="sidebarOpen = !sidebarOpen; $dispatch('sidebar-toggle', { open: sidebarOpen })"
+            {{-- <button @click="sidebarOpen = !sidebarOpen; $dispatch('sidebar-toggle', { open: sidebarOpen })"
                 class="text-gray-500 hover:text-londa-orange dark:text-gray-400 dark:hover:text-londa-300 focus:outline-none focus:ring-2 focus:ring-londa-orange focus:ring-offset-2 p-2 rounded-lg transition-all duration-200 group relative"
                 aria-label="Toggle sidebar" :aria-expanded="sidebarOpen">
                 <i class="fas fa-bars text-lg sm:text-xl transition-transform duration-300"
@@ -44,20 +44,27 @@
                 <div
                     class="absolute -top-1 -right-1 w-3 h-3 bg-londa-orange rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 </div>
-            </button>
+            </button> --}}
 
             <!-- Breadcrumb -->
-            <nav class="hidden lg:flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
+            {{-- <nav class="hidden lg:flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
                 <a href="{{ route('management.dashboard') }}"
                     class="text-gray-500 dark:text-gray-400 hover:text-londa-orange dark:hover:text-londa-300 transition-colors">
                     <i class="fas fa-home"></i>
                 </a>
                 <span class="text-gray-300 dark:text-gray-600">/</span>
                 <span class="text-gray-700 dark:text-gray-300 font-medium" x-text="currentPage"></span>
-            </nav>
+            </nav> --}}
+            @hasSection('breadcrumbs')
+                <nav class="flex mb-2" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-2 text-sm">
+                        @yield('breadcrumbs')
+                    </ol>
+                </nav>
+            @endif
 
             <!-- Search Bar -->
-            <div class="relative flex-1 max-w-2xl">
+            {{-- <div class="relative flex-1 max-w-2xl">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                         aria-hidden="true">
@@ -173,13 +180,13 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Right Section: Actions & User Menu -->
         <div class="flex items-center space-x-3 sm:space-x-4">
             <!-- Quick Actions -->
-            <div class="relative" x-data="{
+            {{-- <div class="relative" x-data="{
                 quickActions: [
                     { icon: 'fa-plus', label: 'New Loan', action: '{{ route('management.dashboard') }}', color: 'text-green-600' },
                     { icon: 'fa-user-plus', label: 'Add Customer', action: '{{ route('management.dashboard') }}', color: 'text-blue-600' },
@@ -222,10 +229,10 @@
                         </template>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Theme Toggle -->
-            <button
+            {{-- <button
                 @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); $dispatch('theme-changed', { dark: darkMode })"
                 class="text-gray-500 hover:text-londa-orange dark:text-gray-400 dark:hover:text-londa-300 focus:outline-none focus:ring-2 focus:ring-londa-orange focus:ring-offset-2 p-2 rounded-lg transition-all duration-200 relative group"
                 aria-label="Toggle theme">
@@ -233,10 +240,10 @@
                 <div
                     class="absolute -top-1 -right-1 w-2 h-2 bg-londa-orange rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 </div>
-            </button>
+            </button> --}}
 
             <!-- Notifications -->
-            <div class="relative">
+            {{-- <div class="relative">
                 <button @click="notificationsOpen = !notificationsOpen; messagesOpen = false"
                     class="text-gray-500 hover:text-londa-orange dark:text-gray-400 dark:hover:text-londa-300 focus:outline-none focus:ring-2 focus:ring-londa-orange focus:ring-offset-2 p-2 rounded-lg transition-all duration-200 relative group"
                     aria-label="View notifications" :aria-expanded="notificationsOpen">
@@ -324,10 +331,10 @@
                         </a>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Messages -->
-            <div class="relative">
+            {{-- <div class="relative">
                 <button @click="messagesOpen = !messagesOpen; notificationsOpen = false"
                     class="text-gray-500 hover:text-londa-orange dark:text-gray-400 dark:hover:text-londa-300 focus:outline-none focus:ring-2 focus:ring-londa-orange focus:ring-offset-2 p-2 rounded-lg transition-all duration-200 relative group"
                     aria-label="View messages" :aria-expanded="messagesOpen">
@@ -385,7 +392,7 @@
                         </a>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- User Menu -->
             <div class="relative">
@@ -415,9 +422,8 @@
 
                 <!-- User Dropdown Menu -->
                 <div x-show="userMenuOpen" @click.away="userMenuOpen = false"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150"
                     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                     class="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-2 z-50"
                     x-cloak>

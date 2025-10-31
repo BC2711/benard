@@ -1,199 +1,368 @@
-<section id="about" class="about-section"
-    style="background-color:  #7a4603 0%; padding: clamp(2rem, 6vw, 6rem) 0; font-family: 'Arial', sans-serif; overflow: hidden;">
-    <div class="about-container" style="max-width: 1400px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem);">
-        <div class="about-content-wrapper"
-            style="display: grid; grid-template-columns: 1fr; gap: clamp(3rem, 6vw, 5rem);">
+<style>
+    :root {
+        --primary: #db9123;
+        --secondary: #7a4603;
+        --white: #ffffff;
+        --light: #f8f9fa;
+        --dark: #333333;
+        --gray: #666666;
+        --border: #e0e0e0;
+        --shadow-sm: 0 5px 15px rgba(0, 0, 0, .1);
+        --shadow-md: 0 12px 40px rgba(0, 0, 0, .15);
+        --shadow-lg: 0 20px 50px rgba(0, 0, 0, .2);
+        --radius-sm: 12px;
+        --radius-md: 16px;
+        --radius-full: 50px;
+        --transition: all .3s cubic-bezier(.4, 0, .2, 1);
+        --img-size: 360px;
+        --gap: clamp(1.5rem, 4vw, 3rem);
+        --container: 1400px;
+    }
 
-            <!-- Mobile First: Content Above Images -->
-            <div class="about-content-mobile" style="order: 1; display: block;">
-                <!-- Subheading -->
-                <h4 class="about-subheading"
-                    style="font-size: clamp(0.875rem, 3vw, 1.125rem); font-weight: 700; color: #db9123; margin-bottom: 0.5rem; letter-spacing: 1px; text-transform: uppercase;">
-                    {{ $sectionData['subheading'] ?? 'Why Choose Londa Loans' }}
-                </h4>
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --light: #1a1a1a;
+            --white: #2d2d2d;
+            --dark: #ffffff;
+            --gray: #cccccc;
+            --border: #444444;
+        }
+    }
 
-                <!-- Heading -->
-                <h2 class="about-heading"
-                    style="font-size: clamp(1.75rem, 5vw, 3rem); font-weight: 800; color: #7a4603; line-height: 1.2; margin-bottom: 1rem; max-width: 600px;">
-                    {{ $sectionData['heading'] ?? 'We Empower Marketeers with Financial Solutions That Drive Growth' }}
-                </h2>
+   
+</style>
 
-                <!-- Description -->
-                <p class="about-description"
-                    style="font-size: clamp(1rem, 2.5vw, 1.125rem); color: #666; line-height: 1.6; margin-bottom: 2rem; max-width: 500px;">
-                    {{ $sectionData['description'] ?? 'At Londa Loans, we understand the unique financial needs of marketers and entrepreneurs. Our tailored loan programs are designed specifically to fuel your business growth and marketing initiatives.' }}
-                </p>
+<section id="about" class="about" aria-labelledby="about-heading">
+    <div class="about__container" style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
+        <div class="about__grid">
 
-                <!-- Features List -->
-                <div class="features-list"
-                    style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2.5rem;">
-                    @foreach ($sectionData['features'] as $index => $feature)
+            <!-- Content -->
+            <article class="about__content" id="about-content">
+                <header class="about__header">
+                    <p class="about__kicker">{{ $sectionData['subheading'] ?? 'Why Choose Londa Loans' }}</p>
+                    <h2 id="about-heading" class="about__title">
+                        {{ $sectionData['heading'] ?? 'We Empower Marketeers with Financial Solutions That Drive Growth' }}
+                    </h2>
+                    <p class="about__desc">
+                        {{ $sectionData['description'] ?? 'At Londa Loans, we understand the unique financial needs of marketers and entrepreneurs. Our tailored loan programs are designed specifically to fuel your business growth and marketing initiatives.' }}
+                    </p>
+                </header>
+
+                <!-- Features -->
+                <div class="features">
+                    @foreach ($sectionData['features'] as $i => $f)
                         @php
-                            $bgColor = $feature['bg_color'] === 'primary' ? '#db9123' : '#7a4603';
-                            $iconClass = $feature['bg_color'] === 'secondary' ? 'secondary' : '';
-                            $delay = $index * 100;
+                            $isPrimary = $f['bg_color'] === 'primary';
+                            $delay = $i * 100 . 'ms';
                         @endphp
-                        <div class="feature-item"
-                            style="display: flex; align-items: flex-start; gap: 1rem; transition: all 0.3s ease; padding: 1.25rem; border-radius: 12px; background: rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); animation-delay: {{ $delay }}ms;">
-                            <div class="feature-icon-container {{ $iconClass }}"
-                                style="width: 50px; height: 50px; background: linear-gradient(135deg, {{ $bgColor }}, {{ $bgColor }}dd); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease;">
-                                <i class="fas fa-check" style="font-size: 1.125rem; color: white;"></i>
+                        <div class="feature" style="--delay: {{ $delay }};">
+                            <div class="feature__icon {{ $isPrimary ? 'primary' : 'secondary' }}">
+                                <i class="fas fa-check"></i>
                             </div>
-                            <div style="flex: 1;">
-                                <h4 class="feature-title"
-                                    style="font-size: clamp(1rem, 2.5vw, 1.125rem); font-weight: 700; color: #7a4603; margin-bottom: 0.5rem;">
-                                    {{ $feature['title'] }}
-                                </h4>
-                                <p class="feature-description"
-                                    style="font-size: clamp(0.875rem, 2vw, 1rem); color: #666; line-height: 1.5;">
-                                    {{ $feature['description'] }}
-                                </p>
+                            <div class="feature__text">
+                                <h3 class="feature__title">{{ $f['title'] }}</h3>
+                                <p class="feature__desc">{{ $f['description'] }}</p>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
                 <!-- Stats -->
-                <div class="stats"
-                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2.5rem;">
-                    @foreach ($sectionData['stats'] as $stat)
-                        <div class="stat-item"
-                            style="text-align: center; padding: 1.5rem 1rem; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: all 0.3s ease;">
-                            <span class="stat-value"
-                                style="font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; color: #db9123; display: block; margin-bottom: 0.25rem;">
-                                {{ $stat['value'] }}
-                            </span>
-                            <span class="stat-label"
-                                style="font-size: clamp(0.75rem, 2vw, 0.875rem); color: #666; display: block; font-weight: 600;">
-                                {{ $stat['label'] }}
-                            </span>
+                <div class="stats">
+                    @foreach ($sectionData['stats'] as $s)
+                        <div class="stat">
+                            <div class="stat__value">{{ $s['value'] }}</div>
+                            <div class="stat__label">{{ $s['label'] }}</div>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- Video CTA -->
+                <!-- CTA -->
                 @if (isset($sectionData['video_cta']))
-                    <a href="{{ $sectionData['video_cta']['url'] }}" data-fslightbox class="video-cta"
-                        style="display: inline-flex; align-items: center; gap: 1rem; text-decoration: none; transition: all 0.3s ease; padding: clamp(0.875rem, 3vw, 1rem) clamp(1.5rem, 4vw, 2rem); border-radius: 50px; background: linear-gradient(135deg, #db9123, #7a4603); color: white; font-weight: 700; box-shadow: 0 8px 25px rgba(219, 145, 35, 0.3); width: fit-content;"
+                    <a href="{{ $sectionData['video_cta']['url'] }}" data-fslightbox class="cta-video"
                         aria-label="{{ $sectionData['video_cta']['aria_label'] }}">
-                        <span class="video-cta-icon-container"
-                            style="width: clamp(44px, 8vw, 56px); height: clamp(44px, 8vw, 56px); background-color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.3s ease;">
-                            <span class="video-cta-pulse"
-                                style="width: 100%; height: 100%; background-color: white; border-radius: 50%; opacity: 0.3; position: absolute; animation: pulse 2s infinite;"></span>
-                            <i class="fas fa-play"
-                                style="color: #db9123; font-size: clamp(0.875rem, 2.5vw, 1rem); margin-left: 2px;"></i>
-                        </span>
-                        <span class="video-cta-text"
-                            style="font-size: clamp(0.875rem, 2.5vw, 1rem); font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px;">
-                            {{ $sectionData['video_cta']['text'] }}
-                        </span>
-                    </a>
-                @else
-                    <a href="https://www.youtube.com/watch?v=xcJtL7QggTI" data-fslightbox class="video-cta"
-                        style="display: inline-flex; align-items: center; gap: 1rem; text-decoration: none; transition: all 0.3s ease; padding: clamp(0.875rem, 3vw, 1rem) clamp(1.5rem, 4vw, 2rem); border-radius: 50px; background: linear-gradient(135deg, #db9123, #7a4603); color: white; font-weight: 700; box-shadow: 0 8px 25px rgba(219, 145, 35, 0.3); width: fit-content;"
-                        aria-label="Watch video about Londa Loans' impact on marketers">
-                        <span class="video-cta-icon-container"
-                            style="width: clamp(44px, 8vw, 56px); height: clamp(44px, 8vw, 56px); background-color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.3s ease;">
-                            <span class="video-cta-pulse"
-                                style="width: 100%; height: 100%; background-color: white; border-radius: 50%; opacity: 0.3; position: absolute; animation: pulse 2s infinite;"></span>
-                            <i class="fas fa-play"
-                                style="color: #db9123; font-size: clamp(0.875rem, 2.5vw, 1rem); margin-left: 2px;"></i>
-                        </span>
-                        <span class="video-cta-text"
-                            style="font-size: clamp(0.875rem, 2.5vw, 1rem); font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px;">
-                            See How We Empower Marketers
-                        </span>
-                    </a>
+                    @else
+                        <a href="https://www.youtube.com/watch?v=xcJtL7QggTI" data-fslightbox class="cta-video"
+                            aria-label="Watch how Londa Loans empowers marketers">
                 @endif
-            </div>
+                <span class="cta-video__icon">
+                    <span class="pulse"></span>
+                    <i class="fas fa-play"></i>
+                </span>
+                <span class="cta-video__text">
+                    {{ $sectionData['video_cta']['text'] ?? 'See How We Empower Marketers' }}
+                </span>
+                </a>
+            </article>
 
-            <!-- About Images -->
-            <div class="about-images" style="order: 2; position: relative;">
-                <div class="about-images-grid"
-                    style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start; max-width: 600px; margin: 0 auto;">
-                    @foreach ($sectionData['images'] as $index => $image)
+            <!-- Images -->
+            <aside class="about__media" aria-hidden="true">
+                <div class="media-grid">
+                    @foreach ($sectionData['images'] as $i => $img)
                         @php
-                            $isCentered =
-                                $image['is_centered'] === true ||
-                                $image['is_centered'] === '1' ||
-                                $image['is_centered'] === 1;
-                            $gridSpan = $isCentered ? 'grid-column: 1 / -1;' : '';
-                            $imageWidth = $isCentered ? 'width: 90%; margin: 0 auto;' : 'width: 100%;';
-                            $imageClass = $isCentered ? 'about-image--center' : 'about-image';
-                            $delay = $index * 150;
+                            $isCentered = in_array($img['is_centered'], [true, '1', 1]);
+                            $url = str_starts_with($img['src'], 'assets/')
+                                ? asset($img['src'])
+                                : Storage::url($img['src']);
+                            $delay = $i * 120 . 'ms';
                         @endphp
 
-                        <div class="about-image-container {{ $imageClass }}"
-                            style="position: relative; {{ $gridSpan }} border-radius: 16px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); transition: all 0.4s ease; animation-delay: {{ $delay }}ms;">
-
-                            <!-- Shape -->
-                            @if ($image['shape'] && $image['shape_position'])
-                                <img src="{{ $image['shape'] }}" alt="{{ $image['shape_alt'] ?? 'Decorative shape' }}"
-                                    class="shape shape--{{ $image['shape_position'] }}"
-                                    style="position: absolute; 
-                                            max-width: clamp(60px, 10vw, 100px); 
-                                            z-index: 2; 
-                                            animation: float 4s ease-in-out infinite;
-                                            @if ($image['shape_position'] === 'top-left') top: -20px; left: -20px;
-                                            @elseif($image['shape_position'] === 'top-right') top: 15px; right: -15px; animation-duration: 5s;
-                                            @elseif($image['shape_position'] === 'bottom-left') bottom: -15px; left: 10px; animation-duration: 4.5s; 
-                                            @elseif($image['shape_position'] === 'bottom-right') bottom: -15px; right: -15px; animation-duration: 5.5s; @endif" />
+                        <figure class="media-item {{ $isCentered ? 'span-full' : '' }}"
+                            style="--delay: {{ $delay }};">
+                            @if ($img['shape'] && $img['shape_position'])
+                                <img src="{{ $img['shape'] }}" alt=""
+                                    class="shape shape--{{ $img['shape_position'] }}" loading="lazy">
                             @endif
 
-                            <!-- Main Image -->
-                            @if ($image['src'])
-                                @php
-                                    $imageUrl = str_starts_with($image['src'], 'assets/')
-                                        ? asset($image['src'])
-                                        : Storage::url($image['src']);
-                                @endphp
-                                <img src="{{ $imageUrl }}" alt="{{ $image['alt'] ?? 'About us image' }}"
-                                    class="about-image"
-                                    style="{{ $imageWidth }} height: auto; display: block; border-radius: 12px; transition: all 0.4s ease;"
-                                    onerror="this.style.display='none'" loading="lazy" />
+                            @if ($img['src'])
+                                <img src="{{ $url }}"
+                                    srcset="{{ $url }} 1x, {{ $url }} 2x"
+                                    alt="{{ $img['alt'] ?? 'Londa Loans in action' }}" class="media-img" loading="lazy"
+                                    width="380" height="380">
                             @endif
-                        </div>
+                        </figure>
                     @endforeach
                 </div>
-            </div>
+            </aside>
         </div>
     </div>
 
+    <!-- Professional CSS -->
     <style>
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
+        .about {
+            background: var(--secondary);
+            padding: clamp(3rem, 8vw, 7rem) 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
 
+        .about__container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+        }
+
+        .about__grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--gap);
+            align-items: center;
+        }
+
+        /* Typography */
+        .about__kicker {
+            font: 700 clamp(.875rem, 2.5vw, 1rem)/1.2 system-ui;
+            color: var(--primary);
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin-bottom: .75rem;
+        }
+
+        .about__title {
+            font: 800 clamp(2rem, 5.5vw, 3.5rem)/1.15 system-ui;
+            color: var(--light);
+            margin: 0 0 1rem;
+            max-width: 15ch;
+        }
+
+        .about__desc {
+            font-size: clamp(1rem, 2.5vw, 1.125rem);
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            max-width: 60ch;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .feature {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, .95);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp .6s var(--delay) forwards;
+            transition: var(--transition);
+        }
+
+        .feature__icon {
+            flex: 0 0 52px;
+            height: 52px;
+            border-radius: var(--radius-sm);
+            display: grid;
+            place-items: center;
+            font-size: 1.25rem;
+            color: var(--white);
+            background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 85%, #000));
+            transition: var(--transition);
+        }
+
+        .feature__icon.secondary {
+            background: linear-gradient(135deg, var(--secondary), color-mix(in srgb, var(--secondary) 85%, #000));
+        }
+
+        .feature__title {
+            font: 700 clamp(1.05rem, 2.5vw, 1.15rem)/1.3 system-ui;
+            color: var(--secondary);
+            margin: 0 0 .4rem;
+        }
+
+        .feature__desc {
+            font-size: clamp(.9rem, 2vw, 1rem);
+            color: var(--gray);
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1.75rem 1rem;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .stat__value {
+            font: 800 clamp(1.75rem, 4.5vw, 2.25rem)/1 system-ui;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat__label {
+            font: 600 clamp(.8rem, 2vw, .9rem)/1.4 system-ui;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        /* CTA */
+        .cta-video {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: clamp(.9rem, 3vw, 1.1rem) clamp(1.8rem, 4.5vw, 2.25rem);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            font: 700 clamp(.95rem, 2.5vw, 1.05rem)/1 system-ui;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(219, 145, 35, .35);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .cta-video:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        .cta-video__icon {
+            width: clamp(48px, 9vw, 60px);
+            height: clamp(48px, 9vw, 60px);
+            background: var(--white);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .pulse {
+            inset: 0;
+            background: var(--white);
+            border-radius: 50%;
+            opacity: .3;
+            position: absolute;
+            animation: pulse 2s infinite;
+        }
+
+        /* Media */
+        .media-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .media-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp .7s var(--delay) forwards;
+            transition: var(--transition);
+        }
+
+        .media-item.span-full {
+            grid-column: 1 / -1;
+        }
+
+        .media-img {
+            width: var(--img-size);
+            height: var(--img-size);
+            object-fit: cover;
+            display: block;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .shape {
+            position: absolute;
+            z-index: 2;
+            max-width: clamp(60px, 12vw, 110px);
+            animation: float 4.5s ease-in-out infinite;
+        }
+
+        .shape--top-left {
+            top: -1.5rem;
+            left: -1.5rem;
+        }
+
+        .shape--top-right {
+            top: 1rem;
+            right: -1rem;
+            animation-duration: 5s;
+        }
+
+        .shape--bottom-left {
+            bottom: -1rem;
+            left: .5rem;
+            animation-duration: 4.8s;
+        }
+
+        .shape--bottom-right {
+            bottom: -1rem;
+            right: -1rem;
+            animation-duration: 5.5s;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
             to {
                 opacity: 1;
                 transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
             }
         }
 
@@ -205,297 +374,151 @@
             }
 
             33% {
-                transform: translateY(-10px) rotate(2deg);
+                transform: translateY(-12px) rotate(2deg);
             }
 
             66% {
-                transform: translateY(-5px) rotate(-1deg);
+                transform: translateY(-6px) rotate(-1deg);
             }
         }
 
         @keyframes pulse {
-            0% {
+
+            0%,
+            100% {
                 transform: scale(1);
-                opacity: 0.3;
+                opacity: .3;
             }
 
             50% {
-                transform: scale(1.1);
-                opacity: 0.5;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 0.3;
+                transform: scale(1.15);
+                opacity: .5;
             }
         }
 
-        /* Base Animations */
-        .about-content-mobile>* {
-            animation: fadeInUp 0.6s ease-out both;
+        /* Hover & Focus */
+        .feature:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            background: #fff;
         }
 
-        .about-image-container {
-            animation: fadeInUp 0.8s ease-out both;
+        .feature:hover .feature__icon {
+            transform: scale(1.12) rotate(6deg);
         }
 
-        /* Hover Effects */
-        .about-image-container:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        .stat:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
         }
 
-        .feature-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-            background: white !important;
+        .cta-video:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(219, 145, 35, .5);
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
         }
 
-        .feature-item:hover .feature-icon-container {
-            transform: scale(1.1) rotate(5deg);
+        .cta-video:hover .cta-video__icon {
+            transform: scale(1.18);
         }
 
-        .stat-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        .media-item:hover {
+            transform: translateY(-10px) scale(1.025);
+            box-shadow: var(--shadow-lg);
         }
 
-        .video-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(219, 145, 35, 0.5);
-            background: linear-gradient(135deg, #7a4603, #db9123) !important;
-        }
-
-        .video-cta:hover .video-cta-icon-container {
-            transform: scale(1.15);
-        }
-
-        /* Responsive Design - Mobile First Approach */
-
-        /* Small Mobile (320px - 480px) */
-        @media (max-width: 480px) {
-            .about-section {
-                padding: 1.5rem 0;
-            }
-
-            .features-list {
-                gap: 0.75rem;
-            }
-
-            .feature-item {
-                padding: 1rem;
-                gap: 0.75rem;
-            }
-
-            .feature-icon-container {
-                width: 44px !important;
-                height: 44px !important;
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-
-            .about-images-grid {
-                gap: 1rem;
-            }
-        }
-
-        /* Tablet (768px and up) */
+        /* Responsive */
         @media (min-width: 768px) {
-            .about-content-wrapper {
+            .about__grid {
                 grid-template-columns: 1fr 1fr;
-                gap: clamp(2rem, 4vw, 4rem);
-                align-items: center;
+                gap: clamp(2rem, 6vw, 5rem);
             }
 
-            .about-content-mobile {
+            .about__content {
                 order: 2;
             }
 
-            .about-images {
+            .about__media {
                 order: 1;
             }
 
-            .features-list {
+            .media-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .about__title {
+                max-width: 12ch;
+            }
+
+            .stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .about__container {
+                max-width: 1380px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
                 grid-template-columns: 1fr;
             }
 
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .about-images-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
+            .feature__icon {
+                flex: 0 0 46px;
+                height: 46px;
+                font-size: 1.1rem;
             }
         }
 
-        /* Desktop (1024px and up) */
-        @media (min-width: 1024px) {
-            .about-content-wrapper {
-                gap: clamp(3rem, 6vw, 6rem);
-            }
-
-            .about-heading {
-                font-size: clamp(2rem, 4vw, 3.5rem) !important;
-            }
-
-            .features-list {
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-            }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
-
-            .about-images-grid {
-                gap: 2rem;
-            }
-        }
-
-        /* Large Desktop (1440px and up) */
-        @media (min-width: 1440px) {
-            .about-container {
-                max-width: 1400px;
-            }
-
-            .about-content-wrapper {
-                gap: 8rem;
-            }
-
-            .features-list {
-                gap: 2rem;
-            }
-        }
-
-        /* Extra Large Screens (1920px and up) */
-        @media (min-width: 1920px) {
-            .about-container {
-                max-width: 1600px;
-            }
-        }
-
-        /* Print Styles */
-        @media print {
-            .about-section {
-                background: white !important;
-                padding: 2rem 0 !important;
-            }
-
-            .video-cta {
-                display: none !important;
-            }
-
-            .about-image-container:hover {
-                transform: none !important;
-            }
-        }
-
-        /* Reduced Motion Support */
+        /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
             }
         }
 
-        /* High Contrast Support */
-        @media (prefers-contrast: high) {
-            .about-section {
-                background: white !important;
-                border: 2px solid black;
-            }
+        @media (hover: none) {
 
-            .feature-item {
-                border: 1px solid black;
-            }
-        }
-
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            .about-section {
-                background-color: #1a1a1a !important;
-            }
-
-            .about-heading,
-            .feature-title {
-                color: #ffffff !important;
-            }
-
-            .about-description,
-            .feature-description,
-            .stat-label {
-                color: #cccccc !important;
-            }
-
-            .feature-item,
-            .stat-item {
-                background: #2d2d2d !important;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
-            }
-        }
-
-        /* Touch Device Optimizations */
-        @media (hover: none) and (pointer: coarse) {
-
-            .about-image-container:hover,
-            .feature-item:hover,
-            .stat-item:hover,
-            .video-cta:hover {
-                transform: none;
-            }
-
-            .about-image-container:active,
-            .feature-item:active,
-            .stat-item:active {
-                transform: scale(0.98);
-            }
-        }
-
-        /* Landscape Mobile Optimization */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .about-section {
-                padding: 1rem 0 !important;
-            }
-
-            .about-content-wrapper {
-                grid-template-columns: 1fr 1fr !important;
-                gap: 2rem !important;
-            }
-
-            .about-images-grid {
-                grid-template-columns: 1fr !important;
+            .feature:hover,
+            .stat:hover,
+            .cta-video:hover,
+            .media-item:hover {
+                transform: none !important;
             }
         }
     </style>
 
-    <!-- Include fslightbox.js for video lightbox functionality -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.1/index.min.js"></script>
-
-    <!-- Optional: Intersection Observer for scroll animations -->
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.1/index.min.js" integrity="sha512-..."
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Simple intersection observer for animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
+        document.addEventListener('DOMContentLoaded', () => {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, observerOptions);
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -60px 0px'
+            });
 
-            // Observe all animated elements
-            document.querySelectorAll('.about-content-mobile > *, .about-image-container').forEach(el => {
+            document.querySelectorAll('.feature, .media-item').forEach(el => {
                 el.style.animationPlayState = 'paused';
                 observer.observe(el);
             });

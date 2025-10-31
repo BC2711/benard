@@ -252,13 +252,13 @@
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                 <div class="flex-1 min-w-0">
                                     <!-- Breadcrumbs -->
-                                    @hasSection('breadcrumbs')
+                                    {{-- @hasSection('breadcrumbs')
                                         <nav class="flex mb-2" aria-label="Breadcrumb">
                                             <ol class="flex items-center space-x-2 text-sm">
                                                 @yield('breadcrumbs')
                                             </ol>
                                         </nav>
-                                    @endif
+                                    @endif --}}
 
                                     <!-- Page Title & Description -->
                                     <div class="flex items-center sticky top-0 bg-white dark:bg-gray-800">

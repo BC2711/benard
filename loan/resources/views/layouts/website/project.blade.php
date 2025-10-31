@@ -57,12 +57,12 @@
             {{ $sectionData['cta_subheadline'] ?? 'Join hundreds of marketeers who have transformed their businesses with our loans' }}
         </p>
         <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
-            <a href="#!"
+            <a href="/#support"
                 style="padding: 0.75rem 1.5rem; background-color: #db9123; border: 2px solid #db9123; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; transition: all 0.3s;"
                 aria-label="Apply for funding to start your success story">
                 {{ $sectionData['cta_primary_text'] ?? 'Apply for Funding' }}
             </a>
-            <a href="#!"
+            <a href="/stories"
                 style="padding: 0.75rem 1.5rem; border: 2px solid #7a4603; color: #7a4603; text-decoration: none; border-radius: 4px; font-weight: bold; transition: all 0.3s;"
                 aria-label="View all case studies and success stories">
                 {{ $sectionData['cta_secondary_text'] ?? 'View All Case Studies' }}
@@ -280,7 +280,7 @@
                                     `<span style="padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.2); border-radius: 4px; font-size: 0.75rem;">${cat}</span>`
                                 ).join('')}
                             </div>
-                            <a href="#!" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid white; border-radius: 50%; color: white; text-decoration: none; transition: all 0.3s;" aria-label="View details for ${project.title}">
+                            <a href="/stories" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid white; border-radius: 50%; color: white; text-decoration: none; transition: all 0.3s;" aria-label="View details for ${project.title}">
                                 <svg style="width: 14px; height: 14px;" fill="currentColor" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10.4763 6.16664L6.00634 1.69664L7.18467 0.518311L13.6663 6.99998L7.18467 13.4816L6.00634 12.3033L10.4763 7.83331H0.333008V6.16664H10.4763Z" />
                                 </svg>
