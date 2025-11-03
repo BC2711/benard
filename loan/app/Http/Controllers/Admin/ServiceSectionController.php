@@ -11,7 +11,7 @@ class ServiceSectionController extends Controller
     public function index()
     {
         $service = ServiceSection::firstOrCreate([]);
-        return view('admin.services.edit', compact('service'));
+        return view('components.management.service.edit', compact('service'));
     }
 
     public function update(Request $request, ServiceSection $service)
@@ -27,11 +27,23 @@ class ServiceSectionController extends Controller
             'cta_heading'       => 'required|string',
             'cta_description'   => 'required|string',
             'cta_primary_text'  => 'required|string',
-            'cta_primary_link'  => 'required|url',
+            'cta_primary_link'  => 'required|string',
             'cta_primary_icon'  => 'required|string',
             'cta_secondary_text' => 'required|string',
-            'cta_secondary_link' => 'required|url',
+            'cta_secondary_link' => 'required|string',
             'cta_secondary_icon' => 'required|string',
+
+            // Services validation 
+            'icon' => 'required|array|size:6',
+            'icon.*' => 'required|string',
+            'title' => 'required|array|size:6',
+            'title.*' => 'required|string',
+            'desc' => 'required|array|size:6',
+            'desc.*' => 'required|string',
+            'tag' => 'nullable|array|size:6',
+            'tag.*' => 'nullable|string',
+            'tag_color' => 'required|array|size:6',
+            'tag_color.*' => 'required|string|in:primary,secondary',
 
             // Extra Info
             'info_1_icon' => 'required|string',
@@ -45,22 +57,21 @@ class ServiceSectionController extends Controller
             'info_3_subtitle' => 'required|string',
         ]);
 
-        // Build services array
+        // Build services array 
         $services = [];
-        for ($i = 1; $i <= 6; $i++) {
-            $icon = $request->input("service_{$i}_icon");
-            $title = $request->input("service_{$i}_title");
-            $desc = $request->input("service_{$i}_desc");
-            $tag = $request->input("service_{$i}_tag");
-            $tag_color = $request->input("service_{$i}_tag_color");
-            if ($icon && $title && $desc) {
-                $services[] = compact('icon', 'title', 'desc', 'tag', 'tag_color');
-            }
+        for ($i = 0; $i < 6; $i++) {
+            $services[] = [
+                'icon' => $data['icon'][$i],
+                'title' => $data['title'][$i],
+                'desc' => $data['desc'][$i],
+                'tag' => $data['tag'][$i] ?? null,
+                'tag_color' => $data['tag_color'][$i],
+            ];
         }
         $data['services'] = $services;
 
         $service->update($data);
 
-        return back()->with('success', 'Services section updated!');
+        return back()->with('success', 'Services section updated successfully!');
     }
 }

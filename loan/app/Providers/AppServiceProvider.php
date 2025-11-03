@@ -170,7 +170,7 @@ class AppServiceProvider extends ServiceProvider
         // If it's a named route without dots, prepend management
         if (!empty($url) && !str_starts_with($url, '/')) {
             try {
-                return route("management.$url");
+                return route("management.$url.index");
             } catch (\Exception $e) {
                 return url($url);
             }

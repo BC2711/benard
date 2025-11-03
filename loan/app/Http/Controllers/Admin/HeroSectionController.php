@@ -15,7 +15,7 @@ class HeroSectionController extends Controller
     public function index()
     {
         $hero = HeroSection::firstOrCreate([]);
-        return view('website.hero', compact('hero'));
+        return view('components.management.hero.edit', compact('hero'));
     }
 
     /**
@@ -62,7 +62,7 @@ class HeroSectionController extends Controller
             'highlighted_text' => 'required|string|max:255',
             'description' => 'required|string',
             'cta_text' => 'required|string',
-            'cta_link' => 'required|url',
+            'cta_link' => 'required|string',
             'phone_number' => 'required|string',
             'phone_label' => 'required|string',
 

@@ -15,7 +15,7 @@ class AboutSectionController extends Controller
     public function index()
     {
         $about = AboutSection::firstOrCreate([]);
-        return view('components.website.about', compact('about'));
+        return view('components.management.about.edit', compact('about'));
     }
 
     /**
@@ -61,17 +61,17 @@ class AboutSectionController extends Controller
             'highlighted_text'  => 'required|string|max:255',
             'description'       => 'required|string',
             'cta_text'          => 'required|string',
-            'cta_link'          => 'required|url',
+            'cta_link'          => 'required|string',
 
             // Stats
-            'stat_1_value' => 'required|string',
-            'stat_1_label' => 'required|string',
-            'stat_2_value' => 'required|string',
-            'stat_2_label' => 'required|string',
-            'stat_3_value' => 'required|string',
-            'stat_3_label' => 'required|string',
-            'stat_4_value' => 'required|string',
-            'stat_4_label' => 'required|string',
+            'stat_1_value' => 'nullable|string',
+            'stat_1_label' => 'nullable|string',
+            'stat_2_value' => 'nullable|string',
+            'stat_2_label' => 'nullable|string',
+            'stat_3_value' => 'nullable|string',
+            'stat_3_label' => 'nullable|string',
+            'stat_4_value' => 'nullable|string',
+            'stat_4_label' => 'nullable|string',
 
             // Images
             'image_1' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -83,6 +83,14 @@ class AboutSectionController extends Controller
             'rating_icon'   => 'required|string',
             'rating_value'  => 'required|string',
             'rating_subtitle' => 'required|string',
+
+            // Features Section 
+            'icon' => 'required|array|size:4',
+            'icon.*' => 'required|string|max:255',
+            'title' => 'required|array|size:4',
+            'title.*' => 'required|string|max:255',
+            'desc' => 'required|array|size:4',
+            'desc.*' => 'required|string',
         ];
 
         $data = $request->validate($rules);
@@ -94,20 +102,23 @@ class AboutSectionController extends Controller
                     Storage::delete('public/' . $about->{$field});
                 }
                 $data[$field] = $request->file($field)->store('about', 'public');
+            } else {
+                // Keep existing image if no new file uploaded
+                $data[$field] = $about->{$field};
             }
         }
 
-        // Features – 4 repeatable blocks
+        // Features 
         $features = [];
-        for ($i = 1; $i <= 4; $i++) {
-            $icon = $request->input("feature_{$i}_icon");
-            $title = $request->input("feature_{$i}_title");
-            $desc  = $request->input("feature_{$i}_desc");
-            if ($icon && $title && $desc) {
-                $features[] = compact('icon', 'title', 'desc');
-            }
+        for ($i = 0; $i < 4; $i++) {
+            $features[] = [
+                'icon' => $data['icon'][$i],
+                'title' => $data['title'][$i],
+                'desc' => $data['desc'][$i],
+                
+            ];
         }
-        $data['features'] = $features;
+        $data['features'] = json_encode($features); 
 
         $about->update($data);
 

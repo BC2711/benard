@@ -1,6 +1,7 @@
+{{-- resources/views/partials/team.blade.php --}}
 @php $team = \App\Models\TeamSection::first(); @endphp
 
-<section id="team" class="relative overflow-hidden py-20 gradient-team-bg">
+<section id="team" class="relative overflow-hidden py-20 gradient-bg">
     <!-- Background Shapes -->
     <div class="shape w-64 h-64 rounded-full bg-primary-100 opacity-20 top-10 -left-20 animate-float"></div>
     <div class="shape w-40 h-40 rounded-full bg-accent-100 opacity-30 bottom-20 -right-10 animate-float"
@@ -9,13 +10,11 @@
         style="animation-delay: 4s;"></div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <!-- Header -->
         <div class="text-center mb-16 max-w-3xl mx-auto animate-fadeIn">
             <h2 class="text-5xl font-bold text-primary-700 mb-6 leading-tight">{{ $team->heading }}</h2>
             <p class="text-xl text-gray-600 leading-relaxed">{{ $team->description }}</p>
         </div>
 
-        <!-- Carousel -->
         <div class="max-w-7xl mx-auto relative">
             <div class="team-carousel overflow-hidden mb-12">
                 <div class="carousel-track flex gap-6" id="carousel-track">
@@ -23,9 +22,10 @@
                         <div class="carousel-slide team-card min-w-[320px] flex-shrink-0 text-center animate-fadeInUp bg-white rounded-2xl p-6 shadow-lg"
                             style="animation-delay: {{ $i * 0.1 }}s;">
                             <div class="relative mb-6">
-                                <div class="w-full h-80 rounded-xl overflow-hidden">
-                                    <img src="{{ $member['image'] }}" alt="{{ $member['name'] }}"
-                                        class="w-full h-full object-cover" />
+                                <div class="w-full h-80 rounded-xl overflow-hidden bg-gray-100">
+                                    <img src="{{ $member['image'] ? asset('storage/teams/' . $member['image']) : 'https://via.placeholder.com/320x320/eee/999?text=Photo' }}"
+                                        alt="{{ $member['name'] }}" class="w-full h-full object-cover"
+                                        onerror="this.src='https://via.placeholder.com/320x320/eee/999?text=Photo'" />
                                 </div>
                                 @if (!empty($member['social']))
                                     <div class="absolute bottom-4 right-4 transform translate-y-1/2">
@@ -33,8 +33,7 @@
                                             class="social-links flex gap-2 {{ $member['social'][0]['color'] === 'accent' ? 'bg-accent-500' : 'bg-primary-700' }} p-3 rounded-xl">
                                             @foreach ($member['social'] as $link)
                                                 <a href="{{ $link['url'] }}"
-                                                    class="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform hover:scale-110"
-                                                    aria-label="Connect with {{ $member['name'] }} on {{ ucfirst(str_replace('fa-', '', $link['icon'])) }}">
+                                                    class="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform hover:scale-110">
                                                     <i
                                                         class="fab {{ $link['icon'] }} text-{{ $link['color'] === 'accent' ? 'accent' : 'primary' }}-500 text-sm"></i>
                                                 </a>
@@ -45,7 +44,7 @@
                             </div>
                             <h4 class="text-2xl font-bold text-primary-700 mb-2">{{ $member['name'] }}</h4>
                             <p class="text-accent-500 font-semibold mb-2">{{ $member['role'] }}</p>
-                            <p class="text-gray-600 leading-relaxed">{{ $member['bio'] }}</p>
+                            <p class="text-gray-600 leading-relaxed text-sm">{{ $member['bio'] }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -60,7 +59,7 @@
                 <div class="carousel-indicators flex gap-2">
                     @foreach ($team->members as $i => $m)
                         <button
-                            class="carousel-indicator w-3 h-3 {{ $i === 0 ? 'bg-primary-700' : 'bg-gray-300' }} rounded-full"
+                            class="carousel-indicator w-3 h-3 {{ $i === 0 ? 'bg-primary-700 active' : 'bg-gray-300' }} rounded-full transition-all"
                             data-index="{{ $i }}"></button>
                     @endforeach
                 </div>
@@ -71,20 +70,17 @@
             </div>
         </div>
 
-        <!-- CTA -->
         <div class="max-w-4xl mx-auto text-center animate-fadeIn" style="animation-delay: 0.4s;">
             <h3 class="text-3xl font-bold text-primary-700 mb-4">{{ $team->cta_heading }}</h3>
             <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">{{ $team->cta_description }}</p>
             <div class="flex flex-wrap gap-4 justify-center">
                 <a href="{{ $team->cta_primary_link }}"
                     class="px-8 py-4 bg-accent-500 text-white font-semibold rounded-lg transition-all duration-300 hover:bg-accent-600 hover:shadow-lg flex items-center gap-2">
-                    <i class="fas {{ $team->cta_primary_icon }}"></i>
-                    {{ $team->cta_primary_text }}
+                    <i class="fas {{ $team->cta_primary_icon }}"></i> {{ $team->cta_primary_text }}
                 </a>
                 <a href="{{ $team->cta_secondary_link }}"
                     class="px-8 py-4 border-2 border-primary-700 text-primary-700 font-semibold rounded-lg transition-all duration-300 hover:bg-primary-700 hover:text-white flex items-center gap-2">
-                    <i class="fas {{ $team->cta_secondary_icon }}"></i>
-                    {{ $team->cta_secondary_text }}
+                    <i class="fas {{ $team->cta_secondary_icon }}"></i> {{ $team->cta_secondary_text }}
                 </a>
             </div>
         </div>
@@ -92,6 +88,7 @@
 </section>
 
 <script>
+    // Same JS as original, just improved
     document.addEventListener('DOMContentLoaded', function() {
         const track = document.getElementById('carousel-track');
         const slides = document.querySelectorAll('.carousel-slide');
@@ -100,37 +97,38 @@
         const indicators = document.querySelectorAll('.carousel-indicator');
 
         let currentIndex = 0;
-        const totalSlides = slides.length;
-        const slideWidth = slides[0]?.offsetWidth + 24; // + gap
+        const total = slides.length;
 
-        function updateCarousel() {
-            track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+        function getSlideWidth() {
+            return slides[0]?.offsetWidth + 24;
+        }
+
+        function update() {
+            const width = getSlideWidth();
+            track.style.transform = `translateX(-${currentIndex * width}px)`;
+
             indicators.forEach((ind, i) => {
                 ind.classList.toggle('bg-primary-700', i === currentIndex);
                 ind.classList.toggle('bg-gray-300', i !== currentIndex);
+                ind.classList.toggle('active', i === currentIndex);
             });
         }
 
         prev.addEventListener('click', () => {
-            currentIndex = currentIndex > 0 ? currentIndex - 1 : totalSlides - 1;
-            updateCarousel();
+            currentIndex = currentIndex > 0 ? currentIndex - 1 : total - 1;
+            update();
         });
-
         next.addEventListener('click', () => {
-            currentIndex = currentIndex < totalSlides - 1 ? currentIndex + 1 : 0;
-            updateCarousel();
+            currentIndex = currentIndex < total - 1 ? currentIndex + 1 : 0;
+            update();
         });
+        indicators.forEach(ind => ind.addEventListener('click', () => {
+            currentIndex = +ind.dataset.index;
+            update();
+        }));
 
-        indicators.forEach(ind => {
-            ind.addEventListener('click', () => {
-                currentIndex = parseInt(ind.dataset.index);
-                updateCarousel();
-            });
-        });
-
-        // Responsive
-        window.addEventListener('resize', updateCarousel);
-        updateCarousel();
+        window.addEventListener('resize', () => setTimeout(update, 100));
+        update();
     });
 </script>
 
@@ -140,6 +138,11 @@
     }
 
     .carousel-track {
-        transition: transform 0.5s ease;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-indicator.active {
+        width: 32px;
+        border-radius: 8px;
     }
 </style>

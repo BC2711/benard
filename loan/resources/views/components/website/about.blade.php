@@ -1,4 +1,4 @@
-@php $about = \App\Models\AboutSection::first(); @endphp
+@php $about = \App\Models\AboutSection::first();  @endphp
 
 <section id="about" class="gradient-about-bg py-20 lg:py-28 relative overflow-hidden">
     {{-- Background blobs – unchanged --}}
@@ -41,23 +41,75 @@
                 </div>
 
                 {{-- FEATURES GRID --}}
-                <div class="grid sm:grid-cols-2 gap-6 mb-10">
-                    @foreach ($about->features as $i => $f)
-                        <div class="group glass-effect rounded-2xl p-6 hover-lift animate-fade-in-up"
-                            style="animation-delay:{{ ($i + 1) * 100 }}ms">
-                            <div class="flex items-start space-x-4">
-                                <div
-                                    class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-primary to-accent-accent rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas {{ $f['icon'] }} text-white text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-white font-bold text-lg mb-2">{{ $f['title'] }}</h3>
-                                    <p class="text-white/70 text-sm leading-relaxed">{{ $f['desc'] }}</p>
+                {{-- @php                    
+                    $featuresJson = trim($about->features, '"');
+                    $features = json_decode($featuresJson, true) ?? [];
+                @endphp --}}
+
+                @if (!empty($features))
+                    <div class="grid sm:grid-cols-2 gap-6 mb-10">
+                        @foreach ($about->features as $i => $f)
+                            <div class="group glass-effect rounded-2xl p-6 hover-lift animate-fade-in-up"
+                                style="animation-delay:{{ ($i + 1) * 100 }}ms">
+                                <div class="flex items-start space-x-4">
+                                    <div
+                                        class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-primary to-accent-accent rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <i class="fas {{ $f['icon'] ?? 'fa-circle' }} text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white font-bold text-lg mb-2">
+                                            {{ $f['title'] ?? 'Feature Title' }}</h3>
+                                        <p class="text-white/70 text-sm leading-relaxed">
+                                            {{ $f['desc'] ?? 'Feature description' }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="grid sm:grid-cols-2 gap-6 mb-10">
+                        {{-- Fallback features if JSON is invalid --}}
+                        @php
+                            $fallbackFeatures = [
+                                [
+                                    'icon' => 'fa-bolt',
+                                    'title' => 'Fast Approval',
+                                    'desc' => 'Get decisions within 24 hours and funding in 48 hours',
+                                ],
+                                [
+                                    'icon' => 'fa-chart-line',
+                                    'title' => 'Marketing Expertise',
+                                    'desc' => 'Loans designed specifically for marketing campaigns',
+                                ],
+                                [
+                                    'icon' => 'fa-sliders-h',
+                                    'title' => 'Flexible Terms',
+                                    'desc' => 'Repayment plans matching your ROI cycles',
+                                ],
+                                [
+                                    'icon' => 'fa-headset',
+                                    'title' => 'Dedicated Support',
+                                    'desc' => 'Personalized assistance from finance specialists',
+                                ],
+                            ];
+                        @endphp
+                        @foreach ($fallbackFeatures as $i => $f)
+                            <div class="group glass-effect rounded-2xl p-6 hover-lift animate-fade-in-up"
+                                style="animation-delay:{{ ($i + 1) * 100 }}ms">
+                                <div class="flex items-start space-x-4">
+                                    <div
+                                        class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-primary to-accent-accent rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <i class="fas {{ $f['icon'] }} text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white font-bold text-lg mb-2">{{ $f['title'] }}</h3>
+                                        <p class="text-white/70 text-sm leading-relaxed">{{ $f['desc'] }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
 
                 {{-- STATS --}}
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">

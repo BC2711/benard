@@ -1,6 +1,5 @@
 <?php
 
-// database/migrations/xxxx_create_loan_plans_sections_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +13,7 @@ return new class extends Migration {
 
             // Header
             $table->string('heading');
-            $table->string('highlighted_text'); 
+            $table->string('highlighted_text');
             $table->text('description');
 
             // Toggle
@@ -28,17 +27,17 @@ return new class extends Migration {
             $table->string('custom_heading')->default('Need a Bespoke Solution?');
             $table->text('custom_description');
             $table->string('custom_link_text')->default('Request Custom Quote');
-            $table->string('custom_link')->default('#contact');
+            $table->string('custom_link')->default('/web/#support');
             $table->string('custom_link_icon')->default('fa-comment-alt');
             $table->string('custom_flexible_text')->default('Flexible');
             $table->string('custom_flexible_subtext')->default('Tailored to your business');
             $table->string('custom_rate_text')->default('Personalized terms and competitive rates');
 
             // Custom benefits (3)
-            $table->json('custom_benefits')->default('[]');
+            $table->json('custom_benefits')->nullable();
 
             // Dynamic pricing cards
-            $table->json('pricing_cards')->default('[]');
+            $table->json('pricing_cards')->nullable();
 
             $table->timestamps();
         });
@@ -55,13 +54,13 @@ return new class extends Migration {
             ]),
             'pricing_cards' => json_encode([
                 // Short Term
-                ['type' => 'short', 'name' => 'Starter', 'price' => '$5,000', 'term' => '3 months', 'rate' => '12%', 'features' => ['Up to $5K', '3-month term', 'Fast approval', 'No collateral'], 'featured' => false],
-                ['type' => 'short', 'name' => 'Growth', 'price' => '$15,000', 'term' => '6 months', 'rate' => '10%', 'features' => ['Up to $15K', '6-month term', 'Priority support', 'Flexible payments'], 'featured' => true],
-                ['type' => 'short', 'name' => 'Pro', 'price' => '$30,000', 'term' => '9 months', 'rate' => '9%', 'features' => ['Up to $30K', '9-month term', 'Dedicated manager', 'Lowest rates'], 'featured' => false],
+                ['type' => 'short', 'name' => 'Starter', 'price' => 'ZMW5,000', 'term' => '3 months', 'rate' => '12%', 'features' => ['Up to ZMW5K', '3-month term', 'Fast approval', 'No collateral'], 'featured' => false],
+                ['type' => 'short', 'name' => 'Growth', 'price' => 'ZMW15,000', 'term' => '6 months', 'rate' => '10%', 'features' => ['Up to ZMW15K', '6-month term', 'Priority support', 'Flexible payments'], 'featured' => true],
+                ['type' => 'short', 'name' => 'Pro', 'price' => 'ZMW30,000', 'term' => '9 months', 'rate' => '9%', 'features' => ['Up to ZMW30K', '9-month term', 'Dedicated manager', 'Lowest rates'], 'featured' => false],
                 // Long Term
-                ['type' => 'long', 'name' => 'Agency', 'price' => '$50,000', 'term' => '24 months', 'rate' => '8%', 'features' => ['Up to $50K', '24-month term', 'Team expansion', 'Equipment funding'], 'featured' => false],
-                ['type' => 'long', 'name' => 'Enterprise', 'price' => '$100,000', 'term' => '36 months', 'rate' => '7%', 'features' => ['Up to $100K', '36-month term', 'Custom ROI terms', 'Full support team'], 'featured' => true],
-                ['type' => 'long', 'name' => 'Scale', 'price' => '$250,000+', 'term' => '48+ months', 'rate' => '6%', 'features' => ['$250K+', 'Custom terms', 'Strategic partnership', 'Growth consulting'], 'featured' => false],
+                ['type' => 'long', 'name' => 'Agency', 'price' => 'ZMW50,000', 'term' => '24 months', 'rate' => '8%', 'features' => ['Up to ZMW50K', '24-month term', 'Team expansion', 'Equipment funding'], 'featured' => false],
+                ['type' => 'long', 'name' => 'Enterprise', 'price' => 'ZMW100,000', 'term' => '36 months', 'rate' => '7%', 'features' => ['Up to ZMW100K', '36-month term', 'Custom ROI terms', 'Full support team'], 'featured' => true],
+                ['type' => 'long', 'name' => 'Scale', 'price' => 'ZMW250,000+', 'term' => '48+ months', 'rate' => '6%', 'features' => ['ZMW250K+', 'Custom terms', 'Strategic partnership', 'Growth consulting'], 'featured' => false],
             ]),
             'created_at' => now(),
             'updated_at' => now(),

@@ -1,6 +1,5 @@
 <?php
 
-// app/Models/SuccessStoriesSection.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -24,8 +23,42 @@ class SuccessStoriesSection extends Model
     ];
 
     protected $casts = [
-        'stats' => 'array',
+        'stats'      => 'array',
         'categories' => 'array',
-        'stories' => 'array',
+        'stories'    => 'array',
     ];
+
+    /** -----------------------------------------------------------------
+     *  Accessors – guarantee an *array* even if the DB column is null,
+     *  malformed JSON, or still a string.
+     * ----------------------------------------------------------------- */
+    public function getCategoriesAttribute($value)
+    {
+        return $this->castToArray($value);
+    }
+
+    public function getStatsAttribute($value)
+    {
+        return $this->castToArray($value);
+    }
+
+    public function getStoriesAttribute($value)
+    {
+        return $this->castToArray($value);
+    }
+
+    /** Helper used by the accessors */
+    protected function castToArray($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
+    }
 }

@@ -1,9 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FeatureSectionController;
 use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\HeroSectionController;
 use App\Http\Controllers\Admin\LoanCalculatorController;
+use App\Http\Controllers\Admin\LoanPlansController;
+use App\Http\Controllers\Admin\ServiceSectionController;
+use App\Http\Controllers\Admin\SuccessStoriesController;
+use App\Http\Controllers\Admin\SupportController;
+use App\Http\Controllers\Admin\TeamSectionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\EmailController;
@@ -91,46 +98,58 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::match(['get', 'post'], '/hero-section', [SectionController::class, 'hero_section'])->name('hero-section');
         // Route::post('/hero-section', [SectionController::class, 'hero_section'])->name('hero-section');
 
-        Route::get('/feature-section', [SectionController::class, 'feature_section'])->name('feature-section');
-        Route::post('/feature-section', [SectionController::class, 'feature_section'])->name('feature-section');
+        // Route::get('/feature-section', [SectionController::class, 'feature_section'])->name('feature-section');
+        // Route::post('/feature-section', [SectionController::class, 'feature_section'])->name('feature-section');
 
-        Route::get('/about-section', [SectionController::class, 'about_section'])->name('about-section');
-        Route::post('/about-section', [SectionController::class, 'about_section'])->name('about-section');
+        // Route::get('/about-section', [SectionController::class, 'about_section'])->name('about-section');
+        // Route::post('/about-section', [SectionController::class, 'about_section'])->name('about-section');
 
-        Route::get('/service-section', [SectionController::class, 'service_section'])->name('service-section');
-        Route::post('/service-section', [SectionController::class, 'service_section'])->name('service-section');
+        // Route::get('/service-section', [SectionController::class, 'service_section'])->name('service-section');
+        // Route::post('/service-section', [SectionController::class, 'service_section'])->name('service-section');
 
-        Route::get('/price-section', [SectionController::class, 'price_section'])->name('price-section');
-        Route::post('/price-section', [SectionController::class, 'price_section'])->name('price-section');
-        Route::post('/price-section/toggle-loan-type', [SectionController::class, 'toggle_loan_type'])->name('pricing.toggle');
+        // Route::get('/price-section', [SectionController::class, 'price_section'])->name('price-section');
+        // Route::post('/price-section', [SectionController::class, 'price_section'])->name('price-section');
+        // Route::post('/price-section/toggle-loan-type', [SectionController::class, 'toggle_loan_type'])->name('pricing.toggle');
 
-        Route::get('/team-section', [SectionController::class, 'team_section'])->name('team-section');
-        Route::post('/team-section', [SectionController::class, 'team_section'])->name('team-section');
+        // Route::get('/team-section', [SectionController::class, 'team_section'])->name('team-section');
+        // Route::post('/team-section', [SectionController::class, 'team_section'])->name('team-section');
 
-        Route::get('/project-section', [SectionController::class, 'project_section'])->name('project-section');
-        Route::post('/project-section', [SectionController::class, 'project_section'])->name('project-section');
+        // Route::get('/project-section', [SectionController::class, 'project_section'])->name('project-section');
+        // Route::post('/project-section', [SectionController::class, 'project_section'])->name('project-section');
 
-        Route::get('/testimonial-section', [SectionController::class, 'testimonial_section'])->name('testimonial-section');
-        Route::post('/testimonial-section', [SectionController::class, 'testimonial_section'])->name('testimonial-section');
-        Route::post('/testimonial-section/delete-photo/{index}', [SectionController::class, 'deletePhoto'])->name('delete-photo');
+        // Route::get('/testimonial-section', [SectionController::class, 'testimonial_section'])->name('testimonial-section');
+        // Route::post('/testimonial-section', [SectionController::class, 'testimonial_section'])->name('testimonial-section');
+        // Route::post('/testimonial-section/delete-photo/{index}', [SectionController::class, 'deletePhoto'])->name('delete-photo');
 
-        Route::get('/counter-section', [SectionController::class, 'counter_section'])->name('counter-section');
-        Route::post('/counter-section', [SectionController::class, 'counter_section'])->name('counter-section');
+        // Route::get('/counter-section', [SectionController::class, 'counter_section'])->name('counter-section');
+        // Route::post('/counter-section', [SectionController::class, 'counter_section'])->name('counter-section');
 
-        Route::get('/client-section', [SectionController::class, 'client_section'])->name('client-section');
-        Route::post('/client-section', [SectionController::class, 'client_section'])->name('client-section');
+        // Route::get('/client-section', [SectionController::class, 'client_section'])->name('client-section');
+        // Route::post('/client-section', [SectionController::class, 'client_section'])->name('client-section');
 
-        Route::get('/blog-section', [SectionController::class, 'blog_section'])->name('blog-section');
-        Route::post('/blog-section', [SectionController::class, 'blog_section'])->name('blog-section');
+        // Route::get('/blog-section', [SectionController::class, 'blog_section'])->name('blog-section');
+        // Route::post('/blog-section', [SectionController::class, 'blog_section'])->name('blog-section');
 
-        Route::get('/contact-section', [SectionController::class, 'contact_section'])->name('contact-section');
-        Route::post('/contact-section', [SectionController::class, 'contact_section'])->name('contact-section');
+        // Route::get('/contact-section', [SectionController::class, 'contact_section'])->name('contact-section');
+        // Route::post('/contact-section', [SectionController::class, 'contact_section'])->name('contact-section');
 
-        Route::get('/cta-section', [SectionController::class, 'cta_section'])->name('cta-section');
-        Route::post('/cta-section', [SectionController::class, 'cta_section'])->name('cta-section');
+        // Route::get('/cta-section', [SectionController::class, 'cta_section'])->name('cta-section');
+        // Route::post('/cta-section', [SectionController::class, 'cta_section'])->name('cta-section');
 
-        Route::get('/footer-section', [SectionController::class, 'footer_section'])->name('footer-section');
-        Route::post('/footer-section', [SectionController::class, 'footer_section'])->name('footer-section');
+        // Route::get('/footer-section', [SectionController::class, 'footer_section'])->name('footer-section');
+        // Route::post('/footer-section', [SectionController::class, 'footer_section'])->name('footer-section');
+
+        Route::resource('hero', HeroSectionController::class);
+        Route::resource('about', AboutSectionController::class);
+        Route::resource('features', FeatureSectionController::class);
+        Route::resource('service', ServiceSectionController::class);
+        Route::resource('price', LoanPlansController::class);
+        Route::resource('team', TeamSectionController::class);
+        Route::resource('project', SuccessStoriesController::class);
+
+        Route::resource('support', SupportController::class);
+        Route::resource('calculator', LoanCalculatorController::class);
+        Route::resource('footer', FooterController::class);
     });
 });
 

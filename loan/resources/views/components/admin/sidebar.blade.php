@@ -1,41 +1,41 @@
-{{-- resources/views/components/admin/sidebar.blade.php --}}
+{{-- resources/views/components/management/sidebar.blade.php --}}
 @php
     $menu = [
         [
             'icon' => 'fa-tachometer-alt',
             'text' => 'Dashboard',
-            'url' => route('admin.dashboard'),
+            'url' => route('management.dashboard'),
             'permission' => 'view-dashboard',
         ],
         [
             'icon' => 'fa-home',
             'text' => 'Hero Section',
-            'url' => route('admin.hero.index'),
+            'url' => route('management.hero.index'),
             'permission' => 'edit-hero',
         ],
-        ['icon' => 'fa-users', 'text' => 'About Us', 'url' => route('admin.about.index'), 'permission' => 'edit-about'],
+        ['icon' => 'fa-users', 'text' => 'About Us', 'url' => route('management.about.index'), 'permission' => 'edit-about'],
         [
             'icon' => 'fa-handshake',
             'text' => 'Support',
-            'url' => route('admin.support.index'),
+            'url' => route('management.support.index'),
             'permission' => 'edit-support',
         ],
         [
             'icon' => 'fa-calculator',
             'text' => 'Loan Calculator',
-            'url' => route('admin.calculator.index'),
+            'url' => route('management.calculator.index'),
             'permission' => 'edit-calculator',
         ],
-        ['icon' => 'fa-blog', 'text' => 'Blog', 'url' => route('admin.blog.index'), 'permission' => 'manage-blog'],
-        ['icon' => 'fa-comments', 'text' => 'FAQ', 'url' => route('admin.faq.index'), 'permission' => 'edit-faq'],
-        ['icon' => 'fa-cog', 'text' => 'Footer', 'url' => route('admin.footer.index'), 'permission' => 'edit-footer'],
+        // ['icon' => 'fa-blog', 'text' => 'Blog', 'url' => route('management.blog.index'), 'permission' => 'manage-blog'],
+        // ['icon' => 'fa-comments', 'text' => 'FAQ', 'url' => route('management.faq.index'), 'permission' => 'edit-faq'],
+        ['icon' => 'fa-cog', 'text' => 'Footer', 'url' => route('management.footer.index'), 'permission' => 'edit-footer'],
         [
             'icon' => 'fa-users-cog',
             'text' => 'Users',
-            'url' => route('admin.users.index'),
+            'url' => route('management.users.index'),
             'permission' => 'manage-users',
         ],
-        ['icon' => 'fa-sign-out-alt', 'text' => 'Logout', 'url' => route('admin.logout'), 'method' => 'post'],
+        ['icon' => 'fa-sign-out-alt', 'text' => 'Logout', 'url' => route('management.logout'), 'method' => 'post'],
     ];
 @endphp
 
@@ -49,7 +49,7 @@
             </div>
             <div>
                 <div class="text-xl font-black">FinExpert</div>
-                <div class="text-xs text-accent-300">Admin Panel</div>
+                <div class="text-xs text-accent-300">management Panel</div>
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@
         @foreach ($menu as $item)
             @if (!isset($item['permission']) || auth()->user()->can($item['permission']))
                 <a href="{{ $item['url'] }}"
-                    class="{{ request()->routeIs(str_replace('admin.', 'admin.*', \Illuminate\Support\Str::before($item['url'], '.'))) ? 'bg-primary-800 text-white' : 'text-gray-300 hover:bg-primary-800 hover:text-white' }} 
+                    class="{{ request()->routeIs(str_replace('management.', 'management.*', \Illuminate\Support\Str::before($item['url'], '.'))) ? 'bg-primary-800 text-white' : 'text-gray-300 hover:bg-primary-800 hover:text-white' }} 
                           flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group {{ isset($item['method']) ? 'logout-form' : '' }}"
                     @if (isset($item['method'])) onclick="event.preventDefault(); document.getElementById('logout-form').submit();" @endif>
                     <i class="fas {{ $item['icon'] }} text-lg group-hover:scale-110 transition-transform"></i>
@@ -84,7 +84,7 @@
 </aside>
 
 @if (isset($menu[array_key_last($menu)]['method']))
-    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="hidden">
+    <form id="logout-form" action="{{ route('management.logout') }}" method="POST" class="hidden">
         @csrf
     </form>
 @endif

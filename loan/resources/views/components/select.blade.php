@@ -1,5 +1,5 @@
 {{-- resources/views/components/select.blade.php --}}
-@props(['name', 'label' => null, 'options' => [], 'required' => false, 'value' => ''])
+@props(['name', 'label' => null, 'options' => [], 'required' => false, 'value' => '', 'selected' => ''])
 
 <div {{ $attributes->merge(['class' => 'space-y-2']) }}>
     @if ($label)
@@ -17,7 +17,7 @@
             'form-input' => true,
         ]) }}>
         @foreach ($options as $val => $text)
-            <option value="{{ $val }}" {{ old($name, $value) == $val ? 'selected' : '' }}>
+            <option value="{{ $val }}" {{ old($name, $value ?: $selected) == $val ? 'selected' : '' }}>
                 {{ $text }}
             </option>
         @endforeach

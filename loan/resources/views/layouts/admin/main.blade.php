@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <!-- Tailwind CSS -->
-    <script src="{{asset('assets/js/tailwind.js')}}"></script>
+    <script src="{{ asset('assets/js/tailwind.js') }}"></script>
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 
     <script>
@@ -26,6 +26,20 @@
             theme: {
                 extend: {
                     colors: {
+                        'primary': {
+                            '50': '#fef8f0',
+                            '100': '#fdebd6',
+                            '500': '#db9123',
+                            '600': '#c27a1a',
+                            '700': '#7a4603',
+                            '800': '#5c3502',
+                            'primary': '#7a4603',
+                            'primary_2': '#db9123',
+                            'secondary': '#db9123',
+                            'accent': '#f8b750',
+                            'light': '#f8f5f0',
+                            'dark': '#1a1a1a',
+                        },
                         'londa': {
                             '50': '#fef6e6',
                             '100': '#fdebc7',
@@ -228,6 +242,7 @@
 
         <!-- Sidebar -->
         @include('layouts.admin.sidebar')
+        {{-- @include('components.admin.sidebar') --}}
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col w-0 min-w-0 transition-all duration-300 ease-in-out"

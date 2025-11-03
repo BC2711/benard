@@ -24,13 +24,13 @@
     @search-results.window="searchResults = $event.detail">
 
     <!-- Announcement Bar -->
-    <div class="bg-gradient-to-r from-londa-orange to-orange-500 px-4 py-2 text-white text-sm text-center">
+    {{-- <div class="bg-gradient-to-r from-londa-orange to-orange-500 px-4 py-2 text-white text-sm text-center">
         <div class="flex items-center justify-center space-x-2">
             <i class="fas fa-rocket animate-pulse"></i>
             <span>Welcome to Londa Loans Admin v2.0 - New features available!</span>
             <a href="#" class="underline hover:no-underline ml-2 font-medium">Learn more</a>
         </div>
-    </div>
+    </div> --}}
 
     <div class="flex items-center justify-between px-4 sm:px-6 py-3">
         <!-- Left Section: Menu Toggle, Breadcrumb & Search -->

@@ -6,57 +6,111 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TeamSection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TeamSectionController extends Controller
 {
     public function index()
     {
-        $team = TeamSection::firstOrCreate([]);
-        return view('admin.team.edit', compact('team'));
+        $team = TeamSection::getInstance();
+        return view('components.management.team.edit', compact('team'));
     }
 
-    public function update(Request $request, TeamSection $team)
+    public function update(Request $request)
     {
-        $data = $request->validate([
-            'heading' => 'required|string',
+        $request->validate([
+            'heading' => 'required|string|max:255',
             'description' => 'required|string',
-            'cta_heading' => 'required|string',
+            'cta_heading' => 'required|string|max:255',
             'cta_description' => 'required|string',
             'cta_primary_text' => 'required|string',
-            'cta_primary_link' => 'required|url',
+            'cta_primary_link' => 'required|string',
             'cta_primary_icon' => 'required|string',
             'cta_secondary_text' => 'required|string',
-            'cta_secondary_link' => 'required|url',
+            'cta_secondary_link' => 'required|string',
             'cta_secondary_icon' => 'required|string',
         ]);
 
-        // Build members
+        $team = TeamSection::getInstance();
+        $oldMembers = $team->members ?? [];
+        $oldImages = collect($oldMembers)->pluck('image')->filter()->toArray();
+
         $members = [];
         $names = $request->input('member_name', []);
+        $roles = $request->input('member_role', []);
+        $bios = $request->input('member_bio', []);
+        $oldImagesInput = $request->input('member_image_old', []);
+
+        // Get the uploaded files as array
+        $memberImages = $request->file('member_image', []);
+
         foreach ($names as $i => $name) {
-            if ($name) {
-                $social = [];
-                $icons = $request->input("member_social_icon_{$i}", []);
-                $urls = $request->input("member_social_url_{$i}", []);
-                $colors = $request->input("member_social_color_{$i}", []);
-                foreach ($icons as $j => $icon) {
-                    if ($icon && $urls[$j]) {
-                        $social[] = ['icon' => $icon, 'url' => $urls[$j], 'color' => $colors[$j] ?? 'primary'];
-                    }
+            if (!$name) continue;
+
+            $image = $oldImagesInput[$i] ?? null;
+
+            // Check if there's a new image uploaded for this member
+            if (isset($memberImages[$i]) && $memberImages[$i]->isValid()) {
+                $file = $memberImages[$i];
+                $filename = time() . "_{$i}." . $file->getClientOriginalExtension();
+
+                // This will create the directory if it doesn't exist
+                Storage::disk('public')->putFileAs('teams', $file, $filename);
+                $image = $filename;
+
+                // Delete old image if it exists
+                if (!empty($oldImagesInput[$i])) {
+                    Storage::disk('public')->delete('teams/' . $oldImagesInput[$i]);
                 }
-                $members[] = [
-                    'name' => $name,
-                    'role' => $request->input("member_role_{$i}"),
-                    'bio' => $request->input("member_bio_{$i}"),
-                    'image' => $request->input("member_image_{$i}"),
-                    'social' => $social,
-                ];
+            }
+
+            // Handle social links - adjust based on your actual form structure
+            $social = [];
+            $icons = $request->input("member_social_icon.{$i}", []);
+            $urls = $request->input("member_social_url.{$i}", []);
+            $colors = $request->input("member_social_color.{$i}", []);
+
+            foreach ($icons as $j => $icon) {
+                if ($icon && isset($urls[$j]) && $urls[$j]) {
+                    $social[] = [
+                        'icon' => $icon,
+                        'url' => $urls[$j],
+                        'color' => $colors[$j] ?? 'primary'
+                    ];
+                }
+            }
+
+            $members[] = [
+                'name' => $name,
+                'role' => $roles[$i] ?? '',
+                'bio' => $bios[$i] ?? '',
+                'image' => $image,
+                'social' => $social
+            ];
+        }
+
+        // Delete removed images
+        $newImages = collect($members)->pluck('image')->filter()->toArray();
+        foreach ($oldImages as $old) {
+            if (!empty($old) && !in_array($old, $newImages)) {
+                Storage::disk('public')->delete('teams/' . $old);
             }
         }
-        $data['members'] = $members;
 
-        $team->update($data);
+        $team->update([
+            'heading' => $request->heading,
+            'description' => $request->description,
+            'cta_heading' => $request->cta_heading,
+            'cta_description' => $request->cta_description,
+            'cta_primary_text' => $request->cta_primary_text,
+            'cta_primary_link' => $request->cta_primary_link,
+            'cta_primary_icon' => $request->cta_primary_icon,
+            'cta_secondary_text' => $request->cta_secondary_text,
+            'cta_secondary_link' => $request->cta_secondary_link,
+            'cta_secondary_icon' => $request->cta_secondary_icon,
+            'members' => $members
+        ]);
 
-        return back()->with('success', 'Team section updated!');
+        return back()->with('success', 'Team section updated successfully!');
     }
 }

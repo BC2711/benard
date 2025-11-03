@@ -8,7 +8,8 @@
                       <div class="relative">
                           <div
                               class="w-12 h-12 bg-gradient-to-br from-primary-primary to-secondary-secondary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                              <span class="text-white font-bold text-lg">LL</span>
+                              <span class="text-white font-bold text-lg"> <img height="50" width="50"
+                                class="rounded-lg"      src="{{ asset('assets/logos/londa.jpg') }}" alt=""> </span>
                           </div>
                           <div
                               class="absolute -inset-1 bg-gradient-to-r from-primary-primary to-secondary-secondary rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300">

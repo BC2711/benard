@@ -1,14 +1,9 @@
-@extends('layouts.admin')
+@extends('layouts.admin.main')
 
 @section('content')
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Loan Plans Section</h1>
-
-        @if (session('success'))
-            <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
-        @endif
-
-        <form action="{{ route('admin.loan-plans.update', $plans) }}" method="POST" class="space-y-8">
+        <form action="{{ route('management.price.update', $plans->id) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')
 
             <!-- Header -->
@@ -35,7 +30,7 @@
                 <x-input name="custom_heading" label="Heading" :value="old('custom_heading', $plans->custom_heading)" />
                 <x-textarea name="custom_description" label="Description" rows="3" :value="old('custom_description', $plans->custom_description)" />
                 <x-input name="custom_link_text" label="Button Text" :value="old('custom_link_text', $plans->custom_link_text)" />
-                <x-input name="custom_link" label="Button Link" type="url" :value="old('custom_link', $plans->custom_link)" />
+                <x-input name="custom_link" label="Button Link" type="text" :value="old('custom_link', $plans->custom_link)" />
                 <x-input name="custom_link_icon" label="Button Icon" :value="old('custom_link_icon', $plans->custom_link_icon)" />
                 <x-input name="custom_flexible_text" label="Flexible Text" :value="old('custom_flexible_text', $plans->custom_flexible_text)" />
                 <x-input name="custom_flexible_subtext" label="Subtext" :value="old('custom_flexible_subtext', $plans->custom_flexible_subtext)" />
@@ -43,9 +38,9 @@
 
                 <div>
                     <label class="block font-medium mb-2">Benefits (one per line)</label>
-                    <textarea name="custom_benefits[]" rows="4" class="w-full border rounded-lg p-3">{{ old('custom_benefits.0', $plans->custom_benefits[0] ?? '') }}</textarea>
-                    @for ($i = 1; $i < 3; $i++)
-                        <textarea name="custom_benefits[]" rows="1" class="w-full border rounded-lg p-3 mt-2">{{ old("custom_benefits.{$i}", $plans->custom_benefits[$i] ?? '') }}</textarea>
+                    @for ($i = 0; $i < 3; $i++)
+                        <textarea name="custom_benefits[]" rows="2" class="w-full border rounded-lg p-3 mt-2"
+                            placeholder="Benefit {{ $i + 1 }}">{{ old("custom_benefits.{$i}", $plans->custom_benefits[$i] ?? '') }}</textarea>
                     @endfor
                 </div>
             </div>
@@ -54,8 +49,11 @@
             <div class="space-y-6">
                 <h3 class="text-xl font-semibold">Pricing Cards</h3>
                 <div id="pricing-cards-container">
+                    @php
+                        $cardCount = count($plans->pricing_cards);
+                    @endphp
                     @foreach ($plans->pricing_cards as $i => $card)
-                        <div class="border p-6 rounded-lg bg-gray-50 mb-4 card-item">
+                        <div class="border p-6 rounded-lg bg-gray-50 mb-4 card-item" data-index="{{ $i }}">
                             <div class="grid md:grid-cols-2 gap-4">
                                 <x-select name="card_type_{{ $i }}" label="Type" :options="['short' => 'Short Term', 'long' => 'Long Term']"
                                     :selected="old('card_type_' . $i, $card['type'])" />
@@ -63,61 +61,129 @@
                                 <x-input name="card_price_{{ $i }}" label="Price" :value="old('card_price_' . $i, $card['price'])" />
                                 <x-input name="card_term_{{ $i }}" label="Term" :value="old('card_term_' . $i, $card['term'])" />
                                 <x-input name="card_rate_{{ $i }}" label="Rate" :value="old('card_rate_' . $i, $card['rate'])" />
-                                <div>
-                                    <label><input type="checkbox" name="card_featured_{{ $i }}"
+                                <div class="flex items-center">
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" name="card_featured_{{ $i }}" value="on"
                                             {{ old('card_featured_' . $i, $card['featured'] ?? false) ? 'checked' : '' }}>
-                                        Featured</label>
+                                        <span>Featured</span>
+                                    </label>
                                 </div>
                             </div>
                             <div class="mt-4">
-                                <label class="block font-medium mb-2">Features (one per line)</label>
-                                @foreach ($card['features'] as $j => $feat)
+                                <label class="block font-medium mb-2">Features (leave empty to remove)</label>
+                                <div class="features-container">
+                                    @foreach ($card['features'] as $j => $feat)
+                                        @if (!empty($feat))
+                                            <input type="text" name="card_features_{{ $i }}[]"
+                                                value="{{ old('card_features_' . $i . '.' . $j, $feat) }}"
+                                                class="w-full border rounded p-2 mb-2 feature-input"
+                                                placeholder="Feature {{ $j + 1 }}">
+                                        @endif
+                                    @endforeach
+                                    <!-- Always include at least one empty feature input -->
                                     <input type="text" name="card_features_{{ $i }}[]"
-                                        value="{{ old('card_features_' . $i . '.' . $j, $feat) }}"
-                                        class="w-full border rounded p-2 mb-1">
-                                @endforeach
-                                <input type="text" name="card_features_{{ $i }}[]"
-                                    class="w-full border rounded p-2 mb-1" placeholder="Add new feature">
+                                        class="w-full border rounded p-2 mb-2 feature-input" placeholder="Add new feature">
+                                </div>
+                                <button type="button" class="text-blue-600 text-sm mt-2 add-feature"
+                                    data-card="{{ $i }}">+ Add Another Feature</button>
                             </div>
-                            <button type="button" class="text-red-600 text-sm mt-2 remove-card">Remove Card</button>
+                            @if ($i > 0)
+                                <button type="button" class="text-red-600 text-sm mt-2 remove-card">Remove Card</button>
+                            @endif
                         </div>
                     @endforeach
                 </div>
-                <button type="button" id="add-card" class="bg-primary text-white px-4 py-2 rounded">+ Add Card</button>
+                <button type="button" id="add-card" class="bg-primary-primary text-white px-4 py-2 rounded">+ Add
+                    Card</button>
             </div>
 
-            <button type="submit" class="bg-primary text-white px-8 py-3 rounded-lg font-bold">Save Changes</button>
+            <button type="submit" class="bg-primary-primary text-white px-8 py-3 rounded-lg font-bold">Save
+                Changes</button>
         </form>
     </div>
 
     <script>
+        let cardCounter = {{ $cardCount }};
+
         document.getElementById('add-card').addEventListener('click', function() {
             const container = document.getElementById('pricing-cards-container');
-            const index = container.children.length;
+            const index = cardCounter++;
+
             const html = `
-        <div class="border p-6 rounded-lg bg-gray-50 mb-4 card-item">
-            <div class="grid md:grid-cols-2 gap-4">
-                <select name="card_type_${index}" class="border rounded p-2"><option value="short">Short Term</option><option value="long">Long Term</option></select>
-                <input type="text" name="card_name_${index}" placeholder="Name" class="border rounded p-2">
-                <input type="text" name="card_price_${index}" placeholder="Price" class="border rounded p-2">
-                <input type="text" name="card_term_${index}" placeholder="Term" class="border rounded p-2">
-                <input type="text" name="card_rate_${index}" placeholder="Rate" class="border rounded p-2">
-                <label><input type="checkbox" name="card_featured_${index}"> Featured</label>
-            </div>
-            <div class="mt-4">
-                <label class="block font-medium mb-2">Features</label>
-                <input type="text" name="card_features_${index}[]" class="w-full border rounded p-2 mb-1" placeholder="Feature 1">
-                <input type="text" name="card_features_${index}[]" class="w-full border rounded p-2 mb-1" placeholder="Feature 2">
-            </div>
-            <button type="button" class="text-red-600 text-sm mt-2 remove-card">Remove Card</button>
-        </div>`;
+                <div class="border p-6 rounded-lg bg-gray-50 mb-4 card-item" data-index="${index}">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-medium mb-1">Type</label>
+                            <select name="card_type_${index}" class="w-full border rounded p-2">
+                                <option value="short">Short Term</option>
+                                <option value="long">Long Term</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Name</label>
+                            <input type="text" name="card_name_${index}" placeholder="Card Name" class="w-full border rounded p-2" required>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Price</label>
+                            <input type="text" name="card_price_${index}" placeholder="e.g., ZMW5,000" class="w-full border rounded p-2" required>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Term</label>
+                            <input type="text" name="card_term_${index}" placeholder="e.g., 3 months" class="w-full border rounded p-2" required>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Rate</label>
+                            <input type="text" name="card_rate_${index}" placeholder="e.g., 12%" class="w-full border rounded p-2" required>
+                        </div>
+                        <div class="flex items-center">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="card_featured_${index}" value="on">
+                                <span>Featured</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block font-medium mb-2">Features (leave empty to remove)</label>
+                        <div class="features-container">
+                            <input type="text" name="card_features_${index}[]" class="w-full border rounded p-2 mb-2 feature-input" placeholder="Feature 1" required>
+                            <input type="text" name="card_features_${index}[]" class="w-full border rounded p-2 mb-2 feature-input" placeholder="Feature 2">
+                        </div>
+                        <button type="button" class="text-blue-600 text-sm mt-2 add-feature" data-card="${index}">+ Add Another Feature</button>
+                    </div>
+                    <button type="button" class="text-red-600 text-sm mt-2 remove-card">Remove Card</button>
+                </div>`;
+
             container.insertAdjacentHTML('beforeend', html);
         });
 
+        // Add feature input
         document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-feature')) {
+                const cardIndex = e.target.getAttribute('data-card');
+                const featuresContainer = e.target.previousElementSibling;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = `card_features_${cardIndex}[]`;
+                input.className = 'w-full border rounded p-2 mb-2 feature-input';
+                input.placeholder = 'Additional feature';
+
+                featuresContainer.appendChild(input);
+            }
+
+            // Remove card
             if (e.target.classList.contains('remove-card')) {
                 e.target.closest('.card-item').remove();
             }
+        });
+
+        // Remove empty feature inputs on form submit
+        document.querySelector('form').addEventListener('submit', function() {
+            document.querySelectorAll('.feature-input').forEach(input => {
+                if (!input.value.trim()) {
+                    input.remove();
+                }
+            });
         });
     </script>
 @endsection
