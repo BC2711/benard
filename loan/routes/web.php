@@ -18,6 +18,7 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\Admin\TestimonialsController;
 use App\Http\Controllers\Admin\TrustedClientsController;
 use App\Http\Controllers\LoanApplicationController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\SectionController;
@@ -29,8 +30,12 @@ Route::get('/', function () {
     return view('website.index');
 });
 
-
-
+Route::get('/service-details', function () {
+    return view('website.review_testimonials');
+});
+Route::get('/testimonial-reviews', function () {
+    return view('website.review_testimonials');
+});
 Route::get('/calculator', function () {
     return view('website.calculator');
 });
@@ -53,6 +58,7 @@ Route::prefix('notifications')->group(function () {
     Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::post('/loan-application', [EmailController::class, 'send_loan_application_email']);
     Route::post('/application', [LoanApplicationController::class, 'store']);
+    Route::post('/news', [NewsletterController::class, 'store'])->name('newsletter.subscribe');
 });
 
 Route::prefix('management')->name('management.')->group(function () {

@@ -30,20 +30,23 @@
                     <div class="space-y-4 mb-6">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-accent-500 rounded-full flex items-center justify-center text-white">
-                                <i class="fas fa-envelope"></i></div>
+                                <i class="fas fa-envelope"></i>
+                            </div>
                             <a href="mailto:{{ $footer->email }}"
                                 class="text-gray-300 hover:text-white">{{ $footer->email }}</a>
                         </div>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white">
-                                <i class="fas fa-map-marker-alt"></i></div>
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
                             <span
                                 class="text-gray-300">{{ $footer->address_line1 }}<br>{{ $footer->address_line2 }}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-accent-500 rounded-full flex items-center justify-center text-white">
-                                <i class="fas fa-phone"></i></div>
+                                <i class="fas fa-phone"></i>
+                            </div>
                             <a href="tel:{{ preg_replace('/[^0-9]/', '', $footer->phone) }}"
                                 class="text-gray-300 hover:text-white">{{ $footer->phone }}</a>
                         </div>
@@ -104,15 +107,21 @@
                     <h4 class="text-xl font-bold text-accent-400 mb-6">{{ $footer->newsletter_heading }}</h4>
                     <p class="text-gray-300 mb-6">{{ $footer->newsletter_description }}</p>
 
+
                     <form id="newsletterForm" class="space-y-4">
+                        @csrf
                         <input type="email" name="email" placeholder="Your email address" required
                             class="w-full px-4 py-3 bg-white bg-opacity-10 border border-accent-500 rounded-lg newsletter-input focus:outline-none focus:border-accent-400 text-white placeholder-gray-400">
                         <button type="submit"
-                            class="w-full py-3 bg-accent-500 text-white font-semibold rounded-lg hover:bg-accent-600 hover:shadow-lg flex items-center justify-center gap-2">
-                            <i class="fas fa-paper-plane"></i> Subscribe
+                            class="w-full py-3 bg-accent-500 text-white font-semibold rounded-lg hover:bg-accent-600 hover:shadow-lg flex items-center justify-center gap-2 transition-all duration-300">
+                            <i class="fas fa-paper-plane"></i>
+                            <span id="submitText">Subscribe</span>
+                            <div id="submitSpinner" class="hidden">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
                         </button>
                     </form>
-                    <div id="newsletterMessage" class="mt-4 text-sm min-h-6"></div>
+                    <div id="newsletterMessage" class="mt-4 text-sm min-h-6 transition-all duration-300"></div>
 
                     <div class="mt-8 pt-6 border-t border-gray-600">
                         <h5 class="text-accent-400 font-semibold mb-4">Trust & Security</h5>
@@ -171,29 +180,85 @@
 <script>
     document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const msg = document.getElementById('newsletterMessage');
+
         const form = this;
-        const email = form.email.value;
+        const messageEl = document.getElementById('newsletterMessage');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const submitText = document.getElementById('submitText');
+        const submitSpinner = document.getElementById('submitSpinner');
+
+        // Get form data
+        const formData = new FormData(form);
+        const email = formData.get('email');
+
+        // Validate email
+        if (!validateEmail(email)) {
+            showMessage('Please enter a valid email address', 'error');
+            return;
+        }
+
+        // Show loading state
+        submitText.textContent = 'Subscribing...';
+        submitSpinner.classList.remove('hidden');
+        submitBtn.disabled = true;
 
         try {
-            const res = await fetch('', {
+            const response = await fetch('{{ route('newsletter.subscribe') }}', {
                 method: 'POST',
-                body: new FormData(form),
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
             });
-            const data = await res.json();
-            msg.className = data.success ? 'text-green-400' : 'text-red-400';
-            msg.textContent = data.message;
-            if (data.success) form.reset();
-        } catch {
-            msg.className = 'text-red-400';
-            msg.textContent = 'Error. Try again.';
+
+            const data = await response.json();
+
+            if (data.success) {
+                showMessage(data.message, 'success');
+                form.reset();
+            } else {
+                showMessage(data.message || 'Subscription failed. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Newsletter subscription error:', error);
+            showMessage('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            // Reset button state
+            submitText.textContent = 'Subscribe';
+            submitSpinner.classList.add('hidden');
+            submitBtn.disabled = false;
         }
     });
 
-    // Scroll to top
+    function showMessage(message, type) {
+        const messageEl = document.getElementById('newsletterMessage');
+        messageEl.textContent = message;
+        messageEl.className = 'mt-4 text-sm min-h-6 transition-all duration-300 ';
+
+        if (type === 'success') {
+            messageEl.classList.add('text-green-400');
+        } else if (type === 'error') {
+            messageEl.classList.add('text-red-400');
+        } else {
+            messageEl.classList.add('text-gray-300');
+        }
+
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                messageEl.textContent = '';
+                messageEl.className = 'mt-4 text-sm min-h-6';
+            }, 5000);
+        }
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Scroll to top functionality remains the same
     const scrollBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => {
         scrollBtn.classList.toggle('hidden', window.scrollY < 300);

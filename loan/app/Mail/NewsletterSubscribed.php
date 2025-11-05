@@ -12,7 +12,7 @@ class NewsletterSubscribed extends Mailable
 
     public function build()
     {
-        return $this->subject('Welcome to FinExpert Newsletter')
-            ->view('emails.newsletter-welcome');
+        return $this->subject('Welcome to LondaLoans Newsletter')
+            ->view('emails.newslatter');
     }
 }
