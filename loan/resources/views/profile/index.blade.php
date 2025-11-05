@@ -184,8 +184,8 @@
                                                 </button>
                                             </form>
                                             @if ($user->locked_at)
-                                                <form action="{{ route('management.users.unlock', $user) }}"
-                                                    method="POST" class="inline">
+                                                <form action="{{ route('management.users.unlock', $user) }}" method="POST"
+                                                    class="inline">
                                                     @csrf
                                                     <button type="submit"
                                                         class="text-green-600 hover:text-green-900 transition-colors duration-200"

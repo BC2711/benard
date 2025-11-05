@@ -52,7 +52,7 @@ Route::prefix('notifications')->group(function () {
     Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::post('/loan-application', [EmailController::class, 'send_loan_application_email']);
-    Route::resource('/application', LoanApplicationController::class);
+    Route::post('/application', [LoanApplicationController::class, 'store']);
 });
 
 Route::prefix('management')->name('management.')->group(function () {

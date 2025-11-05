@@ -42,15 +42,15 @@ class EmailController extends Controller
     }
     public function send_loan_application_email(Request $request): JsonResponse
     {
-        $request->validate([
-            'fullname' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'business' => 'required|string|max:255',
-            'loan_amount' => 'required|string|max:255',
-            'purpose' => 'required|string|max:255',
-            'message' => 'nullable|string|max:1000'
-        ]);
+        // $request->validate([
+        //     'fullname' => 'required|string|max:255',
+        //     'email' => 'required|email|max:255',
+        //     'phone' => 'nullable|string|max:20',
+        //     'business' => 'required|string|max:255',
+        //     'loan_amount' => 'required|string|max:255',
+        //     'purpose' => 'required|string|max:255',
+        //     'message' => 'nullable|string|max:1000'
+        // ]);
 
         try {
             // Store the application in the database

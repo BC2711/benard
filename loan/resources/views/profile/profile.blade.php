@@ -3,14 +3,14 @@
 @section('title', 'My Profile')
 
 @section('content')
-    <div class="px-6 py-4">
+    <div class="px-6 py-4 rounded-lg bg-white">
         <!-- Header -->
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
             <p class="text-gray-600 mt-1">Manage your personal information and account settings</p>
         </div>
 
-        <div class="max-w-4xl">
+        <div class="max-w-8xl">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left Column - Profile Form -->
                 <div class="lg:col-span-2">
@@ -21,7 +21,7 @@
 
                             <div class="p-6 space-y-6">
                                 <!-- Profile Picture -->
-                                <div>
+                                <div class="bg-gray-50 p-6">
                                     <h3 class="text-lg font-medium text-gray-900 mb-4">Profile Picture</h3>
                                     <div class="flex items-center space-x-6">
                                         <div class="flex-shrink-0">
@@ -60,7 +60,7 @@
                                 </div>
 
                                 <!-- Personal Information -->
-                                <div>
+                                <div class="bg-gray-50 p-6">
                                     <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
@@ -89,7 +89,7 @@
                                 </div>
 
                                 <!-- Contact Information -->
-                                <div>
+                                <div class="bg-gray-50 p-6">
                                     <h3 class="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
@@ -118,10 +118,10 @@
                                 </div>
 
                                 <!-- Additional Information -->
-                                <div>
+                                <div class="bg-gray-50 p-6">
                                     <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
+                                        <div class="bg-gray-50 p-6">
                                             <label for="username"
                                                 class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
                                             <input type="text" name="username" id="username"
@@ -132,7 +132,7 @@
                                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                             @enderror
                                         </div>
-                                        <div>
+                                        <div class="bg-gray-50 p-6">
                                             <label for="date_of_birth"
                                                 class="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
                                             <input type="date" name="date_of_birth" id="date_of_birth"
@@ -145,7 +145,7 @@
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                        <div>
+                                        <div class="bg-gray-50 p-6">
                                             <label for="gender"
                                                 class="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
                                             <select name="gender" id="gender"
@@ -192,7 +192,7 @@
                 <div class="space-y-6">
                     <!-- Account Information -->
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                        <div class="p-6">
+                        <div class="p-6 bg-gray-50">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
                             <div class="space-y-4">
                                 <div>
@@ -234,7 +234,7 @@
 
                     <!-- Quick Actions -->
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                        <div class="p-6">
+                        <div class="p-6 bg-gray-50">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
                             <div class="space-y-3">
                                 <a href="{{ route('management.change-password') }}"

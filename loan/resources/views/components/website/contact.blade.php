@@ -249,6 +249,12 @@
                 msg.className = 'bg-green-100 text-green-700 p-4 rounded-lg mb-4';
                 msg.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${data.message}`;
                 this.reset(); // Reset form on success
+
+                // Scroll to message
+                msg.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             } else {
                 msg.className = 'bg-red-100 text-red-700 p-4 rounded-lg mb-4';
                 if (data.errors) {
@@ -258,6 +264,12 @@
                 } else {
                     msg.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> ${data.message}`;
                 }
+
+                // Scroll to error message
+                msg.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             }
             msg.classList.remove('hidden');
 
@@ -267,6 +279,12 @@
             msg.innerHTML =
                 `<i class="fas fa-exclamation-triangle mr-2"></i> Network error. Please try again or contact support.`;
             msg.classList.remove('hidden');
+
+            // Scroll to error message
+            msg.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
         } finally {
             // Restore button
             btn.disabled = false;
