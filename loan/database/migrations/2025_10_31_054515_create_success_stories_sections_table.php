@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->string('cta_heading');
             $table->text('cta_description');
             $table->string('cta_primary_text')->default('Apply for Funding');
-            $table->string('cta_primary_link')->default('#consultation');
+            $table->string('cta_primary_link')->default('/#support');
             $table->string('cta_primary_icon')->default('fa-paper-plane');
             $table->string('cta_secondary_text')->default('View All Case Studies');
             $table->string('cta_secondary_link')->default('#');
@@ -42,7 +42,7 @@ return new class extends Migration {
             'description' => 'Discover how our loan solutions have helped marketing professionals and businesses achieve remarkable growth and success in their campaigns and operations.',
             'stats' => json_encode([
                 ['value' => '150+', 'label' => 'Businesses Funded'],
-                ['value' => '$25M+', 'label' => 'Total Funding'],
+                ['value' => 'ZMW25M+', 'label' => 'Total Funding'],
                 ['value' => '94%', 'label' => 'Success Rate'],
                 ['value' => '48h', 'label' => 'Avg. Approval Time'],
             ]),
@@ -52,9 +52,9 @@ return new class extends Migration {
             'stories' => json_encode([
                 [
                     'title' => 'SocialBoost Media',
-                    'amount' => '$75,000 Growth Loan',
+                    'amount' => 'ZMW75,000 Growth Loan',
                     'category' => 'marketing',
-                    'funding' => '$75K',
+                    'funding' => 'ZMW75K',
                     'type' => 'Marketing Agency',
                     'result' => '150% Revenue Growth',
                     'time' => '6 Months',
@@ -67,9 +67,9 @@ return new class extends Migration {
                 ],
                 [
                     'title' => 'EcomPulse',
-                    'amount' => '$125,000 Expansion Loan',
+                    'amount' => 'ZMW125,000 Expansion Loan',
                     'category' => 'ecommerce',
-                    'funding' => '$125K',
+                    'funding' => 'ZMW125K',
                     'type' => 'E-commerce Brand',
                     'result' => '3 New Markets',
                     'time' => '9 Months',
@@ -82,9 +82,9 @@ return new class extends Migration {
                 ],
                 [
                     'title' => 'AdTech Innovations',
-                    'amount' => '$250,000 Scale-up Loan',
+                    'amount' => 'ZMW250,000 Scale-up Loan',
                     'category' => 'startup',
-                    'funding' => '$250K',
+                    'funding' => 'ZMW250K',
                     'type' => 'Tech Startup',
                     'result' => '5 Enterprise Clients',
                     'time' => '12 Months',

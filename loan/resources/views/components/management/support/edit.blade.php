@@ -1,14 +1,14 @@
-@extends('layouts.admin')
+@extends('layouts.admin.main')
 
 @section('content')
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Support Section</h1>
 
         @if (session('success'))
             <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('admin.support.update', $section) }}" method="POST" class="space-y-8">
+        <form action="{{ route('management.support.update', $section->id) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')
 
             <!-- Header -->
@@ -41,10 +41,10 @@
             <!-- Social Links -->
             <div class="border p-6 rounded-lg bg-gray-50 space-y-4">
                 <h3 class="text-xl font-semibold">Social Links</h3>
-                <x-input name="facebook" label="Facebook" type="url" :value="old('facebook', $section->facebook)" />
-                <x-input name="twitter" label="Twitter" type="url" :value="old('twitter', $section->twitter)" />
-                <x-input name="linkedin" label="LinkedIn" type="url" :value="old('linkedin', $section->linkedin)" />
-                <x-input name="instagram" label="Instagram" type="url" :value="old('instagram', $section->instagram)" />
+                <x-input name="facebook" label="Facebook" type="text" :value="old('facebook', $section->facebook)" />
+                <x-input name="twitter" label="Twitter" type="text" :value="old('twitter', $section->twitter)" />
+                <x-input name="linkedin" label="LinkedIn" type="text" :value="old('linkedin', $section->linkedin)" />
+                <x-input name="instagram" label="Instagram" type="text" :value="old('instagram', $section->instagram)" />
             </div>
 
             <!-- Form Settings -->
@@ -66,7 +66,8 @@
                 @endfor
             </div>
 
-            <button type="submit" class="bg-primary text-white px-8 py-3 rounded-lg font-bold">Save Changes</button>
+            <button type="submit" class="bg-primary-primary text-white px-8 py-3 rounded-lg font-bold">Save
+                Changes</button>
         </form>
     </div>
 @endsection

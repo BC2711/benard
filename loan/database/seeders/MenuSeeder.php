@@ -27,7 +27,7 @@ class MenuSeeder extends Seeder
 
         // Then, insert all child menus
         DB::table('menus')->insert([
-             [
+            [
                 'name' => 'Dashboard',
                 'menu_type' => 'WEB',
                 'parent_id' => $parentId,
@@ -48,21 +48,21 @@ class MenuSeeder extends Seeder
                 'order' => 1,
             ],
             [
-                'name' => 'Feature Section',
-                'menu_type' => 'WEB',
-                'parent_id' => $parentId,
-                'url' => 'features',
-                'icon' => 'fas fa-star',
-                'status' => 'ACTIVE',
-                'type' => 'SUB',
-                'order' => 2,
-            ],
-            [
                 'name' => 'About Section',
                 'menu_type' => 'WEB',
                 'parent_id' => $parentId,
                 'url' => 'about',
                 'icon' => 'fas fa-info-circle',
+                'status' => 'ACTIVE',
+                'type' => 'SUB',
+                'order' => 2,
+            ],
+            [
+                'name' => 'Feature Section',
+                'menu_type' => 'WEB',
+                'parent_id' => $parentId,
+                'url' => 'features',
+                'icon' => 'fas fa-star',
                 'status' => 'ACTIVE',
                 'type' => 'SUB',
                 'order' => 3,
@@ -78,7 +78,7 @@ class MenuSeeder extends Seeder
                 'order' => 4,
             ],
             [
-                'name' => 'Price Section',
+                'name' => 'Loan Plans Section',
                 'menu_type' => 'WEB',
                 'parent_id' => $parentId,
                 'url' => 'price',
@@ -98,7 +98,7 @@ class MenuSeeder extends Seeder
                 'order' => 6,
             ],
             [
-                'name' => 'Project Section',
+                'name' => 'Success Stories Section',
                 'menu_type' => 'WEB',
                 'parent_id' => $parentId,
                 'url' => 'project',
@@ -137,16 +137,16 @@ class MenuSeeder extends Seeder
                 'type' => 'SUB',
                 'order' => 10,
             ],
-            [
-                'name' => 'Blog Section',
-                'menu_type' => 'WEB',
-                'parent_id' => $parentId,
-                'url' => 'blog',
-                'icon' => 'fas fa-blog',
-                'status' => 'ACTIVE',
-                'type' => 'SUB',
-                'order' => 11,
-            ],
+            // [
+            //     'name' => 'Blog Section',
+            //     'menu_type' => 'WEB',
+            //     'parent_id' => $parentId,
+            //     'url' => 'blog',
+            //     'icon' => 'fas fa-blog',
+            //     'status' => 'ACTIVE',
+            //     'type' => 'SUB',
+            //     'order' => 11,
+            // ],
             [
                 'name' => 'Contact Section',
                 'menu_type' => 'WEB',
@@ -155,18 +155,18 @@ class MenuSeeder extends Seeder
                 'icon' => 'fas fa-envelope',
                 'status' => 'ACTIVE',
                 'type' => 'SUB',
-                'order' => 12,
+                'order' => 11,
             ],
-            [
-                'name' => 'CTA Section',
-                'menu_type' => 'WEB',
-                'parent_id' => $parentId,
-                'url' => 'cta',
-                'icon' => 'fas fa-bullhorn',
-                'status' => 'ACTIVE',
-                'type' => 'SUB',
-                'order' => 13,
-            ],
+            // [
+            //     'name' => 'CTA Section',
+            //     'menu_type' => 'WEB',
+            //     'parent_id' => $parentId,
+            //     'url' => 'cta',
+            //     'icon' => 'fas fa-bullhorn',
+            //     'status' => 'ACTIVE',
+            //     'type' => 'SUB',
+            //     'order' => 13,
+            // ],
             [
                 'name' => 'Footer Section',
                 'menu_type' => 'WEB',
@@ -175,7 +175,7 @@ class MenuSeeder extends Seeder
                 'icon' => 'fas fa-shoe-prints',
                 'status' => 'ACTIVE',
                 'type' => 'SUB',
-                'order' => 14,
+                'order' => 12,
             ]
         ]);
     }

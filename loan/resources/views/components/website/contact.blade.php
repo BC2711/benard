@@ -57,7 +57,8 @@
                             <div class="flex items-start gap-4">
                                 <div
                                     class="w-12 h-12 bg-accent-500 rounded-full flex items-center justify-center text-white">
-                                    <i class="fas fa-envelope"></i></div>
+                                    <i class="fas fa-envelope"></i>
+                                </div>
                                 <div>
                                     <h4 class="text-lg font-semibold text-primary-700 mb-1">Email Address</h4>
                                     <a href="mailto:{{ $support->email }}"
@@ -67,7 +68,8 @@
                             <div class="flex items-start gap-4">
                                 <div
                                     class="w-12 h-12 bg-primary-700 rounded-full flex items-center justify-center text-white">
-                                    <i class="fas fa-building"></i></div>
+                                    <i class="fas fa-building"></i>
+                                </div>
                                 <div>
                                     <h4 class="text-lg font-semibold text-primary-700 mb-1">Office Location</h4>
                                     <p class="text-gray-600">
@@ -77,7 +79,8 @@
                             <div class="flex items-start gap-4">
                                 <div
                                     class="w-12 h-12 bg-accent-500 rounded-full flex items-center justify-center text-white">
-                                    <i class="fas fa-phone"></i></div>
+                                    <i class="fas fa-phone"></i>
+                                </div>
                                 <div>
                                     <h4 class="text-lg font-semibold text-primary-700 mb-1">Phone Number</h4>
                                     <a href="tel:{{ str_replace([' ', '(', ')', '-'], '', $support->phone) }}"
@@ -87,7 +90,8 @@
                             <div class="flex items-start gap-4">
                                 <div
                                     class="w-12 h-12 bg-primary-700 rounded-full flex items-center justify-center text-white">
-                                    <i class="fas fa-clock"></i></div>
+                                    <i class="fas fa-clock"></i>
+                                </div>
                                 <div>
                                     <h4 class="text-lg font-semibold text-primary-700 mb-1">Business Hours</h4>
                                     <p class="text-gray-600">
@@ -123,7 +127,7 @@
                         <p class="text-gray-600 mb-6">{{ $support->form_subheading }}</p>
 
                         <form id="loanApplicationForm" class="space-y-6">
-                            <div id="formMessage" class="hidden p-4 rounded-lg mb-4"></div>
+                            <div id="formMessage" class="hidden p-5 rounded-lg mb-4"></div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <x-input name="fullname" label="Full Name *" required placeholder="Your full name" />
@@ -145,10 +149,10 @@
                                 ]" />
                                 <x-select name="loanAmount" label="Desired Loan Amount *" required :options="[
                                     '' => 'Select amount range',
-                                    '5k-25k' => '$5,000 - $25,000',
-                                    '25k-75k' => '$25,000 - $75,000',
-                                    '75k-150k' => '$75,000 - $150,000',
-                                    '150k-plus' => '$150,000+',
+                                    '5k-25k' => 'ZMW5,000 - ZMW25,000',
+                                    '25k-75k' => 'ZMW25,000 - ZMW75,000',
+                                    '75k-150k' => 'ZMW75,000 - ZMW150,000',
+                                    '150k-plus' => 'ZMW150,000+',
                                 ]" />
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,30 +215,62 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('formMessage');
+
+        // Reset message
+        msg.classList.add('hidden');
+
+        // Update button state
+        const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
-        const formData = new FormData(this);
         try {
-            const res = await fetch('') }}', {
+            const formData = new FormData(this);
+
+            const res = await fetch('/notifications/application', {
                 method: 'POST',
                 body: formData,
                 headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
+
+            // Check if response is JSON
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned non-JSON response');
+            }
+
             const data = await res.json();
-            msg.className = data.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-            msg.textContent = data.message || data.errors?.[0] || 'Error';
+
+            // Show message
+            if (data.success) {
+                msg.className = 'bg-green-100 text-green-700 p-4 rounded-lg mb-4';
+                msg.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${data.message}`;
+                this.reset(); // Reset form on success
+            } else {
+                msg.className = 'bg-red-100 text-red-700 p-4 rounded-lg mb-4';
+                if (data.errors) {
+                    // Show validation errors
+                    const errorList = Object.values(data.errors).flat().join('<br>');
+                    msg.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> ${errorList}`;
+                } else {
+                    msg.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> ${data.message}`;
+                }
+            }
             msg.classList.remove('hidden');
-            if (data.success) this.reset();
+
         } catch (err) {
-            msg.className = 'bg-red-100 text-red-700';
-            msg.textContent = 'Network error. Try again.';
+            console.error('Submission error:', err);
+            msg.className = 'bg-red-100 text-red-700 p-4 rounded-lg mb-4';
+            msg.innerHTML =
+                `<i class="fas fa-exclamation-triangle mr-2"></i> Network error. Please try again or contact support.`;
             msg.classList.remove('hidden');
         } finally {
+            // Restore button
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+            btn.innerHTML = originalText;
         }
     });
 

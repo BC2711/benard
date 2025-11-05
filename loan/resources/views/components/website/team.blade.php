@@ -23,9 +23,9 @@
                             style="animation-delay: {{ $i * 0.1 }}s;">
                             <div class="relative mb-6">
                                 <div class="w-full h-80 rounded-xl overflow-hidden bg-gray-100">
-                                    <img src="{{ $member['image'] ? asset('storage/teams/' . $member['image']) : 'https://via.placeholder.com/320x320/eee/999?text=Photo' }}"
+                                    <img src="{{ $member['image'] ? asset('storage/teams/' . $member['image']) : 'No Image' }}"
                                         alt="{{ $member['name'] }}" class="w-full h-full object-cover"
-                                        onerror="this.src='https://via.placeholder.com/320x320/eee/999?text=Photo'" />
+                                         />
                                 </div>
                                 @if (!empty($member['social']))
                                     <div class="absolute bottom-4 right-4 transform translate-y-1/2">

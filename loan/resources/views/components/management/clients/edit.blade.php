@@ -1,14 +1,14 @@
-@extends('layouts.admin')
+@extends('layouts.admin.main')
 
 @section('content')
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Trusted Clients Section</h1>
 
         @if (session('success'))
             <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('admin.trusted-clients.update', $section) }}" method="POST" class="space-y-8">
+        <form action="{{ route('management.client.update', $section->id) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')
 
             <!-- Header -->
@@ -90,12 +90,12 @@
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <x-input name="cta_primary_text" label="Primary Text" :value="old('cta_primary_text', $section->cta_primary_text)" />
-                        <x-input name="cta_primary_link" label="Primary Link" type="url" :value="old('cta_primary_link', $section->cta_primary_link)" />
+                        <x-input name="cta_primary_link" label="Primary Link" type="text" :value="old('cta_primary_link', $section->cta_primary_link)" />
                         <x-input name="cta_primary_icon" label="Primary Icon" :value="old('cta_primary_icon', $section->cta_primary_icon)" />
                     </div>
                     <div>
                         <x-input name="cta_secondary_text" label="Secondary Text" :value="old('cta_secondary_text', $section->cta_secondary_text)" />
-                        <x-input name="cta_secondary_link" label="Secondary Link" type="url" :value="old('cta_secondary_link', $section->cta_secondary_link)" />
+                        <x-input name="cta_secondary_link" label="Secondary Link" type="text" :value="old('cta_secondary_link', $section->cta_secondary_link)" />
                         <x-input name="cta_secondary_icon" label="Secondary Icon" :value="old('cta_secondary_icon', $section->cta_secondary_icon)" />
                     </div>
                 </div>
@@ -118,7 +118,7 @@
                 <button type="button" id="add-trust" class="text-sm text-blue-600">+ Add Indicator</button>
             </div>
 
-            <button type="submit" class="bg-primary text-white px-8 py-3 rounded-lg font-bold">Save Changes</button>
+            <button type="submit" class="bg-primary-primary text-white px-8 py-3 rounded-lg font-bold">Save Changes</button>
         </form>
     </div>
 

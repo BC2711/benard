@@ -26,16 +26,16 @@ return new class extends Migration {
             $table->string('stat_2_label')->default('Approval Rate');
             $table->string('stat_3_value')->default('24h');
             $table->string('stat_3_label')->default('Average Processing Time');
-            $table->string('stat_4_value')->default('$10M+');
+            $table->string('stat_4_value')->default('ZMW10M+');
             $table->string('stat_4_label')->default('Loans Disbursed');
 
             // CTA
             $table->string('cta_heading')->default('Ready to fund your next marketing success?');
             $table->text('cta_description')->default('Join hundreds of marketeers who have scaled their businesses with Londa Loans');
             $table->string('cta_primary_text')->default('Apply for Loan');
-            $table->string('cta_primary_link')->default('#');
+            $table->string('cta_primary_link')->default('/#support');
             $table->string('cta_secondary_text')->default('Calculate Payments');
-            $table->string('cta_secondary_link')->default('#');
+            $table->string('cta_secondary_link')->default('/calculator');
 
             // Features (6) – JSON array
             $table->json('features')->default('[]');

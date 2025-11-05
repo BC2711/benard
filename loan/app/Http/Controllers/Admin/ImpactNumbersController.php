@@ -12,21 +12,22 @@ class ImpactNumbersController extends Controller
     public function index()
     {
         $section = ImpactNumbersSection::firstOrCreate([]);
-        return view('admin.impact-numbers.edit', compact('section'));
+        return view('components.management.counter.edit', compact('section'));
     }
 
-    public function update(Request $request, ImpactNumbersSection $section)
+    public function update(Request $request,  $id)
     {
+        $section = ImpactNumbersSection::findOrFail($id);
         $data = $request->validate([
             'heading' => 'required|string',
             'description' => 'required|string',
             'cta_heading' => 'required|string',
             'cta_description' => 'required|string',
             'cta_primary_text' => 'required|string',
-            'cta_primary_link' => 'required|url',
+            'cta_primary_link' => 'required|string',
             'cta_primary_icon' => 'required|string',
             'cta_secondary_text' => 'required|string',
-            'cta_secondary_link' => 'required|url',
+            'cta_secondary_link' => 'required|string',
             'cta_secondary_icon' => 'required|string',
         ]);
 

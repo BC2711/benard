@@ -31,10 +31,10 @@ return new class extends Migration {
             $table->string('cta_heading');
             $table->text('cta_description');
             $table->string('cta_primary_text')->default('Apply Now');
-            $table->string('cta_primary_link')->default('#consultation');
+            $table->string('cta_primary_link')->default('/#support');
             $table->string('cta_primary_icon')->default('fa-paper-plane');
             $table->string('cta_secondary_text')->default('Calculate Loan');
-            $table->string('cta_secondary_link')->default('#calculator');
+            $table->string('cta_secondary_link')->default('/calculator');
             $table->string('cta_secondary_icon')->default('fa-calculator');
 
             // Trust Badges
@@ -65,8 +65,8 @@ return new class extends Migration {
             ]),
             'timeline' => json_encode([
                 ['year' => '2018', 'label' => 'Founded', 'detail' => '50+ Clients'],
-                ['year' => '2020', 'label' => 'Expansion', 'detail' => '$5M+ Funding'],
-                ['year' => '2023', 'label' => 'Market Leader', 'detail' => '$25M+ Funding'],
+                ['year' => '2020', 'label' => 'Expansion', 'detail' => 'ZMW5M+ Funding'],
+                ['year' => '2023', 'label' => 'Market Leader', 'detail' => 'ZMW25M+ Funding'],
             ]),
             'cta_heading' => 'Ready to join our success stories?',
             'cta_description' => 'Start your application and become our next success story',

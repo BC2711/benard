@@ -31,10 +31,10 @@ return new class extends Migration {
             $table->string('cta_heading');
             $table->text('cta_description');
             $table->string('cta_primary_text')->default('Start Your Application');
-            $table->string('cta_primary_link')->default('#consultation');
+            $table->string('cta_primary_link')->default('/#support');
             $table->string('cta_primary_icon')->default('fa-paper-plane');
             $table->string('cta_secondary_text')->default('View Client Stories');
-            $table->string('cta_secondary_link')->default('#stories');
+            $table->string('cta_secondary_link')->default('#success-stories');
             $table->string('cta_secondary_icon')->default('fa-book-open');
 
             // Trust Indicators
@@ -98,7 +98,7 @@ return new class extends Migration {
             ]),
             'highlights' => json_encode([
                 [
-                    'amount' => '$25K',
+                    'amount' => 'ZMW25K',
                     'client' => 'SocialBoost Agency',
                     'type' => 'Marketing Agency',
                     'result' => 'Campaign funding led to 300% ROI and 50 new enterprise clients in 6 months.',
@@ -106,7 +106,7 @@ return new class extends Migration {
                     'timeline' => '6 Months',
                 ],
                 [
-                    'amount' => '$50K',
+                    'amount' => 'ZMW50K',
                     'client' => 'ContentCraft Studios',
                     'type' => 'Content Creators',
                     'result' => 'Expansion funding enabled new video production division and 120% revenue growth.',
@@ -114,7 +114,7 @@ return new class extends Migration {
                     'timeline' => '9 Months',
                 ],
                 [
-                    'amount' => '$15K',
+                    'amount' => 'ZMW15K',
                     'client' => 'GrowthGurus Inc',
                     'type' => 'Digital Marketing',
                     'result' => 'Seed funding for marketing automation tool resulted in 5x user growth and acquisition offers.',

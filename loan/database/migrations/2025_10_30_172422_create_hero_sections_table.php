@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('highlighted_text');
             $table->text('description');
             $table->string('cta_text')->default('Get Started Now');
-            $table->string('cta_link')->default('#application');
+            $table->string('cta_link')->default('#support');
             $table->string('phone_number')->default('+1 (234) 567-89');
             $table->string('phone_label')->default('For any question or concern');
 
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('stat_2_label')->default('Approval Rate');
             $table->string('stat_3_value')->default('24h');
             $table->string('stat_3_label')->default('Fast Processing');
-            $table->string('stat_4_value')->default('$10M+');
+            $table->string('stat_4_value')->default('ZMW10M+');
             $table->string('stat_4_label')->default('Loans Disbursed');
 
             // Image Card

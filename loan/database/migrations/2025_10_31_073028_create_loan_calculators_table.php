@@ -77,9 +77,9 @@ return new class extends Migration {
             'cta_heading' => 'Ready to Get Your Loan?',
             'cta_description' => 'Apply now and get approved within 24 hours with our streamlined process',
             'cta_apply_text' => 'Apply Now',
-            'cta_apply_url' => '#apply',
+            'cta_apply_url' => '#support',
             'cta_contact_text' => 'Contact Advisor',
-            'cta_contact_url' => '/contact',
+            'cta_contact_url' => '/#support',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

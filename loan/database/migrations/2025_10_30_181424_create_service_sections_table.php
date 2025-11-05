@@ -1,6 +1,5 @@
 <?php
 
-// database/migrations/xxxx_create_service_sections_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -16,17 +15,17 @@ return new class extends Migration {
             $table->string('badge_text')->default('Our Solutions');
             $table->string('badge_icon')->default('fa-hand-holding-usd');
             $table->string('heading');
-            $table->string('highlighted_text'); // e.g. Marketeers
+            $table->string('highlighted_text'); 
             $table->text('description');
 
             // CTA
             $table->string('cta_heading')->default('Ready to grow your marketing business?');
             $table->text('cta_description')->default('Get the financial support you need to scale your marketing efforts and achieve remarkable growth.');
             $table->string('cta_primary_text')->default('Apply for Loan');
-            $table->string('cta_primary_link')->default('#');
+            $table->string('cta_primary_link')->default('/#support');
             $table->string('cta_primary_icon')->default('fa-rocket');
             $table->string('cta_secondary_text')->default('Calculate Payments');
-            $table->string('cta_secondary_link')->default('#');
+            $table->string('cta_secondary_link')->default('/calculator');
             $table->string('cta_secondary_icon')->default('fa-calculator');
 
             // Extra Info (3)

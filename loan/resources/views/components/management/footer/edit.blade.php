@@ -1,14 +1,14 @@
-@extends('layouts.admin')
+@extends('layouts.admin.main')
 
 @section('content')
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Footer</h1>
 
         @if (session('success'))
             <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('admin.footer.update', $footer) }}" method="POST" class="space-y-8">
+        <form action="{{ route('management.footer.update', $footer) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')
 
             <!-- Brand -->
@@ -26,10 +26,10 @@
             <!-- Social Links -->
             <div class="border p-6 rounded-lg bg-gray-50 space-y-4">
                 <h3 class="text-xl font-semibold">Social Links</h3>
-                <x-input name="facebook" label="Facebook" type="url" :value="old('facebook', $footer->facebook)" />
-                <x-input name="twitter" label="Twitter" type="url" :value="old('twitter', $footer->twitter)" />
-                <x-input name="linkedin" label="LinkedIn" type="url" :value="old('linkedin', $footer->linkedin)" />
-                <x-input name="instagram" label="Instagram" type="url" :value="old('instagram', $footer->instagram)" />
+                <x-input name="facebook" label="Facebook" type="text" :value="old('facebook', $footer->facebook)" />
+                <x-input name="twitter" label="Twitter" type="text" :value="old('twitter', $footer->twitter)" />
+                <x-input name="linkedin" label="LinkedIn" type="text" :value="old('linkedin', $footer->linkedin)" />
+                <x-input name="instagram" label="Instagram" type="text" :value="old('instagram', $footer->instagram)" />
             </div>
 
             <!-- Quick Links -->
@@ -114,7 +114,7 @@
                 <x-input name="footer_note" label="Footer Note" :value="old('footer_note', $footer->footer_note)" />
             </div>
 
-            <button type="submit" class="bg-primary text-white px-8 py-3 rounded-lg font-bold">Save Footer</button>
+            <button type="submit" class="bg-primary-primary text-white px-8 py-3 rounded-lg font-bold">Save Footer</button>
         </form>
     </div>
 
@@ -127,7 +127,7 @@
         document.getElementById('add-quick').addEventListener('click', () => {
             const html = `<div class="flex gap-4 mb-2">
         <input type="text" name="quick_text_${quickIndex}" placeholder="Link Text" class="border rounded p-2 flex-1">
-        <input type="url" name="quick_url_${quickIndex}" placeholder="https://..." class="border rounded p-2 flex-1">
+        <input type="text" name="quick_url_${quickIndex}" placeholder="https://..." class="border rounded p-2 flex-1">
         <button type="button" class="text-red-600 remove-quick">Remove</button>
     </div>`;
             document.getElementById('quick-container').insertAdjacentHTML('beforeend', html);
@@ -137,7 +137,7 @@
         document.getElementById('add-resource').addEventListener('click', () => {
             const html = `<div class="flex gap-4 mb-2">
         <input type="text" name="resource_text_${resourceIndex}" placeholder="Text" class="border rounded p-2 flex-1">
-        <input type="url" name="resource_url_${resourceIndex}" placeholder="https://..." class="border rounded p-2 flex-1">
+        <input type="text" name="resource_url_${resourceIndex}" placeholder="https://..." class="border rounded p-2 flex-1">
         <button type="button" class="text-red-600 remove-resource">Remove</button>
     </div>`;
             document.getElementById('resource-container').insertAdjacentHTML('beforeend', html);
@@ -157,7 +157,7 @@
         document.getElementById('add-legal').addEventListener('click', () => {
             const html = `<div class="flex gap-4 mb-2">
         <input type="text" name="legal_text_${legalIndex}" placeholder="Privacy Policy" class="border rounded p-2 flex-1">
-        <input type="url" name="legal_url_${legalIndex}" placeholder="https://..." class="border rounded p-2 flex-1">
+        <input type="text" name="legal_url_${legalIndex}" placeholder="https://..." class="border rounded p-2 flex-1">
         <button type="button" class="text-red-600 remove-legal">Remove</button>
     </div>`;
             document.getElementById('legal-container').insertAdjacentHTML('beforeend', html);

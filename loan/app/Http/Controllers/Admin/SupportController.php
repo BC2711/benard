@@ -11,11 +11,12 @@ class SupportController extends Controller
     public function index()
     {
         $section = SupportSection::firstOrCreate([]);
-        return view('admin.support.edit', compact('section'));
+        return view('components.management.support.edit', compact('section'));
     }
 
-    public function update(Request $request, SupportSection $section)
+    public function update(Request $request,  $id)
     {
+        $section = SupportSection::findOrFail($id);
         $data = $request->validate([
             'heading' => 'required|string',
             'description' => 'required|string',
@@ -27,10 +28,10 @@ class SupportController extends Controller
             'address_line2' => 'required|string',
             'hours_line1' => 'required|string',
             'hours_line2' => 'required|string',
-            'facebook' => 'required|url',
-            'twitter' => 'required|url',
-            'linkedin' => 'required|url',
-            'instagram' => 'required|url',
+            'facebook' => 'required|string',
+            'twitter' => 'required|string',
+            'linkedin' => 'required|string',
+            'instagram' => 'required|string',
         ]);
 
         // Steps

@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->string('stat_2_label')->default('Approval Rate');
             $table->string('stat_3_value')->default('24h');
             $table->string('stat_3_label')->default('Fast Processing');
-            $table->string('stat_4_value')->default('$10M+');
+            $table->string('stat_4_value')->default('ZMW10M+');
             $table->string('stat_4_label')->default('Loans Disbursed');
 
             // Features (4) – stored as JSON for easy expansion

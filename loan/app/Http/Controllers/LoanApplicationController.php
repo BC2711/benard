@@ -12,7 +12,7 @@ class LoanApplicationController extends Controller
     public function store(StoreLoanApplicationRequest $request)
     {
         $data = $request->validated();
-
+        dd($data);
         // Send email (configure in .env)
         Mail::to(config('mail.from.address'))->send(new LoanApplicationSubmitted($data));
 

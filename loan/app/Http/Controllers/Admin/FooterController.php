@@ -12,11 +12,12 @@ class FooterController extends Controller
     public function index()
     {
         $footer = FooterSection::firstOrCreate([]);
-        return view('admin.footer.edit', compact('footer'));
+        return view('components.management.footer.edit', compact('footer'));
     }
 
-    public function update(Request $request, FooterSection $footer)
+    public function update(Request $request,  $id)
     {
+        $footer = FooterSection::findOrFail($id);
         $data = $request->validate([
             'brand_name' => 'required|string',
             'brand_tagline' => 'required|string',
@@ -25,10 +26,10 @@ class FooterController extends Controller
             'phone' => 'required|string',
             'address_line1' => 'required|string',
             'address_line2' => 'required|string',
-            'facebook' => 'required|url',
-            'twitter' => 'required|url',
-            'linkedin' => 'required|url',
-            'instagram' => 'required|url',
+            'facebook' => 'required|string',
+            'twitter' => 'required|string',
+            'linkedin' => 'required|string',
+            'instagram' => 'required|string',
             'newsletter_heading' => 'required|string',
             'newsletter_description' => 'required|string',
             'copyright_text' => 'required|string',

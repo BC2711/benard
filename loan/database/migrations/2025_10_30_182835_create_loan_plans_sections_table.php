@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->string('custom_heading')->default('Need a Bespoke Solution?');
             $table->text('custom_description');
             $table->string('custom_link_text')->default('Request Custom Quote');
-            $table->string('custom_link')->default('/web/#support');
+            $table->string('custom_link')->default('/#support');
             $table->string('custom_link_icon')->default('fa-comment-alt');
             $table->string('custom_flexible_text')->default('Flexible');
             $table->string('custom_flexible_subtext')->default('Tailored to your business');
