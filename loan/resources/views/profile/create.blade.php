@@ -27,7 +27,7 @@
             <div class="mb-6">
                 <div class="flex items-center justify-between">
                     <div>
-
+                        <p class="text-gray-600 mt-1">Add a new user to the system</p>
                     </div>
                     <a href="{{ route('management.users.index') }}"
                         class="text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center">
@@ -38,7 +38,7 @@
             </div>
 
             <div class="max-w-8xl">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="bg-gray-50 rounded-lg shadow-sm border border-gray-200">
                     <form action="{{ route('management.users.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 

@@ -16,7 +16,7 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                         <form action="{{ route('management.update-profile') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
+                            @csrf 
                             @method('PUT')
 
                             <div class="p-6 space-y-6">

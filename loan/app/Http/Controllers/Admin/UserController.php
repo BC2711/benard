@@ -231,8 +231,7 @@ class UserController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
-
+        $user = User::findOrFail(Auth::user()->id);
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -266,7 +265,7 @@ class UserController extends Controller
 
             $user->update($validated);
 
-            return redirect()->route('management.users.profile')
+            return redirect()->route('management.profile')
                 ->with('success', 'Profile updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -288,7 +287,7 @@ class UserController extends Controller
      */
     public function changePassword(Request $request)
     {
-        $user = Auth::user();
+        $user = User::findOrFail(Auth::user()->id);
 
         $validated = $request->validate([
             'current_password' => 'required|string',
@@ -305,7 +304,7 @@ class UserController extends Controller
             $user->password = Hash::make($validated['password']);
             $user->save();
 
-            return redirect()->route('management.users.profile')
+            return redirect()->route('management.profile')
                 ->with('success', 'Password changed successfully.');
         } catch (\Exception $e) {
             return redirect()->back()

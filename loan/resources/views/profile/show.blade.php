@@ -16,7 +16,7 @@
 @endsection
 @section('page-title')
     <h1 class="text-2xl font-bold text-gray-900">User Details - {{ $user->first_name }} {{ $user->last_name }}</h1>
-    <p class="text-gray-600 mt-1">View user information and activity</p>
+
 @endsection
 
 @section('title', 'User Management')
@@ -27,6 +27,7 @@
             <div class="mb-6">
                 <div class="flex items-center justify-between">
                     <div>
+                        <p class="text-gray-600 mt-1">View user information and activity</p>
                     </div>
                     <div class="flex items-center space-x-3">
                         <a href="{{ route('management.users.index') }}"
@@ -44,7 +45,7 @@
             </div>
 
             <div class="max-w-8xl">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-gray-50 rounded-lg p-4">
                     <!-- Left Column - User Info -->
                     <div class="lg:col-span-2 space-y-6">
                         <!-- Profile Card -->
@@ -107,7 +108,8 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500">Date of Birth</label>
-                                        <p class="mt-1 text-sm text-gray-900">{{ $user->date_of_birth->format('F j, Y') }}</p>
+                                        <p class="mt-1 text-sm text-gray-900">{{ $user->date_of_birth->format('F j, Y') }}
+                                        </p>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500">Gender</label>
