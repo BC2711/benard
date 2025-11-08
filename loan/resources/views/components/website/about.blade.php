@@ -14,9 +14,11 @@
     <div class="absolute top-20 left-10 animate-float">
         <div class="w-20 h-20 bg-accent-accent/20 rounded-2xl rotate-12"></div>
     </div>
+   
     <div class="absolute bottom-20 right-10 animate-float" style="animation-delay:2s;">
         <div class="w-16 h-16 bg-primary-primary/30 rounded-full"></div>
     </div>
+
     <div class="absolute top-1/3 right-20 animate-float" style="animation-delay:4s;">
         <div class="w-12 h-12 bg-white/20 rounded-lg rotate-45"></div>
     </div>
@@ -40,11 +42,7 @@
                     </p>
                 </div>
 
-                {{-- FEATURES GRID --}}
-                {{-- @php                    
-                    $featuresJson = trim($about->features, '"');
-                    $features = json_decode($featuresJson, true) ?? [];
-                @endphp --}}
+             
 
                 @if (!empty($features))
                     <div class="grid sm:grid-cols-2 gap-6 mb-10">

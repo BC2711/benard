@@ -1,23 +1,21 @@
-{{-- resources/views/admin/team/edit.blade.php --}}
 @extends('layouts.admin.main')
-
+@section('title', 'Team Management')
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">Team</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-users fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">Team</h1>
+@endsection
 @section('content')
     <div class="max-w-8xl mx-auto p-6 bg-white rounded-lg shadow">
         <h1 class="text-3xl font-bold mb-8">Edit Team Section</h1>
-
-        @if (session('success'))
-            <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
-        @endif
-
-        @if ($errors->any())
-            <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <form action="{{ route('management.team.update', $team) }}" method="POST" enctype="multipart/form-data"
             class="space-y-8">
@@ -159,7 +157,7 @@
                 row.className = 'flex gap-2 social-row';
                 row.innerHTML = `
                 <input type="text" name="member_social_icon[${memberIndex}][]" placeholder="fa-linkedin-in" class="w-32 border rounded p-2">
-                <input type="url" name="member_social_url[${memberIndex}][]" placeholder="https://..." class="border rounded p-2 flex-1">
+                <input type="text" name="member_social_url[${memberIndex}][]" placeholder="https://..." class="border rounded p-2 flex-1">
                 <select name="member_social_color[${memberIndex}][]" class="w-32 border rounded p-2">
                     <option value="primary">Primary</option>
                     <option value="accent">Accent</option>

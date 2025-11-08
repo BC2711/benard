@@ -28,7 +28,7 @@ return new class extends Migration {
             $table->string('cta_primary_link')->default('/#support');
             $table->string('cta_primary_icon')->default('fa-paper-plane');
             $table->string('cta_secondary_text')->default('View All Case Studies');
-            $table->string('cta_secondary_link')->default('#');
+            $table->string('cta_secondary_link')->default('/view-success-stories');
             $table->string('cta_secondary_icon')->default('fa-book-open');
 
             // Success Stories

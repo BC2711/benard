@@ -205,7 +205,7 @@
 
 <style>
     .gradient-client-bg {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e1f5fe 50%, #f0fff4 100%);
+        background: linear-gradient(135deg, #db9123 0%, #c08a39 50%, #805a21 100%);
     }
 
     .industry-badge {
@@ -279,7 +279,7 @@
     }
 
     .swiper-pagination-bullet-custom {
-        background: #3b82f6;
+        background: #db9123;
         opacity: 0.3;
         width: 10px;
         height: 10px;
@@ -289,7 +289,7 @@
     }
 
     .swiper-pagination-bullet-custom-active {
-        background: #3b82f6;
+        background: #db9123;
         opacity: 1;
         width: 24px;
         transform: scale(1);

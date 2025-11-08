@@ -51,7 +51,7 @@ return new class extends Migration {
                 ['number' => 2, 'title' => 'Consultation', 'desc' => 'Speak with our loan specialist'],
                 ['number' => 3, 'title' => 'Get Funded', 'desc' => 'Receive funds in 24-48 hours'],
             ]),
-            'email' => 'loans@finexpert.com',
+            'email' => 'loans@loans.com',
             'phone' => '+260 965508033',
             'address_line1' => 'Software Developer',
             'address_line2' => 'Biness Chama',

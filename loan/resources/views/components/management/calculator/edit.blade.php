@@ -1,5 +1,18 @@
 @extends('layouts.admin')
-
+@section('title', 'Loan Calculator Management')
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">Loan Calculator</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-users fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">Loan Calculator</h1>
+@endsection
 @section('content')
     <div class="max-w-7xl mx-auto p-6">
         <h1 class="text-3xl font-bold mb-8">Edit Loan Calculator</h1>

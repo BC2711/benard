@@ -279,8 +279,8 @@
                             <div
                                 class="w-14 h-14 rounded-full bg-gradient-to-br from-primary-700 to-accent-500 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                                 @if (!empty($testimonial['image']))
-                                    <img src="{{ $testimonial['image'] }}" alt="{{ $testimonial['name'] }}"
-                                        class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/' . $testimonial['image']) }}"
+                                        alt="{{ $testimonial['name'] }}" class="w-full h-full object-cover">
                                 @else
                                     {{ substr($testimonial['name'], 0, 1) }}
                                 @endif

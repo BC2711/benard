@@ -127,7 +127,7 @@ return new class extends Migration {
                     'initials' => 'SJ',
                     'name' => 'Sarah Johnson',
                     'role' => 'CEO, SocialBoost Agency',
-                    'quote' => "FinExpert's funding transformed our agency. We went from struggling to scale to becoming industry leaders in just 6 months.",
+                    'quote' => "LondaLoan's funding transformed our agency. We went from struggling to scale to becoming industry leaders in just 6 months.",
                 ],
                 [
                     'initials' => 'MC',

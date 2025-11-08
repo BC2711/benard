@@ -1,28 +1,21 @@
 @extends('layouts.admin.main')
-
+@section('title', 'Testimonials Management')
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">Testimonials</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-users fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">Testimonials</h1>
+@endsection
 @section('content')
     <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Testimonials Section</h1>
-
-        @if (session('success'))
-            <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
-        @endif
-
-        @if ($errors->any())
-            <div class="bg-red-100 text-red-700 p-4 rounded mb-6">
-                <strong class="font-semibold">Please fix the following errors:</strong>
-                <ul class="list-disc list-inside mt-2">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="bg-red-100 text-red-700 p-4 rounded mb-6">{{ session('error') }}</div>
-        @endif
-
         <form action="{{ route('management.testimonial.update', $section->id) }}" method="POST" class="space-y-8"
             enctype="multipart/form-data" id="testimonial-form">
             @csrf @method('PUT')
@@ -295,7 +288,7 @@
                 ];
 
                 if (!validTypes.includes(file.type) && !file.name.toLowerCase().match(
-                    /\.(mp4|mov|avi|m4v|webm)$/)) {
+                        /\.(mp4|mov|avi|m4v|webm)$/)) {
                     errorDiv.textContent = 'Please select a valid video file (MP4, MOV, AVI, WebM)';
                     errorDiv.classList.remove('hidden');
                     infoDiv.classList.add('hidden');

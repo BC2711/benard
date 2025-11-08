@@ -51,7 +51,7 @@ return new class extends Migration {
         });
 
         DB::table('footer_sections')->insert([
-            'brand_name' => 'FinExpert',
+            'brand_name' => 'LondaLoans',
             'brand_tagline' => 'Empowering Marketeers',
             'brand_description' => 'Providing specialized financial solutions for marketing professionals and entrepreneurs to fuel business growth and campaign success.',
             'email' => 'binesschama1127@gmail.cpm',
@@ -84,11 +84,11 @@ return new class extends Migration {
                 ['icon' => 'fa-award', 'text' => 'Licensed Lender'],
             ]),
             'legal_links' => json_encode([
-                ['text' => 'Privacy Policy', 'url' => '/privacy'],
-                ['text' => 'Terms of Service', 'url' => '/terms'],
-                ['text' => 'Compliance', 'url' => '/compliance'],
-                ['text' => 'Cookie Policy', 'url' => '/cookies'],
-                ['text' => 'Disclaimer', 'url' => '/disclaimer'],
+                ['text' => 'Privacy Policy', 'url' => '/#privacy'],
+                ['text' => 'Terms of Service', 'url' => '/#terms'],
+                ['text' => 'Compliance', 'url' => '/#compliance'],
+                ['text' => 'Cookie Policy', 'url' => '/#cookies'],
+                ['text' => 'Disclaimer', 'url' => '/#disclaimer'],
             ]),
             'copyright_text' => '© 2025 LondaLoans. All rights reserved.',
             'footer_note' => 'Empowering marketeers with financial solutions',

@@ -1,12 +1,21 @@
 @extends('layouts.admin.main')
-
+@section('title', 'Impact Numbers Management')
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">Impact Numbers</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-users fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">Impact Numbers</h1>
+@endsection
 @section('content')
     <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Impact Numbers Section</h1>
-
-        @if (session('success'))
-            <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
-        @endif
 
         <form action="{{ route('management.counter.update', $section->id) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')

@@ -97,6 +97,16 @@ class MenuSeeder extends Seeder
                 'type' => 'SUB',
                 'order' => 6,
             ],
+             [
+                'name' => 'Consult Section',
+                'menu_type' => 'WEB',
+                'parent_id' => $parentId,
+                'url' => 'consultation',
+                'icon' => 'fas fa-users',
+                'status' => 'ACTIVE',
+                'type' => 'SUB',
+                'order' => 6,
+            ],
             [
                 'name' => 'Success Stories Section',
                 'menu_type' => 'WEB',

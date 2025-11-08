@@ -1,6 +1,19 @@
 {{-- resources/views/admin/consultation/edit.blade.php --}}
 @extends('layouts.admin.main')
-
+@section('title', 'Consultation Management')
+@section('breadcrumbs')
+    <nav class="flex items-center space-x-2">
+        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-sm text-gray-500">Consultation</span>
+    </nav>
+@endsection
+@section('page-icon')
+    <i class="fas fa-users fa-lg text-gray-700"></i>
+@endsection
+@section('page-title')
+    <h1 class="text-2xl font-bold text-gray-900">Consultation</h1>
+@endsection
 @section('content')
     <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-6 text-gray-800">Edit Consultation Section</h1>

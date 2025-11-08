@@ -1,5 +1,6 @@
 @php $impact = \App\Models\ImpactNumbersSection::first(); @endphp
 
+
 <section id="impact-numbers" class="relative overflow-hidden py-20 impact-gradient">
     <!-- Background -->
     <div class="shape w-64 h-64 rounded-full bg-white opacity-10 top-10 -left-20 animate-float"></div>
@@ -34,7 +35,7 @@
                             <i class="fas {{ $stat['icon'] }} text-white text-2xl"></i>
                         </div>
                         <div class="counter text-center text-5xl font-bold text-white mb-4"
-                            data-target="{{ $stat['target'] }}" data-suffix="{{ $stat['suffix'] ?? '' }}">0
+                            data-target="{{ $stat['target'] }}" data-suffix="{{ $stat['suffix'] ?? '' }}">{{$stat['target']}}
                             @if (!empty($stat['suffix']))
                                 <span class="text-3xl text-white">{{ $stat['suffix'] }}</span>
                             @endif
@@ -43,7 +44,7 @@
                         <p class="text-white opacity-90 text-lg font-semibold mt-2">{{ $stat['label'] }}</p>
                         <div class="impact-bar mt-4 h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
                             <div class="impact-progress h-full bg-accent-500 transition-all duration-1000"
-                                style="width: 0%"></div>
+                                style="width: {{$stat['target']}}%"></div>
                         </div>
                     </div>
                 @endforeach

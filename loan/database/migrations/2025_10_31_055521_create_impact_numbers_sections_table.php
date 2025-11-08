@@ -64,9 +64,9 @@ return new class extends Migration {
                 ['value' => '25+', 'label' => 'Industries Served'],
             ]),
             'timeline' => json_encode([
-                ['year' => '2018', 'label' => 'Founded', 'detail' => '50+ Clients'],
-                ['year' => '2020', 'label' => 'Expansion', 'detail' => 'ZMW5M+ Funding'],
-                ['year' => '2023', 'label' => 'Market Leader', 'detail' => 'ZMW25M+ Funding'],
+                ['year' => '2025', 'label' => 'Founded', 'detail' => '50+ Clients'],
+                ['year' => '2026', 'label' => 'Expansion', 'detail' => 'ZMW5M+ Funding'],
+                ['year' => '2027', 'label' => 'Market Leader', 'detail' => 'ZMW25M+ Funding'],
             ]),
             'cta_heading' => 'Ready to join our success stories?',
             'cta_description' => 'Start your application and become our next success story',
