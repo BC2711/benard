@@ -50,9 +50,9 @@
                     </h3>
                     <p class="text-gray-600 leading-relaxed mb-6">{{ $f['desc'] }}</p>
                     <div class="flex items-center text-primary-primary font-semibold text-sm">
-                        <span>{{ $f['learn_more'] }}</span>
+                        {{-- <span>{{ $f['learn_more'] }}</span>
                         <i
-                            class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                            class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i> --}}
                     </div>
                 </div>
             @endforeach

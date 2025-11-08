@@ -97,20 +97,22 @@
                             </div>
                         @endforeach
                     </div>
+                </div>
 
-                    <!-- Navigation -->
-                    <div class="flex justify-center gap-4 mt-8">
-                        <div
-                            class="swiper-button-prev w-12 h-12 bg-white border-2 border-accent-500 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-accent-500 hover:border-white group">
-                            <i
-                                class="fas fa-chevron-left text-accent-500 text-sm transition-colors duration-300 group-hover:text-white"></i>
-                        </div>
-                        <div class="swiper-pagination"></div>
-                        <div
-                            class="swiper-button-next w-12 h-12 bg-white border-2 border-accent-500 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-accent-500 hover:border-white group">
-                            <i
-                                class="fas fa-chevron-right text-accent-500 text-sm transition-colors duration-300 group-hover:text-white"></i>
-                        </div>
+                <!-- Navigation - Positioned directly under the testimonial cards -->
+                <div class="flex justify-center items-center gap-6 mt-12">
+                    <div
+                        class="swiper-button-prev w-12 h-12 bg-white border-2 border-accent-500 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-accent-500 hover:border-white group shadow-lg">
+                        <i
+                            class="fas fa-chevron-left text-accent-500 text-sm transition-colors duration-300 group-hover:text-white"></i>
+                    </div>
+
+                    <div class="swiper-pagination items-center"></div>
+
+                    <div
+                        class="swiper-button-next w-12 h-12 bg-white border-2 border-accent-500 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-accent-500 hover:border-white group shadow-lg">
+                        <i
+                            class="fas fa-chevron-right text-accent-500 text-sm transition-colors duration-300 group-hover:text-white"></i>
                     </div>
                 </div>
             </div>
@@ -169,14 +171,17 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Swiper
-        new Swiper('.testimonial-slider', {
+        const testimonialSwiper = new Swiper('.testimonial-slider', {
             loop: true,
             slidesPerView: 1,
             spaceBetween: 30,
             pagination: {
                 el: '.swiper-pagination',
-                clickable: true
+                clickable: true,
+                renderBullet: function(index, className) {
+                    return '<span class="' + className +
+                    ' swiper-pagination-bullet-custom"></span>';
+                }
             },
             navigation: {
                 nextEl: '.swiper-button-next',
@@ -198,10 +203,9 @@
             speed: 800
         });
 
-        // Pause autoplay on hover
         const slider = document.querySelector('.testimonial-slider');
-        slider.addEventListener('mouseenter', () => slider.swiper.autoplay.stop());
-        slider.addEventListener('mouseleave', () => slider.swiper.autoplay.start());
+        slider.addEventListener('mouseenter', () => testimonialSwiper.autoplay.stop());
+        slider.addEventListener('mouseleave', () => testimonialSwiper.autoplay.start());
     });
 
     function openVideoModal(url) {
@@ -344,15 +348,43 @@
         z-index: 1;
     }
 
-    .swiper-pagination-bullet {
-        background: white;
-        opacity: 0.5;
-        width: 10px;
-        height: 10px;
+    /* Custom Swiper Navigation Styles */
+    .swiper-pagination {
+        position: relative !important;
+        bottom: auto !important;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 20px;
     }
 
-    .swiper-pagination-bullet-active {
+    .swiper-pagination-bullet-custom {
+        background: white;
+        opacity: 0.5;
+        width: 12px;
+        height: 12px;
+        margin: 0 !important;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+    }
+
+    .swiper-pagination-bullet-custom-active {
         background: #db9123;
         opacity: 1;
+        width: 32px;
+        transform: scale(1);
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        position: relative !important;
+        top: auto !important;
+        margin-top: 0 !important;
+        transform: none !important;
+    }
+
+    .swiper-button-prev:after,
+    .swiper-button-next:after {
+        display: none;
     }
 </style>

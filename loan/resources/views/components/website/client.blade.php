@@ -66,9 +66,23 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-pagination mt-8"></div>
+            </div>
+
+            <!-- Navigation - Moved outside Swiper container -->
+            <div class="flex justify-center items-center gap-6 mt-8">
+                <div
+                    class="swiper-button-prev w-12 h-12 bg-white border-2 border-primary-700 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-primary-700 group shadow-lg">
+                    <i
+                        class="fas fa-chevron-left text-primary-700 text-sm transition-colors duration-300 group-hover:text-white"></i>
+                </div>
+
+                <div class="swiper-pagination flex gap-3 items-center"></div>
+
+                <div
+                    class="swiper-button-next w-12 h-12 bg-white border-2 border-primary-700 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-primary-700 group shadow-lg">
+                    <i
+                        class="fas fa-chevron-right text-primary-700 text-sm transition-colors duration-300 group-hover:text-white"></i>
+                </div>
             </div>
         </div>
 
@@ -153,17 +167,21 @@
 </section>
 
 <!-- Swiper JS -->
-<link rel="stylesheet" href="httpsa://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        new Swiper('.clients-swiper', {
+        const clientsSwiper = new Swiper('.clients-swiper', {
             loop: true,
             slidesPerView: 1,
             spaceBetween: 30,
             pagination: {
                 el: '.swiper-pagination',
-                clickable: true
+                clickable: true,
+                renderBullet: function(index, className) {
+                    return '<span class="' + className +
+                    ' swiper-pagination-bullet-custom"></span>';
+                }
             },
             navigation: {
                 nextEl: '.swiper-button-next',
@@ -176,6 +194,10 @@
                 1024: {
                     slidesPerView: 3
                 }
+            },
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false
             }
         });
     });
@@ -183,10 +205,124 @@
 
 <style>
     .gradient-client-bg {
-        @apply bg-gradient-to-br from-primary-50 via-white to-accent-50;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e1f5fe 50%, #f0fff4 100%);
     }
 
     .industry-badge {
-        @apply transition-all duration-300 hover:scale-105;
+        transition: all 0.3s ease;
+    }
+
+    .industry-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .shape {
+        position: absolute;
+        z-index: 0;
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-in;
+    }
+
+    .animate-fadeInUp {
+        animation: fadeInUp 0.6s ease-in;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Custom Swiper Navigation Styles */
+    .swiper-pagination {
+        position: relative !important;
+        bottom: auto !important;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 20px;
+    }
+
+    .swiper-pagination-bullet-custom {
+        background: #3b82f6;
+        opacity: 0.3;
+        width: 10px;
+        height: 10px;
+        margin: 0 !important;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .swiper-pagination-bullet-custom-active {
+        background: #3b82f6;
+        opacity: 1;
+        width: 24px;
+        transform: scale(1);
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        position: relative !important;
+        top: auto !important;
+        margin-top: 0 !important;
+        transform: none !important;
+    }
+
+    .swiper-button-prev:after,
+    .swiper-button-next:after {
+        display: none;
+    }
+
+    .client-card {
+        transition: all 0.3s ease;
+    }
+
+    .client-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .highlight-card {
+        transition: all 0.3s ease;
+    }
+
+    .highlight-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 </style>

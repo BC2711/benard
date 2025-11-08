@@ -67,8 +67,10 @@
                 <h3 class="text-xl font-semibold">Features (4)</h3>
                 <div class="lg:grid-cols-4 grid md:grid-cols-2 gap-4">
                     @php
+                  
                         // Decode the JSON features string
                         $features = json_decode($about->features, true) ?? [];
+                        //   dd($features);
                     @endphp
 
                     @foreach ($features as $index => $feat)
@@ -79,6 +81,7 @@
                             <x-input name="title[]" placeholder="Feature Title" label="Feature Title" :value="old('title.' . $index, $feat['title'] ?? '')"
                                 class="mt-2" />
                             <x-textarea name="desc[]" label="Description" rows="3" :value="old('desc.' . $index, $feat['desc'] ?? '')" />
+                           
                         </div>
                     @endforeach
                 </div>

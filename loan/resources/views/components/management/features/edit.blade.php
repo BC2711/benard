@@ -4,7 +4,7 @@
     <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-8">Edit Features Section</h1>
 
-        @if (session('success'))
+        {{-- @if (session('success'))
             <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
         @endif
 
@@ -16,7 +16,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif --}}
 
         <form action="{{ route('management.features.update', $feature) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')
@@ -138,7 +138,7 @@
                                     <x-input name="title[]" label="Title" :value="old('title', $f['title'])" placeholder="" required />
                                     <x-textarea name="desc[]" label="Description" rows="3" :value="old('desc', $f['desc'])"
                                         placeholder="" required />
-                                    <x-input type="hidden" name="learn_more[]" label="" :value="old('learn_more', $f['learn_more'])" placeholder=""
+                                    <x-input type="text" name="learn_more[]" label="" :value="old('learn_more', $f['learn_more'])" placeholder=""
                                         required />
                                 </div>
                             </div>

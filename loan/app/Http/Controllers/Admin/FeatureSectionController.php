@@ -43,6 +43,8 @@ class FeatureSectionController extends Controller
             'title.*' => 'required|string|max:255',
             'desc' => 'required|array|size:6',
             'desc.*' => 'required|string',
+            'learn_more' => 'required|array|size:6',
+            'learn_more.*' => 'required|string|max:255',
 
             // CTA Section
             'cta_heading' => 'required|string|max:255',

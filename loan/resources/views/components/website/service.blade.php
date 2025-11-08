@@ -42,13 +42,13 @@
                     </h3>
                     <p class="text-gray-600 leading-relaxed mb-6">{{ $s['desc'] }}</p>
                     <div class="flex items-center justify-between">
-                        <a href="#" class="flex items-center text-primary-primary font-semibold text-sm group-hover:translate-x-1 transition-transform duration-300">
+                        {{-- <a href="#" class="flex items-center text-primary-primary font-semibold text-sm group-hover:translate-x-1 transition-transform duration-300">
                             <span>Learn more</span>
                             <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                         <div class="text-xs font-semibold {{ $s['tag_color'] === 'secondary' ? 'text-secondary-secondary bg-secondary-secondary/10' : 'text-primary-primary bg-primary-primary/10' }} px-3 py-1 rounded-full">
                             {{ $s['tag'] }}
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             @endforeach

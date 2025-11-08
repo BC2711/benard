@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AboutSectionController;
+use App\Http\Controllers\Admin\ConsultationSectionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FeatureSectionController;
 use App\Http\Controllers\Admin\FooterController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\Admin\TestimonialsController;
 use App\Http\Controllers\Admin\TrustedClientsController;
+use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\LoanApplicationController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationController;
@@ -29,12 +31,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('website.index');
 });
-
+Route::get('/consultation', function () {
+    return view('website.consultation');
+});
 Route::get('/service-details', function () {
     return view('website.review_testimonials');
 });
 Route::get('/testimonial-reviews', function () {
     return view('website.review_testimonials');
+});
+Route::get('/view-success-stories', function () {
+    return view('website.case');
 });
 Route::get('/calculator', function () {
     return view('website.calculator');
@@ -100,7 +107,8 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::resource('testimonial', TestimonialsController::class);
         Route::resource('counter', ImpactNumbersController::class);
         Route::resource('client', TrustedClientsController::class);
-
+        Route::resource('consultation', ConsultationSectionController::class)->only(['index', 'update']);
+        Route::post('consultation', [ConsultationController::class, 'store'])->name('consultation.store');
         Route::resource('support', SupportController::class);
         Route::resource('calculator', LoanCalculatorController::class);
         Route::resource('footer', FooterController::class);

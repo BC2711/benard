@@ -24,20 +24,22 @@
         </div>
 
         <!-- Main Stats -->
-        <div class="max-w-6xl mx-auto mb-16">
+        <div class="max-w-7xl mx-auto mb-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach ($impact->main_stats as $i => $stat)
-                    <div class="stat-card bg-white bg-opacity-10 rounded-2xl p-8 text-center backdrop-blur-sm border border-white border-opacity-20 animate-fadeInUp"
+                    <div class="stat-card bg-white bg-opacity-10 rounded-2xl p-4 text-center backdrop-blur-sm border border-white border-opacity-20 animate-fadeInUp"
                         style="animation-delay: {{ $i * 0.1 }}s;">
                         <div
-                            class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3">
                             <i class="fas {{ $stat['icon'] }} text-white text-2xl"></i>
                         </div>
-                        <div class="counter text-5xl font-bold text-white mb-4" data-target="{{ $stat['target'] }}"
-                            data-suffix="{{ $stat['suffix'] ?? '' }}">0</div>
-                        @if (!empty($stat['suffix']))
-                            <span class="text-3xl text-white">{{ $stat['suffix'] }}</span>
-                        @endif
+                        <div class="counter text-center text-5xl font-bold text-white mb-4"
+                            data-target="{{ $stat['target'] }}" data-suffix="{{ $stat['suffix'] ?? '' }}">0
+                            @if (!empty($stat['suffix']))
+                                <span class="text-3xl text-white">{{ $stat['suffix'] }}</span>
+                            @endif
+                        </div>
+
                         <p class="text-white opacity-90 text-lg font-semibold mt-2">{{ $stat['label'] }}</p>
                         <div class="impact-bar mt-4 h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
                             <div class="impact-progress h-full bg-accent-500 transition-all duration-1000"
@@ -49,8 +51,8 @@
         </div>
 
         <!-- Performance Metrics -->
-        <div class="max-w-4xl mx-auto mb-16 animate-fadeInUp" style="animation-delay: 0.4s;">
-            <div class="bg-white bg-opacity-10 rounded-2xl p-8 backdrop-blur-sm border border-white border-opacity-20">
+        <div class="max-w-4xl mx-auto mb-12 animate-fadeInUp" style="animation-delay: 0.4s;">
+            <div class="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm border border-white border-opacity-20">
                 <h3 class="text-2xl font-bold text-white text-center mb-8">Performance Metrics</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @foreach ($impact->performance_metrics as $m)
@@ -67,7 +69,7 @@
         </div>
 
         <!-- Industry Impact -->
-        <div class="max-w-6xl mx-auto mb-16 animate-fadeInUp" style="animation-delay: 0.5s;">
+        <div class="max-w-7xl mx-auto mb-12 animate-fadeInUp" style="animation-delay: 0.5s;">
             <h3 class="text-2xl font-bold text-white text-center mb-8">Industry Impact</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($impact->industry_impact as $ind)
@@ -80,14 +82,17 @@
         </div>
 
         <!-- Growth Timeline -->
-        <div class="max-w-4xl mx-auto mb-16 animate-fadeInUp" style="animation-delay: 0.6s;">
-            <div class="bg-white bg-opacity-10 rounded-2xl p-8 backdrop-blur-sm border border-white border-opacity-20">
-                <h3 class="text-2xl font-bold text-white text-center mb-8">Our Growth Journey</h3>
+        <div class="max-w-4xl mx-auto mb-12 animate-fadeInUp" style="animation-delay: 0.6s;">
+            <div class="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm border border-white border-opacity-20">
+                <h3 class="text-2xl font-bold text-white text-center mb-4">Our Growth Journey</h3>
                 <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                     @foreach ($impact->timeline as $i => $t)
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-2">{{ $t['year'] }}</div>
-                            <p class="text-white opacity-90">{{ $t['label'] }}</p>
+                            <div class="flex gap-2 font-bold text-white mb-2">
+                                <p class="text-white opacity-90">{{ $t['label'] }}</p>
+                                <p>{{ $t['year'] }}</p>
+                            </div>
+
                             <div class="text-accent-500 mt-2">{{ $t['detail'] }}</div>
                         </div>
                         @if ($i < count($impact->timeline) - 1)
