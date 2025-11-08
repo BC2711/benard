@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Menu;
 use App\Models\Section;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 
@@ -157,7 +158,7 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Exception $e) {
                 // If route doesn't exist, try with management prefix
                 if (!str_starts_with($url, 'management.')) {
-                    try {
+                    try {                       
                         return route("management.$url");
                     } catch (\Exception $e) {
                         return url('/');
@@ -177,6 +178,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Otherwise, use url() helper for regular paths
+      
         return url($url);
     }
 }

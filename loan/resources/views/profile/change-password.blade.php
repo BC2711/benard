@@ -12,7 +12,7 @@
                         <nav class="flex mb-4" aria-label="Breadcrumb">
                             <ol class="flex items-center space-x-2 text-sm">
                                 <li>
-                                    <a href="{{ route('management.dashboard') }}"
+                                    <a href="{{ route('management.dashboard.index') }}"
                                         class="text-gray-500 hover:text-gray-700 transition-colors">Dashboard</a>
                                 </li>
                                 <li class="flex items-center">

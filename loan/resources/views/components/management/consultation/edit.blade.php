@@ -3,7 +3,7 @@
 @section('title', 'Consultation Management')
 @section('breadcrumbs')
     <nav class="flex items-center space-x-2">
-        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
         <span class="text-gray-400">/</span>
         <span class="text-sm text-gray-500">Consultation</span>
     </nav>
@@ -18,18 +18,12 @@
     <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-6 text-gray-800">Edit Consultation Section</h1>
 
-        @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <form action="{{ route('management.consultation.update', $section->id) }}" method="POST" class="space-y-8">
             @csrf
             @method('PUT')
 
             <!-- Heading & Description -->
-            <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-gray-50 p-6 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4">Main Heading</h2>
                 <input type="text" name="heading" value="{{ old('heading', $section->heading) }}"
                     class="w-full px-4 py-2 border rounded-lg" required>
@@ -37,14 +31,14 @@
             </div>
 
             <!-- Info Heading -->
-            <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-gray-50 p-6 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4">Why Section Heading</h2>
                 <input type="text" name="info_heading" value="{{ old('info_heading', $section->info_heading) }}"
                     class="w-full px-4 py-2 border rounded-lg" required>
             </div>
 
             <!-- Benefits -->
-            <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-gray-50 p-6 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4">Benefits (3 Items)</h2>
                 <div id="benefits-container">
                     @foreach (old('benefits', $section->benefits ?? []) as $i => $benefit)
@@ -73,7 +67,7 @@
             </div>
 
             <!-- Expectations -->
-            <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-gray-50 p-6 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4">What to Expect</h2>
                 <input type="text" name="expect_heading" value="{{ old('expect_heading', $section->expect_heading) }}"
                     class="w-full px-4 py-2 border rounded-lg mb-4" required>
@@ -92,7 +86,7 @@
             </div>
 
             <!-- Contact Info -->
-            <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-gray-50 p-6 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4">Contact Info</h2>
                 <input type="text" name="contact_heading"
                     value="{{ old('contact_heading', $section->contact_heading) }}"

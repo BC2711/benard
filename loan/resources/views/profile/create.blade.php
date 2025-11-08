@@ -4,7 +4,7 @@
 @section('title', 'User Management')
 @section('breadcrumbs')
     <nav class="flex items-center space-x-2">
-        <a href="{{ route('management.dashboard') }}" class="text-sm text-gray-500 hover:text-gray-700">User Management</a>
+        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">User Management</a>
         <span class="text-gray-400">/</span>
         <span class="text-sm text-gray-500">User</span>
         <span class="text-gray-400">/</span>

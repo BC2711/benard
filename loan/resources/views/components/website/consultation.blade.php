@@ -8,68 +8,22 @@
         background: linear-gradient(135deg, #7a4603 0%, #db9123 100%);
     }
 
-    .team-card {
-        transition: all 0.3s ease;
-    }
-
-    .team-card:hover {
-        transform: translateY(-8px);
-    }
-
-    .social-links {
-        opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
-    }
-
-    .team-card:hover .social-links {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .carousel-track {
-        transition: transform 0.5s ease-in-out;
-    }
-
-    .shape {
-        position: absolute;
-        z-index: 0;
-    }
-
-    .carousel-indicator {
-        transition: all 0.3s ease;
-    }
-
-    .carousel-indicator.active {
-        width: 32px;
-        border-radius: 8px;
-    }
-
     .form-input:focus {
         box-shadow: 0 0 0 3px rgba(219, 145, 35, 0.2);
     }
-
-    .consultation-step {
-        transition: all 0.3s ease;
-    }
-
-    .consultation-step.active {
-        transform: scale(1.05);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
 </style>
+
 <section id="consultation" class="py-16 consultation-bg text-white">
     <div class="container mx-auto px-4">
-        <div class="max-w-7xl mx-auto text-center mb-12 animate-fadeIn">
+        <div class="max-w-7xl mx-auto text-center mb-12">
             <h1 class="text-5xl font-bold mb-6">{{ $cs->heading }}</h1>
             <p class="text-xl opacity-90 leading-relaxed">{{ $cs->description }}</p>
         </div>
 
         <div class="max-w-8xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-            <div class="bg-white rounded-2xl p-8 shadow-xl animate-fadeInUp">
-                <form id="consultation-form" action="{{ route('management.consultation.store') }}" method="POST"
-                    class="space-y-6">
+            <div class="bg-white rounded-2xl p-8 shadow-xl">
+                <!-- Remove the ID and JavaScript event listener -->
+                <form action="{{ route('management.consultation.store') }}" method="POST" class="space-y-6">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -131,20 +85,13 @@
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('preferred_time') border-red-500 @enderror"
                                 required>
                                 <option value="">Select a time slot</option>
-                                <option value="09:00" {{ old('preferred_time') == '09:00' ? 'selected' : '' }}>9:00 AM
-                                </option>
-                                <option value="10:00" {{ old('preferred_time') == '10:00' ? 'selected' : '' }}>10:00
-                                    AM</option>
-                                <option value="11:00" {{ old('preferred_time') == '11:00' ? 'selected' : '' }}>11:00
-                                    AM</option>
-                                <option value="13:00" {{ old('preferred_time') == '13:00' ? 'selected' : '' }}>1:00 PM
-                                </option>
-                                <option value="14:00" {{ old('preferred_time') == '14:00' ? 'selected' : '' }}>2:00 PM
-                                </option>
-                                <option value="15:00" {{ old('preferred_time') == '15:00' ? 'selected' : '' }}>3:00 PM
-                                </option>
-                                <option value="16:00" {{ old('preferred_time') == '16:00' ? 'selected' : '' }}>4:00 PM
-                                </option>
+                                <option value="09:00" {{ old('preferred_time') == '09:00' ? 'selected' : '' }}>9:00 AM</option>
+                                <option value="10:00" {{ old('preferred_time') == '10:00' ? 'selected' : '' }}>10:00 AM</option>
+                                <option value="11:00" {{ old('preferred_time') == '11:00' ? 'selected' : '' }}>11:00 AM</option>
+                                <option value="13:00" {{ old('preferred_time') == '13:00' ? 'selected' : '' }}>1:00 PM</option>
+                                <option value="14:00" {{ old('preferred_time') == '14:00' ? 'selected' : '' }}>2:00 PM</option>
+                                <option value="15:00" {{ old('preferred_time') == '15:00' ? 'selected' : '' }}>3:00 PM</option>
+                                <option value="16:00" {{ old('preferred_time') == '16:00' ? 'selected' : '' }}>4:00 PM</option>
                             </select>
                             @error('preferred_time')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -153,8 +100,7 @@
                     </div>
 
                     <div>
-                        <label for="message" class="block text-gray-700 mb-2 font-medium">Additional
-                            Information</label>
+                        <label for="message" class="block text-gray-700 mb-2 font-medium">Additional Information</label>
                         <textarea name="message" id="message" rows="4"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('message') border-red-500 @enderror"
                             placeholder="Tell us about your funding needs and goals...">{{ old('message') }}</textarea>
@@ -163,26 +109,14 @@
                         @enderror
                     </div>
 
-                    <!-- reCAPTCHA v3 (Optional) -->
                     @if (config('services.recaptcha.site_key'))
                         <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"
                             data-action="consultation"></div>
                     @endif
 
-                    <div id="error-message" class="error-message text-sm mt-4 p-3 rounded-lg hidden"></div>
                     <button type="submit"
                         class="w-full bg-primary-700 text-white py-4 rounded-lg font-semibold text-lg hover:bg-primary-800 transition-colors flex items-center justify-center">
-                        <span id="submit-text">Schedule My Consultation</span>
-                        <span id="loading-spinner" class="hidden ml-2">
-                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
-                            </svg>
-                        </span>
+                        Schedule My Consultation
                     </button>
 
                     @if (session('success'))
@@ -200,7 +134,7 @@
             </div>
 
             <!-- Dynamic Info -->
-            <div class="animate-fadeInUp" style="animation-delay: 0.2s;">
+            <div>
                 <h2 class="text-3xl font-bold mb-6">{{ $cs->info_heading }}</h2>
 
                 <div class="space-y-6 mb-8">
@@ -277,51 +211,30 @@
             if (spinner) spinner.classList.remove('hidden');
 
             try {
-                // Get CSRF token safely
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute(
-                    'content') || '';
-
                 const response = await fetch(form.action, {
                     method: 'POST',
                     body: new FormData(form),
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfToken,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json'
                     }
                 });
 
-                // Check if response is JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('Server returned non-JSON response');
-                }
-
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // Success
-                    form.reset();
+                    // Success - show message but don't reset form immediately
                     if (errorMessageEl) {
-                        errorMessageEl.textContent = data.message ||
-                            'Thank you! We\'ll contact you soon.';
-                        errorMessageEl.className =
-                            'error-message bg-green-100 text-green-700 p-3 rounded-lg block';
+                        errorMessageEl.textContent = data.message || 'Thank you! We\'ll contact you soon.';
+                        errorMessageEl.className = 'error-message bg-green-100 text-green-700 p-3 rounded-lg block';
                     }
-
-                    // Show success message at the top
-                    const successDiv = document.createElement('div');
-                    successDiv.className =
-                        'mt-4 p-4 bg-green-100 text-green-700 rounded-lg text-center';
-                    successDiv.textContent = data.message ||
-                        'Thank you! Your consultation has been scheduled.';
-                    form.prepend(successDiv);
-
-                    // Remove success message after 5 seconds
+                    
+                    // Optionally reset form after successful submission
                     setTimeout(() => {
-                        successDiv.remove();
-                    }, 5000);
-
+                        form.reset();
+                    }, 2000);
+                    
                 } else {
                     // Validation or server error
                     let errorMsg = data.message || 'Please fix the errors below.';
@@ -330,17 +243,14 @@
                     }
                     if (errorMessageEl) {
                         errorMessageEl.innerHTML = errorMsg;
-                        errorMessageEl.className =
-                            'error-message bg-red-100 text-red-700 p-3 rounded-lg block';
+                        errorMessageEl.className = 'error-message bg-red-100 text-red-700 p-3 rounded-lg block';
                     }
                 }
             } catch (error) {
                 console.error('Submission error:', error);
                 if (errorMessageEl) {
-                    errorMessageEl.textContent =
-                        'An error occurred. Please try again or contact us directly.';
-                    errorMessageEl.className =
-                        'error-message bg-red-100 text-red-700 p-3 rounded-lg block';
+                    errorMessageEl.textContent = 'An error occurred. Please try again or contact us directly.';
+                    errorMessageEl.className = 'error-message bg-red-100 text-red-700 p-3 rounded-lg block';
                 }
             } finally {
                 // Hide loading
@@ -351,3 +261,27 @@
         });
     });
 </script>
+<style>
+    .form-input {
+        background-color: white;
+        color: #374151; /* gray-700 */
+        border: 1px solid #d1d5db; /* gray-300 */
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6; /* primary-500 */
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Ensure text is visible in all states */
+    input, textarea, select {
+        color: #374151 !important;
+    }
+
+    /* Remove any potential overlays blocking input */
+    .consultation-bg * {
+        position: relative;
+        z-index: 1;
+    }
+</style>

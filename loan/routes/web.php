@@ -95,7 +95,7 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::post('change-password', [UserController::class, 'changePassword'])->name('change-password');
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::resource('dashboard', DashboardController::class);
 
         Route::resource('hero', HeroSectionController::class);
         Route::resource('about', AboutSectionController::class);

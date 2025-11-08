@@ -48,7 +48,7 @@
 
             <!-- Breadcrumb -->
             {{-- <nav class="hidden lg:flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
-                <a href="{{ route('management.dashboard') }}"
+                <a href="{{ route('management.dashboard.index') }}"
                     class="text-gray-500 dark:text-gray-400 hover:text-londa-orange dark:hover:text-londa-300 transition-colors">
                     <i class="fas fa-home"></i>
                 </a>
@@ -188,10 +188,10 @@
             <!-- Quick Actions -->
             {{-- <div class="relative" x-data="{
                 quickActions: [
-                    { icon: 'fa-plus', label: 'New Loan', action: '{{ route('management.dashboard') }}', color: 'text-green-600' },
-                    { icon: 'fa-user-plus', label: 'Add Customer', action: '{{ route('management.dashboard') }}', color: 'text-blue-600' },
-                    { icon: 'fa-file-invoice', label: 'Create Report', action: '{{ route('management.dashboard') }}', color: 'text-purple-600' },
-                    { icon: 'fa-chart-line', label: 'Analytics', action: '{{ route('management.dashboard') }}', color: 'text-orange-600' }
+                    { icon: 'fa-plus', label: 'New Loan', action: '{{ route('management.dashboard.index') }}', color: 'text-green-600' },
+                    { icon: 'fa-user-plus', label: 'Add Customer', action: '{{ route('management.dashboard.index') }}', color: 'text-blue-600' },
+                    { icon: 'fa-file-invoice', label: 'Create Report', action: '{{ route('management.dashboard.index') }}', color: 'text-purple-600' },
+                    { icon: 'fa-chart-line', label: 'Analytics', action: '{{ route('management.dashboard.index') }}', color: 'text-orange-600' }
                 ]
             }">
                 <button @click="quickActionsOpen = !quickActionsOpen"
@@ -325,7 +325,7 @@
 
                     <div
                         class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-b-xl">
-                        <a href="{{ route('management.dashboard') }}"
+                        <a href="{{ route('management.dashboard.index') }}"
                             class="block text-center text-sm font-medium text-londa-orange hover:text-orange-700 dark:hover:text-orange-300 transition-colors duration-200">
                             View all notifications
                         </a>
@@ -386,7 +386,7 @@
 
                     <div
                         class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-b-xl">
-                        <a href="{{ route('management.dashboard') }}"
+                        <a href="{{ route('management.dashboard.index') }}"
                             class="block text-center text-sm font-medium text-londa-orange hover:text-orange-700 dark:hover:text-orange-300 transition-colors duration-200">
                             View all messages
                         </a>
@@ -457,13 +457,13 @@
                                 class="fas fa-user-circle mr-3 text-gray-400 group-hover:text-londa-orange transition-colors duration-150 w-5 text-center"></i>
                             <span>My Profile</span>
                         </a>
-                        <a href="{{ route('management.dashboard') }}"
+                        <a href="{{ route('management.dashboard.index') }}"
                             class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-londa-50 dark:hover:bg-gray-700 hover:text-londa-orange dark:hover:text-londa-300 transition-colors duration-150 group">
                             <i
                                 class="fas fa-cog mr-3 text-gray-400 group-hover:text-londa-orange transition-colors duration-150 w-5 text-center"></i>
                             <span>Settings</span>
                         </a>
-                        <a href="{{ route('management.dashboard') }}"
+                        <a href="{{ route('management.dashboard.index') }}"
                             class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-londa-50 dark:hover:bg-gray-700 hover:text-londa-orange dark:hover:text-londa-300 transition-colors duration-150 group">
                             <i
                                 class="fas fa-question-circle mr-3 text-gray-400 group-hover:text-londa-orange transition-colors duration-150 w-5 text-center"></i>

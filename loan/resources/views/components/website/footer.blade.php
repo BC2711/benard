@@ -19,7 +19,8 @@
                         <div class="flex items-center gap-2 mb-2">
                             <div
                                 class="w-10 h-10 bg-accent-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                                {{ substr($footer->brand_name, 0, 1) }}
+                                {{-- {{ substr($footer->brand_name, 0, 1) }} --}}
+                                <img src="{{ asset('assets/logos/londa.jpg') }}" alt="">
                             </div>
                             <span class="text-2xl font-bold">{{ $footer->brand_name }}</span>
                         </div>
@@ -153,7 +154,7 @@
             </div>
             <div class="mt-6 pt-6 border-t border-gray-600 border-opacity-30">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-                    <p>FinExpert is a registered trademark. All loan products subject to credit approval.</p>
+                    <p>LondaLoan is a registered trademark. All loan products subject to credit approval.</p>
                     <div class="flex items-center gap-4">
                         <span>Follow us:</span>
                         <div class="flex gap-2">

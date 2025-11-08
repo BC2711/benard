@@ -183,7 +183,7 @@
                     Quick Actions
                 </h3>
                 <div class="space-y-1">
-                    <a href="{{ route('management.dashboard') }}"
+                    <a href="{{ route('management.dashboard.index') }}"
                         class="nav-item group flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-londa-50 dark:hover:bg-gray-700 hover:text-londa-orange dark:hover:text-londa-300 transition-all duration-200 ease-in-out">
                         <i class="fas fa-plus w-5 text-center text-gray-400 group-hover:text-londa-orange transition-colors duration-200"
                             aria-hidden="true"></i>
