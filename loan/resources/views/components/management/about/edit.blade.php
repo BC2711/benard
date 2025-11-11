@@ -78,7 +78,7 @@
                   
                         // Decode the JSON features string
                         $features = json_decode($about->features, true) ?? [];
-                        //   dd($features);
+                        //   dd($about->features);
                     @endphp
 
                     @foreach ($features as $index => $feat)

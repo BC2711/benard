@@ -598,7 +598,7 @@
                 </div>
             @endif
 
-            <form class="login-form" id="loginForm" action="{{ route('management.login') }}" method="post">
+            <form class="login-form" id="loginForm" action="{{ route('login') }}" method="post">
                 @csrf
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
@@ -675,7 +675,7 @@
 
                 <div class="register-link">
                     Don't have an account?
-                    <a href="{{ route('management.register') }}"
+                    <a href="{{ route('register') }}"
                         @if (session('account_locked')) style="pointer-events: none; opacity: 0.5;" @endif>
                         Register here
                     </a>

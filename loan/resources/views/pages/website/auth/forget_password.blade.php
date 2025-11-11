@@ -474,7 +474,7 @@
         <!-- Right Side: Forgot Password Form -->
         <div class="forgot-password-right">
             <div class="back-to-login">
-                <a href="{{ route('management.login') }}" class="back-link">
+                <a href="{{ route('login') }}" class="back-link">
                     <i class="fas fa-arrow-left"></i>
                     Back to Login
                 </a>
@@ -562,7 +562,7 @@
                         We've sent a password reset link to <strong id="userEmail"></strong>. The link will expire in 30
                         minutes.
                     </p>
-                    <button class="reset-button" onclick="window.location.href='{{ route('management.login') }}'">
+                    <button class="reset-button" onclick="window.location.href='{{ route('login') }}'">
                         <i class="fas fa-sign-in-alt"></i>
                         Return to Login
                     </button>

@@ -4,7 +4,7 @@
           <div class="container mx-auto px-4 lg:px-8">
               <div class="flex items-center justify-between h-20">
                   <!-- Logo Section -->
-                  <a href="index.html" class="flex items-center space-x-3 group" aria-label="Londa Loans Homepage">
+                  <a href="/" class="flex items-center space-x-3 group" aria-label="Londa Loans Homepage">
                       <div class="relative">
                           <div
                               class="w-12 h-12 bg-gradient-to-br from-primary-primary to-secondary-secondary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -56,7 +56,7 @@
 
                   <!-- Desktop Actions -->
                   <div class="hidden lg:flex items-center space-x-4">
-                      <a href="{{ route('management.login') }}"
+                      <a href="{{ route('login') }}"
                           class="bg-primary-primary from-secondary-secondary to-accent-accent text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 flex items-center space-x-2">
                           <i class="fas fa-sign-in-alt"></i>
                           <span>Sign In</span>
@@ -112,7 +112,7 @@
 
                   <!-- Mobile Actions -->
                   <div class="mt-6 pt-6 border-t border-gray-200">
-                      <a href="{{ route('management.login') }}"
+                      <a href="{{ route('login') }}"
                           class="w-full bg-gradient-to-r from-secondary-secondary to-accent-accent text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
                           <i class="fas fa-sign-in-alt"></i>
                           <span>Sign In</span>

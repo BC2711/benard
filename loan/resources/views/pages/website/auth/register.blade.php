@@ -600,7 +600,7 @@
         <!-- Right Side: Registration Form -->
         <div class="register-right">
             <div class="back-to-login">
-                <a href="{{route('management.login')}}" class="back-link">
+                <a href="{{route('login')}}" class="back-link">
                     <i class="fas fa-arrow-left"></i>
                     Back to Login
                 </a>
@@ -611,7 +611,7 @@
                 <p>Fill in your details to get started with Londa Loans</p>
             </div>
 
-            <form class="register-form" id="registerForm" method="POST" action="{{route('management.login')}}"
+            <form class="register-form" id="registerForm" method="POST" action="{{route('login')}}"
                 enctype="multipart/form-data">
                 @csrf
 
@@ -761,7 +761,7 @@
                 </button>
 
                 <div class="login-link">
-                    Already have an account? <a href="{{route('management.login')}}">Sign in here</a>
+                    Already have an account? <a href="{{route('login')}}">Sign in here</a>
                 </div>
             </form>
         </div>
@@ -875,7 +875,7 @@
                         // Clear saved form data on successful submission
                         clearFormData()
                         // Success - redirect to login page
-                        window.location.href = "{{route('management.login')}}"
+                        window.location.href = "{{route('login')}}"
                     }, 2000)
                 }
             })

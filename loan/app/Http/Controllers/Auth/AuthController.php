@@ -122,7 +122,7 @@ class AuthController extends Controller
 
                 $user->update(['attempts' => 0, 'locked_at' => null]);
                 $request->session()->regenerate();
-                return redirect()->intended(route('management.dashboard'));
+                return redirect()->intended(route('management.dashboard.index'));
             }
 
             // Handle failed login attempt
@@ -150,7 +150,7 @@ class AuthController extends Controller
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
             ]);
-            return back()->withErrors(['email' => 'An unexpected error occurred. Please try again later.']);
+            return back()->withErrors(['email' => 'An unexpected error occurred. Please try again later.'.$th->getMessage()]);
         }
     }
 

@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
 
             if ($request->is('management/*')) {
-                return redirect()->route('management.login');
+                return redirect()->route('login');
             }
 
             return redirect()->route('login');

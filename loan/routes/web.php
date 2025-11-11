@@ -48,12 +48,16 @@ Route::get('/calculator', function () {
 });
 
 
+Route::get('/management/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/management/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-});
+// Route::middleware('guest')->group(function () {
+//     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+//     Route::post('/login', [AuthController::class, 'login']);
+// });
 
 Route::prefix('notifications')->group(function () {
     Route::post('/send', [NotificationController::class, 'sendNotification']);
@@ -70,11 +74,11 @@ Route::prefix('notifications')->group(function () {
 
 Route::prefix('management')->name('management.')->group(function () {
     Route::middleware('guest:management')->group(function () {
-        Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+        // Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+        // Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
-        Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
-        Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+        // Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+        // Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
         // Password Reset Routes
         Route::get('/password/reset', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
