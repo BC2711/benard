@@ -23,32 +23,84 @@ class DashboardController extends Controller
     public function index()
     {
         try {
-            // Use count() instead of get() for better performance
             $total_users = User::count();
             $active_users = User::where('status', 'ACTIVE')->count();
             $pending_users = User::where('status', 'PENDING')->count();
 
-            // Remove soft deletes check since table doesn't have deleted_at
-            $total_consultations = ConsultationRequest::whereIn('status', ['new', 'contacted', 'scheduled', 'cancelled'])->count();
-            $pending_consultations = ConsultationRequest::where('status', 'new')->count();
-            $completed_consultations = ConsultationRequest::where('status', 'scheduled')->count();
+            $total_consultations = DB::table('consultation_requests')->count();
+            $pending_consultations =  DB::table('consultation_requests')->where('status', 'new')->count();
+            $completed_consultations =  DB::table('consultation_requests')->where('status', 'scheduled')->count();
 
-            $total_subscribers = NewsletterSubscriber::count();
+            $total_subscribers = DB::table('newsletter_subscribers')->count();
 
             // Recent data for tables
-            $recent_consultations = ConsultationRequest::latest()
-                ->take(5)
+            $recent_consultations = DB::table('consultation_requests')->latest()
+                ->take(4)
                 ->get();
 
             $recent_users = User::latest()
                 ->take(5)
                 ->get();
 
-            // Chart data - last 7 days consultations (simplified for now)
-            $consultation_trend = [
-                'labels' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                'data' => [3, 5, 2, 8, 6, 9, 4]
+            $startDate = now()->subDays(7)->startOfDay();
+            $endDate = now()->endOfDay();
+
+            // PostgreSQL compatible query
+            $consultation_trend = DB::table('consultation_requests')
+                ->select(
+                    DB::raw('EXTRACT(DOW FROM created_at) as day_of_week'),
+                    DB::raw('TO_CHAR(created_at, \'Day\') as day_name'),
+                    DB::raw('COUNT(*) as count')
+                )
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->groupBy('day_of_week', 'day_name')
+                ->orderBy('day_of_week')
+                ->get();
+
+            // Define day mapping for PostgreSQL (0=Sunday, 1=Monday, ..., 6=Saturday)
+            $daysOfWeek = [
+                1 => 'Monday',
+                2 => 'Tuesday',
+                3 => 'Wednesday',
+                4 => 'Thursday',
+                5 => 'Friday',
+                6 => 'Saturday',
+                0 => 'Sunday'
             ];
+
+            $dayMap = [
+                'Monday' => 'Mon',
+                'Tuesday' => 'Tue',
+                'Wednesday' => 'Wed',
+                'Thursday' => 'Thu',
+                'Friday' => 'Fri',
+                'Saturday' => 'Sat',
+                'Sunday' => 'Sun'
+            ];
+
+            // Initialize all days with 0
+            $counts = [];
+            foreach ($daysOfWeek as $dayNumber => $dayName) {
+                $counts[$dayName] = 0;
+            }
+
+            // Fill with actual data
+            foreach ($consultation_trend as $data) {
+                // PostgreSQL returns day names with trailing spaces, so trim them
+                $dayName = trim($data->day_name);
+                if (isset($counts[$dayName])) {
+                    $counts[$dayName] = $data->count;
+                }
+            }
+
+            // Build the converted data array for amCharts
+            $convertedData = [];
+            foreach ($daysOfWeek as $dayNumber => $dayName) {
+                $convertedData[] = [
+                    'country' => $dayMap[$dayName],
+                    'value' => $counts[$dayName]
+                ];
+            }
 
             $stats = [
                 'total_users' => $total_users,
@@ -60,20 +112,20 @@ class DashboardController extends Controller
                 'total_subscribers' => $total_subscribers,
                 'recent_consultation' => $recent_consultations,
                 'recent_users' => $recent_users,
-                'consultation_trend' => $consultation_trend,
+                'consultation_trend' => $convertedData,
             ];
 
             // Debug info
-            Log::info('Dashboard stats loaded', [
-                'users' => $total_users,
-                'consultations' => $total_consultations,
-                'subscribers' => $total_subscribers
-            ]);
+            // Log::info('Dashboard stats loaded', [
+            //     'users' => $total_users,
+            //     'consultations' => $total_consultations,
+            //     'subscribers' => $total_subscribers,
+            //     'chart_data' => $convertedData
+            // ]);
 
             return view('pages.admin.dashboard', compact('stats'));
         } catch (\Exception $e) {
             Log::error('Dashboard error: ' . $e->getMessage());
-
             // Provide fallback stats in case of error
             $fallback_stats = [
                 'total_users' => 0,
@@ -86,8 +138,13 @@ class DashboardController extends Controller
                 'recent_consultation' => collect(),
                 'recent_users' => collect(),
                 'consultation_trend' => [
-                    'labels' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    'data' => [0, 0, 0, 0, 0, 0, 0]
+                    ['country' => 'Mon', 'value' => 0],
+                    ['country' => 'Tue', 'value' => 0],
+                    ['country' => 'Wed', 'value' => 0],
+                    ['country' => 'Thu', 'value' => 0],
+                    ['country' => 'Fri', 'value' => 0],
+                    ['country' => 'Sat', 'value' => 0],
+                    ['country' => 'Sun', 'value' => 0]
                 ],
             ];
 

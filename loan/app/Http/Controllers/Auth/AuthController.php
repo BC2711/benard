@@ -162,7 +162,7 @@ class AuthController extends Controller
         Auth::guard('management')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('management.login');
+        return redirect()->route('login');
     }
 
     // Show registration form
@@ -237,7 +237,7 @@ class AuthController extends Controller
             );
 
             return $status === Password::PASSWORD_RESET
-                ? redirect()->route('management.login')->with('status', __($status))
+                ? redirect()->route('login')->with('status', __($status))
                 : back()->withErrors(['email' => __($status)]);
         } catch (\Throwable $th) {
             //throw $th;

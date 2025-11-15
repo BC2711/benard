@@ -14,7 +14,7 @@
     <div class="absolute top-20 left-10 animate-float">
         <div class="w-20 h-20 bg-accent-accent/20 rounded-2xl rotate-12"></div>
     </div>
-   
+
     <div class="absolute bottom-20 right-10 animate-float" style="animation-delay:2s;">
         <div class="w-16 h-16 bg-primary-primary/30 rounded-full"></div>
     </div>
@@ -41,12 +41,14 @@
                         {{ $about->description }}
                     </p>
                 </div>
+                @php $features  = array($about->features); @endphp
 
-             
 
-                @if (!empty($features))
+
+                @if ($about->features)
+
                     <div class="grid sm:grid-cols-2 gap-6 mb-10">
-                        @foreach ($about->features as $i => $f)
+                        @foreach ($features as $i => $f)
                             <div class="group glass-effect rounded-2xl p-6 hover-lift animate-fade-in-up"
                                 style="animation-delay:{{ ($i + 1) * 100 }}ms">
                                 <div class="flex items-start space-x-4">

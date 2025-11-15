@@ -3,9 +3,9 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50/30">
+    <div class="min-h-screen bg-white rounded-lg border-b border-gray-200">
         <!-- Header -->
-        <div class="bg-white border-b border-gray-200">
+        <div class="bg-gray-50 border-b border-gray-200">
             <div class="px-6 py-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
@@ -155,7 +155,7 @@
                                 class="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Year</button>
                         </div>
                     </div>
-                    <canvas id="consultationChart" class="h-80"></canvas>
+                    <div id="chartdiv"></div>
                 </div>
 
                 <!-- User Analytics -->
@@ -238,7 +238,7 @@
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">
                                         @if (isset($consultation->preferred_date) && $consultation->preferred_date)
-                                            {{ $consultation->preferred_date->format('M j, Y') }}
+                                            {{ \Carbon\Carbon::parse($consultation->preferred_date)->format('M j, Y') }}
                                         @else
                                             Not set
                                         @endif
@@ -282,10 +282,10 @@
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                                            {{ substr($user->name ?? 'U', 0, 1) }}
+                                            {{ substr($user->first_name ?? 'U', 0, 1) }}
                                         </div>
                                         <div>
-                                            <p class="font-medium text-gray-900">{{ $user->name ?? 'Unknown User' }}</p>
+                                            <p class="font-medium text-gray-900">{{ $user->first_name ?? 'Unknown User' }}</p>
                                             <p class="text-sm text-gray-500">{{ $user->email ?? 'No email' }}</p>
                                         </div>
                                     </div>
@@ -317,7 +317,7 @@
                                     class="fas fa-user-plus text-blue-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
                                 <span class="text-sm font-medium text-gray-900">Add User</span>
                             </a>
-                            <a href="{{ route('management.consultation.index') }}"
+                            <a href="#"
                                 class="flex flex-col items-center justify-center p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors group">
                                 <i
                                     class="fas fa-list text-green-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
@@ -341,115 +341,130 @@
             </div>
         </div>
     </div>
-@endsection
 
-@section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Use a reliable Chart.js CDN -->
+    <!-- Styles -->
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 300px;
+        }
+    </style>
+
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+    <!-- Chart code -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Consultation Trend Chart
-            const ctx = document.getElementById('consultationChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: @json($stats['consultation_trend']['labels']),
-                    datasets: [{
-                        label: 'Consultations',
-                        data: @json($stats['consultation_trend']['data']),
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: 'rgb(59, 130, 246)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            cornerRadius: 8
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                color: '#6B7280'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#6B7280'
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    }
-                }
+        am5.ready(function() {
+
+            // Create root element
+            // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+            var root = am5.Root.new("chartdiv");
+
+            // Set themes
+            // https://www.amcharts.com/docs/v5/concepts/themes/
+            root.setThemes([
+                am5themes_Animated.new(root)
+            ]);
+
+            // Create chart
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/
+            var chart = root.container.children.push(am5xy.XYChart.new(root, {
+                panX: true,
+                panY: true,
+                wheelX: "panX",
+                wheelY: "zoomX",
+                pinchZoomX: true,
+                paddingLeft: 0,
+                paddingRight: 1
+            }));
+
+            // Add cursor
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+            var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
+            cursor.lineY.set("visible", false);
+
+
+            // Create axes
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+            var xRenderer = am5xy.AxisRendererX.new(root, {
+                minGridDistance: 30,
+                minorGridEnabled: true
             });
 
-            // Number counting animation
-            const animateValue = (element, start, end, duration) => {
-                let startTimestamp = null;
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    const value = Math.floor(progress * (end - start) + start);
-                    element.textContent = value.toLocaleString();
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    }
-                };
-                window.requestAnimationFrame(step);
-            };
-
-            // Animate all stat numbers
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const element = entry.target;
-                        const finalValue = parseInt(element.textContent.replace(/,/g, ''));
-                        animateValue(element, 0, finalValue, 1500);
-                        observer.unobserve(element);
-                    }
-                });
+            xRenderer.labels.template.setAll({
+                rotation: -90,
+                centerY: am5.p50,
+                centerX: am5.p100,
+                paddingRight: 15
             });
 
-            // Observe all animated number elements
-            const animatedElements = [
-                'totalUsers', 'totalConsultations', 'pendingConsultations', 'totalSubscribers',
-                'activeUsers', 'pendingUsers', 'completedConsultations'
-            ];
+            xRenderer.grid.template.setAll({
+                location: 1
+            })
 
-            animatedElements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    observer.observe(element);
-                }
+            var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+                maxDeviation: 0.3,
+                categoryField: "country",
+                renderer: xRenderer,
+                tooltip: am5.Tooltip.new(root, {})
+            }));
+
+            var yRenderer = am5xy.AxisRendererY.new(root, {
+                strokeOpacity: 0.1
+            })
+
+            var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+                maxDeviation: 0.3,
+                renderer: yRenderer
+            }));
+
+            // Create series
+            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+            var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+                name: "Series 1",
+                xAxis: xAxis,
+                yAxis: yAxis,
+                valueYField: "value",
+                sequencedInterpolation: true,
+                categoryXField: "country",
+                tooltip: am5.Tooltip.new(root, {
+                    labelText: "{valueY}"
+                })
+            }));
+
+            series.columns.template.setAll({
+                cornerRadiusTL: 5,
+                cornerRadiusTR: 5,
+                strokeOpacity: 0
             });
+            series.columns.template.adapters.add("fill", function(fill, target) {
+                return chart.get("colors").getIndex(series.columns.indexOf(target));
+            });
+
+            series.columns.template.adapters.add("stroke", function(stroke, target) {
+                return chart.get("colors").getIndex(series.columns.indexOf(target));
+            });
+
+
+            // Set data
+            var data = @json($stats['consultation_trend']);
+
+            xAxis.data.setAll(data);
+            series.data.setAll(data);
+
+
+            // Make stuff animate on load
+            // https://www.amcharts.com/docs/v5/concepts/animations/
+            series.appear(1000);
+            chart.appear(1000, 100);
+
         });
     </script>
+
 
     <style>
         .animate-fade-in {
@@ -466,10 +481,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        .hover-lift:hover {
-            transform: translateY(-2px);
         }
     </style>
 @endsection

@@ -513,7 +513,7 @@
         <!-- Right Side: Reset Password Form -->
         <div class="reset-password-right">
             <div class="back-to-login">
-                <a href="{{ route('management.login') }}" class="back-link">
+                <a href="{{ route('login') }}" class="back-link">
                     <i class="fas fa-arrow-left"></i>
                     Back to Login
                 </a>
