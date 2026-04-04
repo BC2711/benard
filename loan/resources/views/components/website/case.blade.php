@@ -1,17 +1,8 @@
 @php
     $ss = \App\Models\SuccessStoriesSection::first();
-    // $stats = json_decode($ss->stats, true);
-    // $categories = json_decode($ss->categories, true);
-    // $stories = json_decode($ss->stories, true);
 @endphp
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-    .gradient-bg {
-        background: linear-gradient(135deg, #f8f5f0 0%, #fef8f0 100%);
-    }
-
     .case-study-card {
         transition: all 0.3s ease;
     }
@@ -26,20 +17,9 @@
         border-color: #db9123 !important;
     }
 
-    .shape {
-        position: absolute;
-        z-index: 0;
-    }
-
     .filter-active {
         background-color: #7a4603 !important;
         color: white !important;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
     }
 
     .read-more-content {
@@ -49,19 +29,7 @@
     }
 
     .read-more-content.expanded {
-        max-height: 1000px;
-    }
-
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
-    }
-
-    .animate-fadeIn {
-        animation: fadeIn 0.6s ease-in;
-    }
-
-    .animate-fadeInUp {
-        animation: fadeInUp 0.6s ease-in;
+        max-height: 800px;
     }
 
     @keyframes float {
@@ -76,16 +44,6 @@
         }
     }
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
-        }
-    }
-
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -97,26 +55,38 @@
             transform: translateY(0);
         }
     }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
 </style>
 
-<!-- Case Studies Hero Section -->
-<section class="relative overflow-hidden py-20 gradient-bg">
-    <!-- Background Shapes -->
-    <div class="shape w-64 h-64 rounded-full bg-primary-100 opacity-20 top-10 -left-20 animate-float"></div>
-    <div class="shape w-40 h-40 rounded-full bg-accent-100 opacity-30 bottom-20 -right-10 animate-float"
+<!-- Hero Section -->
+<section class="relative overflow-hidden py-16 lg:py-20 bg-gradient-to-br from-primary-50 to-white">
+    <div class="absolute w-64 h-64 rounded-full bg-primary-100/30 top-10 -left-20 animate-float"></div>
+    <div class="absolute w-40 h-40 rounded-full bg-primary-accent/20 bottom-20 -right-10 animate-float"
         style="animation-delay: 2s;"></div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-4xl mx-auto text-center animate-fadeIn">
-            <h1 class="text-5xl font-bold text-primary-700 mb-6">{{ $ss->heading }}</h1>
-            <p class="text-xl text-gray-600 leading-relaxed mb-8">
-                {{ $ss->description }}
-            </p>
+        <div class="max-w-4xl mx-auto text-center animate-fade-in-up">
+            <div
+                class="inline-flex items-center space-x-2 bg-primary-100 text-primary-primary px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wider mb-6 border border-primary-200">
+                <i class="fas fa-star text-xs"></i>
+                <span>Success Stories</span>
+            </div>
+            <h1 class="text-3xl lg:text-4xl xl:text-5xl font-black text-primary-primary mb-5">{{ $ss->heading }}</h1>
+            <div class="w-20 h-1 bg-primary-secondary mx-auto rounded-full mb-6"></div>
+            <p class="text-lg text-gray-600 leading-relaxed mb-8">{{ $ss->description }}</p>
             <div class="flex flex-wrap gap-4 justify-center">
                 @foreach ($ss->stats as $stat)
-                    <div class="bg-white rounded-lg px-6 py-3 shadow-sm">
-                        <div class="text-2xl font-bold text-primary-700">{{ $stat['value'] }}</div>
-                        <div class="text-gray-600">{{ $stat['label'] }}</div>
+                    <div class="bg-white rounded-xl px-5 py-2 shadow-md border border-primary-100">
+                        <div class="text-xl font-black text-primary-primary">{{ $stat['value'] }}</div>
+                        <div class="text-gray-500 text-xs">{{ $stat['label'] }}</div>
                     </div>
                 @endforeach
             </div>
@@ -125,12 +95,12 @@
 </section>
 
 <!-- Filter Section -->
-<section class="py-8 bg-white border-b">
+<section class="py-6 bg-white border-b border-primary-100">
     <div class="container mx-auto px-4">
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div class="flex flex-wrap gap-4">
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex flex-wrap gap-2 justify-center">
                 <button
-                    class="filter-btn px-4 py-2 bg-primary-700 text-white rounded-lg font-medium transition-all duration-300 filter-active"
+                    class="filter-btn px-4 py-2 bg-primary-primary text-white rounded-lg font-semibold text-sm transition-all duration-300 filter-active"
                     data-filter="all">
                     All Case Studies
                 </button>
@@ -145,24 +115,22 @@
                         $label = $categoryLabels[$category] ?? ucfirst($category);
                     @endphp
                     <button
-                        class="filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium transition-all duration-300 hover:bg-primary-700 hover:text-white"
+                        class="filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-primary-primary hover:text-white"
                         data-filter="{{ $category }}">
                         {{ $label }}
                     </button>
                 @endforeach
             </div>
 
-            <div class="flex items-center gap-4">
-                <div class="relative">
-                    <select
-                        class="appearance-none bg-gray-100 border-0 rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                        <option>Sort by: Newest First</option>
-                        <option>Sort by: Funding Amount</option>
-                        <option>Sort by: Success Rate</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
+            <div class="relative">
+                <select
+                    class="appearance-none bg-gray-100 border-0 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-secondary">
+                    <option>Sort by: Newest First</option>
+                    <option>Sort by: Funding Amount</option>
+                    <option>Sort by: Success Rate</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-primary-primary">
+                    <i class="fas fa-chevron-down text-xs"></i>
                 </div>
             </div>
         </div>
@@ -170,85 +138,91 @@
 </section>
 
 <!-- Case Studies Grid -->
-<section class="py-16 bg-gray-50">
+<section class="py-16 bg-gradient-to-br from-primary-50 to-white">
     <div class="container mx-auto px-4">
         <div id="case-studies-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             @foreach ($ss->stories as $index => $story)
-                <div class="case-study-card bg-white rounded-2xl overflow-hidden shadow-lg animate-fadeInUp"
+                <div class="case-study-card bg-white rounded-xl overflow-hidden shadow-lg border border-primary-100 animate-fade-in-up"
                     data-category="{{ $story['category'] }}" style="animation-delay: {{ $index * 0.1 }}s;">
-                    <div
-                        class="relative h-64 bg-gradient-to-br from-{{ $story['gradient_from'] }} to-{{ $story['gradient_to'] }}">
+
+                    <!-- Header Gradient -->
+                    <div class="relative h-48 bg-gradient-to-br from-primary-primary to-primary-700">
                         <div class="absolute inset-0 flex items-center justify-center text-white p-6 text-center">
                             <div>
-                                <h3 class="text-2xl font-bold mb-2">{{ $story['overlay_title'] ?? $story['title'] }}
-                                </h3>
-                                <p class="text-primary-100">{{ $story['overlay_desc'] ?? $story['description'] }}</p>
+                                <h3 class="text-xl font-bold mb-1">{{ $story['overlay_title'] ?? $story['title'] }}</h3>
+                                <p class="text-white/80 text-sm">{{ $story['overlay_desc'] ?? $story['description'] }}
+                                </p>
                             </div>
                         </div>
-                        <div class="absolute top-4 left-4">
+                        <div class="absolute top-3 left-3">
                             <span
-                                class="px-3 py-1 bg-white/20 rounded-full text-white text-sm">{{ $story['type'] }}</span>
+                                class="px-2 py-0.5 bg-primary-accent/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold">{{ $story['type'] }}</span>
                         </div>
                     </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
+
+                    <!-- Content -->
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
                             <div>
-                                <h3 class="text-2xl font-bold text-primary-700 mb-2">{{ $story['title'] }}</h3>
-                                <p class="text-accent-500 font-semibold">{{ $story['type'] }}</p>
+                                <h3 class="text-lg font-bold text-primary-primary mb-1">{{ $story['title'] }}</h3>
+                                <p class="text-primary-secondary text-xs font-semibold">{{ $story['type'] }}</p>
                             </div>
                             <div class="text-right">
-                                <div class="text-2xl font-bold text-primary-700">{{ $story['funding'] }}</div>
-                                <div class="text-sm text-gray-600">{{ $story['amount'] }}</div>
+                                <div class="text-lg font-black text-primary-primary">{{ $story['funding'] }}</div>
+                                <div class="text-xs text-gray-400">{{ $story['amount'] }}</div>
                             </div>
                         </div>
 
-                        <div class="mb-6">
-                            <h4 class="font-semibold text-gray-800 mb-2">The Challenge</h4>
-                            <p class="text-gray-600 mb-4">{{ $story['description'] }}</p>
-
-                            <h4 class="font-semibold text-gray-800 mb-2">Our Solution</h4>
-                            <p class="text-gray-600">Provided tailored funding with strategic support to achieve their
-                                growth objectives.</p>
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-gray-700 text-sm mb-1">The Challenge</h4>
+                            <p class="text-gray-500 text-sm">{{ Str::limit($story['description'], 100) }}</p>
                         </div>
 
-                        <div class="stats-grid mb-6">
-                            <div class="bg-primary-50 rounded-lg p-4 text-center">
-                                <div class="text-xl font-bold text-primary-700">{{ $story['result'] }}</div>
-                                <div class="text-sm text-gray-600">Key Result</div>
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-primary-50 rounded-lg p-2 text-center">
+                                <div class="text-sm font-black text-primary-primary">{{ $story['result'] }}</div>
+                                <div class="text-xs text-gray-500">Key Result</div>
                             </div>
-                            <div class="bg-primary-50 rounded-lg p-4 text-center">
-                                <div class="text-xl font-bold text-primary-700">{{ $story['time'] }}</div>
-                                <div class="text-sm text-gray-600">Timeframe</div>
+                            <div class="bg-primary-50 rounded-lg p-2 text-center">
+                                <div class="text-sm font-black text-primary-primary">{{ $story['time'] }}</div>
+                                <div class="text-xs text-gray-500">Timeframe</div>
                             </div>
-                            <div class="bg-primary-50 rounded-lg p-4 text-center">
-                                <div class="text-xl font-bold text-primary-700">{{ $story['funding'] }}</div>
-                                <div class="text-sm text-gray-600">Funding</div>
+                            <div class="bg-primary-50 rounded-lg p-2 text-center">
+                                <div class="text-sm font-black text-primary-primary">{{ $story['funding'] }}</div>
+                                <div class="text-xs text-gray-500">Funding</div>
                             </div>
                         </div>
 
-                        <div class="read-more-content" id="content-{{ $index + 1 }}">
-                            <h4 class="font-semibold text-gray-800 mb-2">The Results</h4>
-                            <p class="text-gray-600 mb-4">{{ $story['overlay_desc'] ?? $story['description'] }}</p>
+                        <!-- Read More Content -->
+                        <div class="read-more-content" id="content-{{ $index }}">
+                            <h4 class="font-semibold text-gray-700 text-sm mb-1 mt-3">Our Solution</h4>
+                            <p class="text-gray-500 text-sm mb-3">Provided tailored funding with strategic support to
+                                achieve their growth objectives.</p>
 
-                            <div class="flex flex-wrap gap-2 mb-4">
+                            <h4 class="font-semibold text-gray-700 text-sm mb-1">The Results</h4>
+                            <p class="text-gray-500 text-sm mb-3">{{ $story['overlay_desc'] ?? $story['description'] }}
+                            </p>
+
+                            <div class="flex flex-wrap gap-1 mb-3">
                                 @foreach ($story['tags'] as $tag)
                                     <span
-                                        class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">{{ $tag }}</span>
+                                        class="px-2 py-0.5 bg-primary-100 text-primary-primary rounded-full text-xs">{{ $tag }}</span>
                                 @endforeach
                             </div>
 
-                            <div class="bg-accent-50 rounded-lg p-4 mb-4">
-                                <p class="text-accent-700 font-semibold italic">"This funding transformed our business
-                                    and helped us achieve remarkable growth in record time."</p>
-                                <p class="text-accent-600 mt-2">- Management Team</p>
+                            <div class="bg-primary-50 rounded-lg p-3 mb-2 border-l-4 border-primary-accent">
+                                <p class="text-primary-700 text-xs italic">"This funding transformed our business and
+                                    helped us achieve remarkable growth in record time."</p>
+                                <p class="text-primary-600 text-xs mt-1 font-semibold">- Management Team</p>
                             </div>
                         </div>
 
                         <button
-                            class="read-more-btn w-full py-3 border-2 border-primary-700 text-primary-700 rounded-lg font-semibold transition-all duration-300 hover:bg-primary-700 hover:text-white flex items-center justify-center gap-2"
-                            data-target="content-{{ $index + 1 }}">
+                            class="read-more-btn w-full py-2 border-2 border-primary-primary text-primary-primary rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-primary-primary hover:text-white flex items-center justify-center gap-2 mt-2"
+                            data-target="content-{{ $index }}">
                             <span>Read Full Case Study</span>
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down text-xs"></i>
                         </button>
                     </div>
                 </div>
@@ -256,10 +230,10 @@
         </div>
 
         <!-- Load More Button -->
-        <div class="text-center mt-12">
+        <div class="text-center mt-10">
             <button
-                class="px-8 py-4 bg-primary-700 text-white rounded-lg font-semibold transition-all duration-300 hover:bg-primary-800 hover:shadow-lg flex items-center gap-2 mx-auto">
-                <i class="fas fa-sync-alt"></i>
+                class="px-6 py-3 bg-primary-primary text-white rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-primary-secondary hover:shadow-lg flex items-center gap-2 mx-auto">
+                <i class="fas fa-sync-alt text-xs"></i>
                 Load More Case Studies
             </button>
         </div>
@@ -267,20 +241,19 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-16 bg-gradient-to-r from-primary-700 to-accent-500 text-white">
+<section class="py-16 bg-gradient-to-br from-primary-primary via-primary-800 to-primary-700 text-white">
     <div class="container mx-auto px-4 text-center">
-        <h2 class="text-4xl font-bold mb-6">{{ $ss->cta_heading }}</h2>
-        <p class="text-xl mb-8 max-w-2xl mx-auto">
-            {{ $ss->cta_description }}
-        </p>
+        <h2 class="text-2xl lg:text-3xl font-black mb-4">{{ $ss->cta_heading }}</h2>
+        <p class="text-white/80 mb-6 max-w-2xl mx-auto">{{ $ss->cta_description }}</p>
         <div class="flex flex-wrap gap-4 justify-center">
             <a href="{{ $ss->cta_primary_link }}"
-                class="px-8 py-4 bg-white text-primary-700 font-semibold rounded-lg transition-all duration-300 hover:bg-primary-50 hover:shadow-lg flex items-center gap-2">
+                class="px-6 py-3 bg-white text-primary-primary rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
                 <i class="fas {{ $ss->cta_primary_icon }}"></i>
                 {{ $ss->cta_primary_text }}
+                <i class="fas fa-arrow-right text-sm"></i>
             </a>
             <a href="{{ $ss->cta_secondary_link }}"
-                class="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg transition-all duration-300 hover:bg-white hover:text-primary-700 flex items-center gap-2">
+                class="px-6 py-3 border-2 border-white text-white rounded-xl font-bold hover:bg-white hover:text-primary-primary transition-all duration-300 hover:scale-105 flex items-center gap-2">
                 <i class="fas {{ $ss->cta_secondary_icon }}"></i>
                 {{ $ss->cta_secondary_text }}
             </a>
@@ -298,22 +271,20 @@
             button.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
 
-                // Update active filter button
                 filterButtons.forEach(btn => {
-                    btn.classList.remove('filter-active');
+                    btn.classList.remove('filter-active', 'bg-primary-primary',
+                        'text-white');
                     btn.classList.add('bg-gray-100', 'text-gray-700');
-                    btn.classList.remove('bg-primary-700', 'text-white');
                 });
 
-                this.classList.add('filter-active');
+                this.classList.add('filter-active', 'bg-primary-primary', 'text-white');
                 this.classList.remove('bg-gray-100', 'text-gray-700');
-                this.classList.add('bg-primary-700', 'text-white');
 
-                // Filter case studies
                 caseStudies.forEach(study => {
                     if (filter === 'all' || study.getAttribute('data-category') ===
                         filter) {
                         study.style.display = 'block';
+                        study.style.animation = 'fadeInUp 0.5s ease-out forwards';
                     } else {
                         study.style.display = 'none';
                     }
@@ -329,28 +300,19 @@
                 const targetId = this.getAttribute('data-target');
                 const content = document.getElementById(targetId);
                 const icon = this.querySelector('i');
+                const span = this.querySelector('span');
 
                 if (content.classList.contains('expanded')) {
                     content.classList.remove('expanded');
-                    this.innerHTML =
-                        '<span>Read Full Case Study</span><i class="fas fa-chevron-down"></i>';
+                    span.textContent = 'Read Full Case Study';
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
                 } else {
                     content.classList.add('expanded');
-                    this.innerHTML = '<span>Show Less</span><i class="fas fa-chevron-up"></i>';
+                    span.textContent = 'Show Less';
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
                 }
-            });
-        });
-
-        // Add hover effects to case study cards
-        caseStudies.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px)';
-                this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
             });
         });
     });

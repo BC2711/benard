@@ -1,111 +1,126 @@
 @php $cs = \App\Models\ConsultationSection::first(); @endphp
+
 <style>
-    .gradient-consultation-bg {
-        background: linear-gradient(135deg, #f8f5f0 0%, #fef8f0 100%);
-    }
-
-    .consultation-bg {
-        background: linear-gradient(135deg, #7a4603 0%, #db9123 100%);
-    }
-
     .form-input:focus {
         box-shadow: 0 0 0 3px rgba(219, 145, 35, 0.2);
+        border-color: #db9123;
     }
 </style>
 
-<section id="consultation" class="py-16 consultation-bg text-white">
+<section id="consultation" class="py-16 bg-gradient-to-br from-primary-primary via-primary-800 to-primary-700 text-white">
     <div class="container mx-auto px-4">
-        <div class="max-w-7xl mx-auto text-center mb-12">
-            <h1 class="text-5xl font-bold mb-6">{{ $cs->heading }}</h1>
-            <p class="text-xl opacity-90 leading-relaxed">{{ $cs->description }}</p>
+        <div class="max-w-7xl mx-auto text-center mb-10">
+            <div
+                class="inline-flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wider mb-5 border border-white/20">
+                <i class="fas fa-calendar-check text-xs"></i>
+                <span>Free Consultation</span>
+            </div>
+            <h1 class="text-3xl lg:text-4xl xl:text-5xl font-black mb-4">{{ $cs->heading }}</h1>
+            <div class="w-20 h-1 bg-primary-accent mx-auto rounded-full mb-5"></div>
+            <p class="text-lg text-white/80 leading-relaxed max-w-3xl mx-auto">{{ $cs->description }}</p>
         </div>
 
-        <div class="max-w-8xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div class="bg-white rounded-2xl p-8 shadow-xl">
-                <!-- Remove the ID and JavaScript event listener -->
-                <form action="{{ route('management.consultation.store') }}" method="POST" class="space-y-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+            <!-- Form Column -->
+            <div class="bg-white rounded-2xl p-6 lg:p-8 shadow-2xl">
+                <form action="{{ route('management.consultation.store') }}" method="POST" class="space-y-5">
                     @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label for="firstName" class="block text-gray-700 mb-2 font-medium">First Name</label>
+                            <label for="firstName" class="block text-primary-primary text-sm font-bold mb-2">First Name
+                                <span class="text-red-500">*</span></label>
                             <input type="text" name="first_name" id="firstName" value="{{ old('first_name') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('first_name') border-red-500 @enderror"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('first_name') border-red-500 @enderror"
                                 required>
                             @error('first_name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
-                            <label for="lastName" class="block text-gray-700 mb-2 font-medium">Last Name</label>
+                            <label for="lastName" class="block text-primary-primary text-sm font-bold mb-2">Last Name
+                                <span class="text-red-500">*</span></label>
                             <input type="text" name="last_name" id="lastName" value="{{ old('last_name') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('last_name') border-red-500 @enderror"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('last_name') border-red-500 @enderror"
                                 required>
                             @error('last_name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label for="email" class="block text-gray-700 mb-2 font-medium">Email Address</label>
+                            <label for="email" class="block text-primary-primary text-sm font-bold mb-2">Email
+                                Address <span class="text-red-500">*</span></label>
                             <input type="email" name="email" id="email" value="{{ old('email') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('email') border-red-500 @enderror"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('email') border-red-500 @enderror"
                                 required>
                             @error('email')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-
                         <div>
-                            <label for="phone" class="block text-gray-700 mb-2 font-medium">Phone Number</label>
+                            <label for="phone" class="block text-primary-primary text-sm font-bold mb-2">Phone Number
+                                <span class="text-red-500">*</span></label>
                             <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('phone') border-red-500 @enderror"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('phone') border-red-500 @enderror"
                                 required>
                             @error('phone')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label for="date" class="block text-gray-700 mb-2 font-medium">Preferred Date</label>
+                            <label for="date" class="block text-primary-primary text-sm font-bold mb-2">Preferred
+                                Date <span class="text-red-500">*</span></label>
                             <input type="date" name="preferred_date" id="date"
                                 value="{{ old('preferred_date') }}" min="{{ now()->format('Y-m-d') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('preferred_date') border-red-500 @enderror"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('preferred_date') border-red-500 @enderror"
                                 required>
                             @error('preferred_date')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-
                         <div>
-                            <label for="time" class="block text-gray-700 mb-2 font-medium">Preferred Time</label>
+                            <label for="time" class="block text-primary-primary text-sm font-bold mb-2">Preferred
+                                Time <span class="text-red-500">*</span></label>
                             <select name="preferred_time" id="time"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('preferred_time') border-red-500 @enderror"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('preferred_time') border-red-500 @enderror"
                                 required>
                                 <option value="">Select a time slot</option>
-                                <option value="09:00" {{ old('preferred_time') == '09:00' ? 'selected' : '' }}>9:00 AM</option>
-                                <option value="10:00" {{ old('preferred_time') == '10:00' ? 'selected' : '' }}>10:00 AM</option>
-                                <option value="11:00" {{ old('preferred_time') == '11:00' ? 'selected' : '' }}>11:00 AM</option>
-                                <option value="13:00" {{ old('preferred_time') == '13:00' ? 'selected' : '' }}>1:00 PM</option>
-                                <option value="14:00" {{ old('preferred_time') == '14:00' ? 'selected' : '' }}>2:00 PM</option>
-                                <option value="15:00" {{ old('preferred_time') == '15:00' ? 'selected' : '' }}>3:00 PM</option>
-                                <option value="16:00" {{ old('preferred_time') == '16:00' ? 'selected' : '' }}>4:00 PM</option>
+                                <option value="09:00" {{ old('preferred_time') == '09:00' ? 'selected' : '' }}>9:00 AM
+                                </option>
+                                <option value="10:00" {{ old('preferred_time') == '10:00' ? 'selected' : '' }}>10:00
+                                    AM</option>
+                                <option value="11:00" {{ old('preferred_time') == '11:00' ? 'selected' : '' }}>11:00
+                                    AM</option>
+                                <option value="13:00" {{ old('preferred_time') == '13:00' ? 'selected' : '' }}>1:00 PM
+                                </option>
+                                <option value="14:00" {{ old('preferred_time') == '14:00' ? 'selected' : '' }}>2:00 PM
+                                </option>
+                                <option value="15:00" {{ old('preferred_time') == '15:00' ? 'selected' : '' }}>3:00 PM
+                                </option>
+                                <option value="16:00" {{ old('preferred_time') == '16:00' ? 'selected' : '' }}>4:00 PM
+                                </option>
                             </select>
                             @error('preferred_time')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
                     <div>
-                        <label for="message" class="block text-gray-700 mb-2 font-medium">Additional Information</label>
-                        <textarea name="message" id="message" rows="4"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-500 @error('message') border-red-500 @enderror"
+                        <label for="message" class="block text-primary-primary text-sm font-bold mb-2">Additional
+                            Information</label>
+                        <textarea name="message" id="message" rows="3"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg form-input focus:outline-none focus:border-primary-secondary @error('message') border-red-500 @enderror"
                             placeholder="Tell us about your funding needs and goals...">{{ old('message') }}</textarea>
                         @error('message')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -114,65 +129,76 @@
                             data-action="consultation"></div>
                     @endif
 
-                    <button type="submit"
-                        class="w-full bg-primary-700 text-white py-4 rounded-lg font-semibold text-lg hover:bg-primary-800 transition-colors flex items-center justify-center">
-                        Schedule My Consultation
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-primary-primary text-white py-3 rounded-xl font-bold shadow-lg hover:bg-primary-secondary transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                        <i class="fas fa-calendar-check"></i>
+                        <span id="submit-text">Schedule My Consultation</span>
+                        <i class="fas fa-arrow-right text-sm"></i>
+                        <div id="loading-spinner" class="hidden">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
                     </button>
 
                     @if (session('success'))
-                        <div class="mt-4 p-4 bg-green-100 text-green-700 rounded-lg text-center">
+                        <div class="mt-4 p-3 bg-green-100 text-green-700 rounded-lg text-center text-sm">
                             {{ session('success') }}
                         </div>
                     @endif
 
-                    <p class="text-gray-500 text-sm text-center">
+                    <p class="text-gray-400 text-xs text-center">
                         By submitting this form, you agree to our <a href="#"
-                            class="text-primary-700 hover:underline">Privacy Policy</a> and consent to be contacted by
-                        our team.
+                            class="text-primary-secondary hover:underline">Privacy Policy</a> and consent to be
+                        contacted.
                     </p>
                 </form>
             </div>
 
-            <!-- Dynamic Info -->
+            <!-- Info Column -->
             <div>
-                <h2 class="text-3xl font-bold mb-6">{{ $cs->info_heading }}</h2>
+                <h2 class="text-2xl lg:text-3xl font-black mb-5">{{ $cs->info_heading }}</h2>
 
-                <div class="space-y-6 mb-8">
+                <div class="space-y-5 mb-6">
                     @foreach ($cs->benefits ?? [] as $benefit)
-                        <div class="flex items-start gap-4">
-                            <div class="bg-white bg-opacity-20 p-3 rounded-full">
-                                <i class="fas {{ $benefit['icon'] }} text-white text-xl"></i>
+                        <div class="flex items-start gap-3">
+                            <div class="bg-white/20 p-2.5 rounded-full flex-shrink-0">
+                                <i class="fas {{ $benefit['icon'] }} text-primary-accent text-lg"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-semibold mb-2">{{ $benefit['title'] }}</h3>
-                                <p class="opacity-90">{{ $benefit['description'] }}</p>
+                                <h3 class="text-lg font-bold mb-1">{{ $benefit['title'] }}</h3>
+                                <p class="text-white/70 text-sm">{{ $benefit['description'] }}</p>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <div class="bg-white bg-opacity-10 rounded-xl p-6 mb-8">
-                    <h3 class="text-xl font-semibold mb-4">{{ $cs->expect_heading }}</h3>
-                    <ul class="space-y-3">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 mb-6 border border-white/20">
+                    <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                        <i class="fas fa-list-check text-primary-accent"></i>
+                        {{ $cs->expect_heading }}
+                    </h3>
+                    <ul class="space-y-2">
                         @foreach ($cs->expectations ?? [] as $exp)
-                            <li class="flex items-center gap-3">
-                                <i class="fas fa-check-circle text-accent-500"></i>
-                                <span>{{ $exp['text'] }}</span>
+                            <li class="flex items-center gap-2 text-sm">
+                                <i class="fas fa-check-circle text-primary-accent text-xs"></i>
+                                <span class="text-white/80">{{ $exp['text'] }}</span>
                             </li>
                         @endforeach
                     </ul>
                 </div>
 
-                <div class="bg-white rounded-xl p-6 text-primary-700">
-                    <h3 class="text-xl font-semibold mb-2">{{ $cs->contact_heading }}</h3>
-                    <p class="mb-4">{{ $cs->contact_description }}</p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="tel:{{ $cs->phone }}"
-                            class="flex items-center gap-2 text-primary-700 hover:text-primary-800">
+                <div class="bg-white rounded-xl p-5 shadow-lg">
+                    <h3 class="text-lg font-bold text-primary-primary mb-2 flex items-center gap-2">
+                        <i class="fas fa-headset text-primary-secondary"></i>
+                        {{ $cs->contact_heading }}
+                    </h3>
+                    <p class="text-gray-500 text-sm mb-3">{{ $cs->contact_description }}</p>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="tel:{{ preg_replace('/\D/', '', $cs->phone) }}"
+                            class="flex items-center gap-2 text-primary-primary hover:text-primary-secondary transition text-sm font-semibold">
                             <i class="fas fa-phone"></i> <span>{{ $cs->phone }}</span>
                         </a>
                         <a href="mailto:{{ $cs->email }}"
-                            class="flex items-center gap-2 text-primary-700 hover:text-primary-800">
+                            class="flex items-center gap-2 text-primary-primary hover:text-primary-secondary transition text-sm font-semibold">
                             <i class="fas fa-envelope"></i> <span>{{ $cs->email }}</span>
                         </a>
                     </div>
@@ -184,104 +210,58 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('consultation-form');
+        const form = document.querySelector('#consultation form');
 
-        if (!form) {
-            console.error('Consultation form not found');
-            return;
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = document.getElementById('submitBtn');
+                const submitText = document.getElementById('submit-text');
+                const spinner = document.getElementById('loading-spinner');
+
+                if (submitBtn && submitText && spinner) {
+                    submitBtn.disabled = true;
+                    submitText.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                }
+            });
         }
-
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const errorMessageEl = document.getElementById('error-message');
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const submitText = document.getElementById('submit-text');
-            const spinner = document.getElementById('loading-spinner');
-
-            // Reset previous messages
-            if (errorMessageEl) {
-                errorMessageEl.textContent = '';
-                errorMessageEl.className = 'error-message text-sm mt-4 p-3 rounded-lg hidden';
-            }
-
-            // Show loading
-            submitBtn.disabled = true;
-            if (submitText) submitText.classList.add('hidden');
-            if (spinner) spinner.classList.remove('hidden');
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: new FormData(form),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    // Success - show message but don't reset form immediately
-                    if (errorMessageEl) {
-                        errorMessageEl.textContent = data.message || 'Thank you! We\'ll contact you soon.';
-                        errorMessageEl.className = 'error-message bg-green-100 text-green-700 p-3 rounded-lg block';
-                    }
-                    
-                    // Optionally reset form after successful submission
-                    setTimeout(() => {
-                        form.reset();
-                    }, 2000);
-                    
-                } else {
-                    // Validation or server error
-                    let errorMsg = data.message || 'Please fix the errors below.';
-                    if (data.errors) {
-                        errorMsg = Object.values(data.errors).flat().join('<br>');
-                    }
-                    if (errorMessageEl) {
-                        errorMessageEl.innerHTML = errorMsg;
-                        errorMessageEl.className = 'error-message bg-red-100 text-red-700 p-3 rounded-lg block';
-                    }
-                }
-            } catch (error) {
-                console.error('Submission error:', error);
-                if (errorMessageEl) {
-                    errorMessageEl.textContent = 'An error occurred. Please try again or contact us directly.';
-                    errorMessageEl.className = 'error-message bg-red-100 text-red-700 p-3 rounded-lg block';
-                }
-            } finally {
-                // Hide loading
-                submitBtn.disabled = false;
-                if (submitText) submitText.classList.remove('hidden');
-                if (spinner) spinner.classList.add('hidden');
-            }
-        });
     });
 </script>
+
 <style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .form-input {
         background-color: white;
-        color: #374151; /* gray-700 */
-        border: 1px solid #d1d5db; /* gray-300 */
+        color: #374151;
+        border: 1px solid #d1d5db;
+        transition: all 0.3s ease;
     }
 
     .form-input:focus {
         outline: none;
-        border-color: #3b82f6; /* primary-500 */
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #db9123;
+        box-shadow: 0 0 0 3px rgba(219, 145, 35, 0.1);
     }
 
-    /* Ensure text is visible in all states */
-    input, textarea, select {
+    input,
+    textarea,
+    select {
         color: #374151 !important;
     }
 
-    /* Remove any potential overlays blocking input */
-    .consultation-bg * {
-        position: relative;
-        z-index: 1;
+    input::placeholder,
+    textarea::placeholder {
+        color: #9ca3af !important;
     }
 </style>
