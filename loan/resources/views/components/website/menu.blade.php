@@ -1,227 +1,94 @@
-<!-- Header -->
-<header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" role="banner">
-    <div class="bg-white/95 backdrop-blur-lg shadow-md border-b border-primary-100">
-        <div class="container mx-auto px-4 lg:px-8">
-            <div class="flex items-center justify-between h-16 lg:h-20">
-
-                <!-- Logo Section -->
-                <a href="/" class="flex items-center gap-2 group" aria-label="Londa Loans Homepage">
-                    <div class="relative">
-                        <div
-                            class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-primary-primary to-primary-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                            <img src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans Logo"
-                                class="w-full h-full object-cover rounded-xl">
-                        </div>
-                        <div
-                            class="absolute -inset-1 bg-gradient-to-r from-primary-primary to-primary-secondary rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300">
-                        </div>
-                    </div>
-                    <div class="flex flex-col">
-                        <div class="flex items-baseline gap-0.5">
-                            <span class="text-xl lg:text-2xl font-black text-primary-primary">Londa</span>
-                            <span class="text-xl lg:text-2xl font-black text-primary-secondary">Loans</span>
-                        </div>
-                        <div class="hidden lg:flex items-center gap-1 text-xs">
-                            <span class="text-primary-secondary font-semibold">Ma Loans Yama Londa!</span>
-                            <span class="text-primary-primary/40">•</span>
-                            <span class="text-primary-primary/60">empowering marketeers</span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Desktop Navigation -->
-                <nav class="hidden lg:flex items-center gap-6" role="navigation" aria-label="Main navigation">
-                    <a href="/" class="nav-link text-primary-primary font-semibold relative group">
-                        Home
-                        <span
-                            class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary-secondary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></span>
-                    </a>
-                    <a href="/#about"
-                        class="nav-link text-gray-600 hover:text-primary-primary font-medium transition-colors duration-300">
-                        About
-                    </a>
-                    <a href="/#features"
-                        class="nav-link text-gray-600 hover:text-primary-primary font-medium transition-colors duration-300">
-                        Features
-                    </a>
-                    <a href="/#services"
-                        class="nav-link text-gray-600 hover:text-primary-primary font-medium transition-colors duration-300">
-                        Services
-                    </a>
-                    <a href="/#support"
-                        class="nav-link text-gray-600 hover:text-primary-primary font-medium transition-colors duration-300">
-                        Contact
-                    </a>
-                </nav>
-
-                <!-- Desktop Actions -->
-                <div class="hidden lg:flex items-center gap-3">
-                    <a href="{{ route('login') }}"
-                        class="bg-primary-primary text-white px-5 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-primary-secondary transition-all duration-300 hover:scale-105 flex items-center gap-2">
-                        <i class="fas fa-sign-in-alt text-sm"></i>
-                        <span>Sign In</span>
-                    </a>
+<header id="header" class="fixed inset-x-0 top-0 z-50 px-3 pt-3 lg:px-6" role="banner">
+    <div data-premium-nav class="premium-nav mx-auto max-w-7xl rounded-2xl transition-all duration-300">
+        <div class="flex h-16 items-center justify-between px-4 lg:h-18 lg:px-5">
+            <a href="/" class="group flex items-center gap-3" aria-label="Londa Loans Homepage">
+                <div class="relative grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-slate-900/10">
+                    <img src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans Logo"
+                        class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-amber-400/20"></div>
                 </div>
+                <div class="leading-none">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-xl font-black tracking-tight text-slate-950">Londa</span>
+                        <span class="text-xl font-black tracking-tight text-cyan-700">Loans</span>
+                    </div>
+                    <div class="mt-1 hidden items-center gap-2 text-xs font-semibold text-slate-500 sm:flex">
+                        <span class="text-amber-600">Ma Loans Yama Londas!</span>
+                        <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                        <span>empowering marketeers</span>
+                    </div>
+                </div>
+            </a>
 
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-button"
-                    class="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 relative group"
-                    aria-label="Toggle navigation" aria-expanded="false">
-                    <span class="w-6 h-0.5 bg-primary-primary rounded-full transition-all duration-300"></span>
-                    <span class="w-6 h-0.5 bg-primary-primary rounded-full transition-all duration-300"></span>
-                    <span class="w-6 h-0.5 bg-primary-primary rounded-full transition-all duration-300"></span>
-                </button>
+            <nav class="hidden items-center gap-8 text-sm font-bold lg:flex" role="navigation" aria-label="Main navigation">
+                <a href="/" class="premium-link">Home</a>
+                <a href="/#about" class="premium-link">About</a>
+                <a href="/#features" class="premium-link">Features</a>
+                <a href="/#services" class="premium-link">Services</a>
+                <a href="/calculator" class="premium-link">Calculator</a>
+                <a href="/#support" class="premium-link">Contact</a>
+            </nav>
+
+            <div class="hidden items-center gap-3 lg:flex">
+                <a href="/consultation" class="premium-btn-secondary px-5 text-sm">
+                    <i class="fas fa-calendar-check text-cyan-700"></i>
+                    <span>Consultation</span>
+                </a>
+                <a href="{{ route('login') }}" class="premium-btn px-5 text-sm">
+                    <i class="fas fa-lock text-xs"></i>
+                    <span>Sign In</span>
+                </a>
             </div>
+
+            <button data-mobile-menu-button
+                class="group grid h-11 w-11 place-items-center rounded-2xl bg-white/80 text-slate-900 shadow-sm ring-1 ring-slate-900/10 transition hover:bg-white lg:hidden"
+                aria-label="Toggle navigation" aria-expanded="false">
+                <span class="relative h-4 w-5">
+                    <span class="absolute left-0 top-0 h-0.5 w-5 rounded-full bg-current transition group-aria-expanded:top-1.5 group-aria-expanded:rotate-45"></span>
+                    <span class="absolute left-0 top-1.5 h-0.5 w-5 rounded-full bg-current transition group-aria-expanded:opacity-0"></span>
+                    <span class="absolute left-0 top-3 h-0.5 w-5 rounded-full bg-current transition group-aria-expanded:top-1.5 group-aria-expanded:-rotate-45"></span>
+                </span>
+            </button>
         </div>
 
-        <!-- Mobile Navigation Menu -->
-        <div id="mobile-menu"
-            class="lg:hidden bg-white/98 backdrop-blur-lg border-t border-primary-100 shadow-xl transform origin-top transition-all duration-300 scale-y-0 opacity-0 absolute top-full left-0 right-0">
-            <div class="container mx-auto px-4 py-5">
-                <nav class="flex flex-col gap-2">
-                    <a href="/"
-                        class="flex items-center gap-3 p-3 rounded-xl bg-primary-50 text-primary-primary font-semibold border-l-4 border-primary-secondary">
-                        <i class="fas fa-home text-primary-secondary w-5"></i>
-                        <span>Home</span>
-                    </a>
-                    <a href="/#about"
-                        class="flex items-center gap-3 p-3 rounded-xl text-gray-600 hover:text-primary-primary hover:bg-primary-50 transition-all duration-300">
-                        <i class="fas fa-info-circle text-gray-400 w-5"></i>
-                        <span>About</span>
-                    </a>
-                    <a href="/#features"
-                        class="flex items-center gap-3 p-3 rounded-xl text-gray-600 hover:text-primary-primary hover:bg-primary-50 transition-all duration-300">
-                        <i class="fas fa-star text-gray-400 w-5"></i>
-                        <span>Features</span>
-                    </a>
-                    <a href="/#services"
-                        class="flex items-center gap-3 p-3 rounded-xl text-gray-600 hover:text-primary-primary hover:bg-primary-50 transition-all duration-300">
-                        <i class="fas fa-hand-holding-usd text-gray-400 w-5"></i>
-                        <span>Services</span>
-                    </a>
-                    <a href="/#support"
-                        class="flex items-center gap-3 p-3 rounded-xl text-gray-600 hover:text-primary-primary hover:bg-primary-50 transition-all duration-300">
-                        <i class="fas fa-envelope text-gray-400 w-5"></i>
-                        <span>Contact</span>
-                    </a>
-                </nav>
+        <div data-mobile-menu class="premium-mobile-panel absolute left-3 right-3 top-[82px] rounded-3xl border border-white/80 bg-white/95 p-4 shadow-2xl backdrop-blur-2xl lg:hidden">
+            <nav class="grid gap-2 text-sm font-bold text-slate-700" aria-label="Mobile navigation">
+                <a href="/" class="flex items-center gap-3 rounded-2xl bg-cyan-50 px-4 py-3 text-cyan-800">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/#about" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                    <i class="fas fa-building-columns w-5 text-slate-400"></i>
+                    <span>About</span>
+                </a>
+                <a href="/#features" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                    <i class="fas fa-star w-5 text-slate-400"></i>
+                    <span>Features</span>
+                </a>
+                <a href="/#services" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                    <i class="fas fa-hand-holding-dollar w-5 text-slate-400"></i>
+                    <span>Services</span>
+                </a>
+                <a href="/calculator" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                    <i class="fas fa-calculator w-5 text-slate-400"></i>
+                    <span>Calculator</span>
+                </a>
+                <a href="/#support" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                    <i class="fas fa-envelope w-5 text-slate-400"></i>
+                    <span>Contact</span>
+                </a>
+            </nav>
 
-                <!-- Mobile Actions -->
-                <div class="mt-5 pt-5 border-t border-primary-100">
-                    <a href="{{ route('login') }}"
-                        class="w-full bg-primary-primary text-white py-3 rounded-xl font-semibold shadow-md hover:bg-primary-secondary transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>Sign In</span>
-                    </a>
-                </div>
+            <div class="mt-4 grid gap-3 border-t border-slate-200 pt-4">
+                <a href="/consultation" class="premium-btn-secondary px-5 text-sm">
+                    <i class="fas fa-calendar-check text-cyan-700"></i>
+                    <span>Book Consultation</span>
+                </a>
+                <a href="{{ route('login') }}" class="premium-btn px-5 text-sm">
+                    <i class="fas fa-lock text-xs"></i>
+                    <span>Sign In</span>
+                </a>
             </div>
         </div>
     </div>
 </header>
-
-<style>
-    /* Nav link styles */
-    .nav-link {
-        position: relative;
-        transition: color 0.3s ease;
-    }
-
-    /* Header scroll effect */
-    .header-scrolled {
-        background: rgba(255, 255, 255, 0.98);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    /* Mobile menu animation */
-    #mobile-menu-button[aria-expanded="true"] span:first-child {
-        transform: translateY(7px) rotate(45deg);
-    }
-
-    #mobile-menu-button[aria-expanded="true"] span:nth-child(2) {
-        opacity: 0;
-    }
-
-    #mobile-menu-button[aria-expanded="true"] span:last-child {
-        transform: translateY(-7px) rotate(-45deg);
-    }
-
-    /* Scale Y animation for mobile menu */
-    .scale-y-0 {
-        transform: scaleY(0);
-    }
-
-    .scale-y-100 {
-        transform: scaleY(1);
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Mobile menu toggle
-        const menuBtn = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        if (menuBtn && mobileMenu) {
-            menuBtn.addEventListener('click', function() {
-                const expanded = this.getAttribute('aria-expanded') === 'true' ? false : true;
-                this.setAttribute('aria-expanded', expanded);
-
-                if (expanded) {
-                    mobileMenu.classList.remove('scale-y-0', 'opacity-0');
-                    mobileMenu.classList.add('scale-y-100', 'opacity-100');
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    mobileMenu.classList.remove('scale-y-100', 'opacity-100');
-                    mobileMenu.classList.add('scale-y-0', 'opacity-0');
-                    document.body.style.overflow = '';
-                }
-            });
-
-            // Close mobile menu when clicking a link
-            const mobileLinks = mobileMenu.querySelectorAll('a');
-            mobileLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    menuBtn.setAttribute('aria-expanded', 'false');
-                    mobileMenu.classList.remove('scale-y-100', 'opacity-100');
-                    mobileMenu.classList.add('scale-y-0', 'opacity-0');
-                    document.body.style.overflow = '';
-                });
-            });
-        }
-
-        // Header scroll effect
-        const header = document.getElementById('header');
-        let lastScroll = 0;
-
-        window.addEventListener('scroll', function() {
-            const currentScroll = window.pageYOffset;
-
-            if (currentScroll > 50) {
-                header.classList.add('header-scrolled');
-                if (currentScroll > lastScroll && currentScroll > 100) {
-                    header.style.transform = 'translateY(-100%)';
-                } else {
-                    header.style.transform = 'translateY(0)';
-                }
-            } else {
-                header.classList.remove('header-scrolled');
-                header.style.transform = 'translateY(0)';
-            }
-            lastScroll = currentScroll;
-        });
-
-        // Close mobile menu on window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 1024) {
-                if (mobileMenu) {
-                    mobileMenu.classList.remove('scale-y-100', 'opacity-100');
-                    mobileMenu.classList.add('scale-y-0', 'opacity-0');
-                    document.body.style.overflow = '';
-                }
-                if (menuBtn) {
-                    menuBtn.setAttribute('aria-expanded', 'false');
-                }
-            }
-        });
-    });
-</script>

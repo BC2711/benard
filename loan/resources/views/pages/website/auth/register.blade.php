@@ -156,7 +156,7 @@
             padding: 3rem;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;           
+            justify-content: flex-start;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -554,7 +554,8 @@
             <div class="logo">
                 <div class="logo-icon">
                     <span style="color: #db9123; font-weight: bold; font-size: 1.2rem;">
-                       <img height="40"  width="40" src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans Logo" />
+                        <img height="40" width="40" src="{{ asset('assets/logos/londa.jpg') }}"
+                            alt="Londa Loans Logo" />
                     </span>
                 </div>
                 <div class="logo-text">
@@ -600,7 +601,7 @@
         <!-- Right Side: Registration Form -->
         <div class="register-right">
             <div class="back-to-login">
-                <a href="{{route('login')}}" class="back-link">
+                <a href="{{ route('login') }}" class="back-link">
                     <i class="fas fa-arrow-left"></i>
                     Back to Login
                 </a>
@@ -611,7 +612,7 @@
                 <p>Fill in your details to get started with Londa Loans</p>
             </div>
 
-            <form class="register-form" id="registerForm" method="POST" action="{{route('login')}}"
+            <form class="register-form" id="registerForm" method="post" action="{{ route('register') }}"
                 enctype="multipart/form-data">
                 @csrf
 
@@ -761,7 +762,7 @@
                 </button>
 
                 <div class="login-link">
-                    Already have an account? <a href="{{route('login')}}">Sign in here</a>
+                    Already have an account? <a href="{{ route('login') }}">Sign in here</a>
                 </div>
             </form>
         </div>
@@ -851,34 +852,89 @@
 
             // Real-time validation
             const formInputs = [firstNameInput, lastNameInput, emailInput, phoneInput, dobInput,
-                confirmPasswordInput, termsInput
+                passwordInput, confirmPasswordInput, termsInput
             ]
             formInputs.forEach((input) => {
                 input.addEventListener('input', function() {
-                    validateField(this)
+                    if (this.id !== 'password') {
+                        validateField(this)
+                    }
                     validateForm()
                     saveFormData()
                 })
             })
 
-            // Form submission
-            registerForm.addEventListener('submit', function(event) {
+            // Form submission - FIXED VERSION
+            registerForm.addEventListener('submit', async function(event) {
                 event.preventDefault()
 
-                if (validateForm()) {
-                    // Show loading state
-                    registerButton.disabled = true
-                    registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...'
-
-                    // Simulate API call
-                    setTimeout(() => {
-                        // Clear saved form data on successful submission
-                        clearFormData()
-                        // Success - redirect to login page
-                        window.location.href = "{{route('login')}}"
-                    }, 2000)
+                if (!validateForm()) {
+                    // Scroll to first error
+                    const firstError = document.querySelector(
+                    '.error-message[style*="display: block"]');
+                    if (firstError) {
+                        firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                    return;
                 }
-            })
+
+                // Show loading state
+                registerButton.disabled = true
+                registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...'
+
+                try {
+                    // Create FormData object for file upload
+                    const formData = new FormData(registerForm);
+
+                    // Send the actual request to your backend
+                    const response = await fetch(registerForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        // Show success message
+                        showSuccessNotification(data.message || 'Registration successful!');
+
+                        // Clear saved form data on successful submission
+                        clearFormData();
+
+                        // Redirect to login page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = data.redirect || '{{ route('login') }}';
+                        }, 2000);
+                    } else {
+                        // Handle validation errors from server
+                        if (data.errors) {
+                            displayServerErrors(data.errors);
+                        } else if (data.message) {
+                            showErrorNotification(data.message);
+                        } else {
+                            showErrorNotification('Registration failed. Please try again.');
+                        }
+
+                        // Re-enable the submit button
+                        registerButton.disabled = false;
+                        registerButton.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showErrorNotification('Network error. Please check your connection and try again.');
+
+                    // Re-enable the submit button
+                    registerButton.disabled = false;
+                    registerButton.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+                }
+            });
 
             function validateField(field) {
                 const fieldId = field.id
@@ -893,31 +949,31 @@
                         if (value.length < 2) {
                             field.classList.add('error')
                             return false
-                        } else {
+                        } else if (value.length > 0) {
                             field.classList.add('success')
                             return true
                         }
-                        break
+                        return false
 
                     case 'email':
                         if (!validateEmail(value)) {
                             field.classList.add('error')
                             return false
-                        } else {
+                        } else if (value) {
                             field.classList.add('success')
                             return true
                         }
-                        break
+                        return false
 
                     case 'phone_number':
                         if (!validatePhone(value)) {
                             field.classList.add('error')
                             return false
-                        } else {
+                        } else if (value) {
                             field.classList.add('success')
                             return true
                         }
-                        break
+                        return false
 
                     case 'date_of_birth':
                         if (!value) {
@@ -933,7 +989,6 @@
                                 return true
                             }
                         }
-                        break
 
                     case 'confirm_password':
                         if (value !== passwordInput.value) {
@@ -943,7 +998,7 @@
                             field.classList.add('success')
                             return true
                         }
-                        break
+                        return false
 
                     case 'terms':
                         if (!field.checked) {
@@ -951,7 +1006,6 @@
                         } else {
                             return true
                         }
-                        break
                 }
 
                 return true
@@ -991,6 +1045,7 @@
                     strengthText.textContent = 'Password strength'
                     strengthText.style.color = 'var(--text-light)'
                     passwordInput.classList.remove('success', 'error')
+                    return 0
                 } else if (strength <= 1) {
                     passwordStrength.classList.add('strength-weak')
                     strengthText.textContent = 'Weak password'
@@ -1047,11 +1102,17 @@
                 if (!validateEmail(emailInput.value.trim())) {
                     showError('emailError', 'Please enter a valid email address')
                     isValid = false
+                } else if (!emailInput.value.trim()) {
+                    showError('emailError', 'Please enter your email address')
+                    isValid = false
                 }
 
                 // Validate phone number
                 if (!validatePhone(phoneInput.value.trim())) {
                     showError('phoneError', 'Please enter a valid phone number')
+                    isValid = false
+                } else if (!phoneInput.value.trim()) {
+                    showError('phoneError', 'Please enter your phone number')
                     isValid = false
                 }
 
@@ -1067,18 +1128,23 @@
                     }
                 }
 
-                // Validate password strength
-                const strength = checkPasswordStrength(passwordInput.value)
-                if (strength < 3 && passwordInput.value) {
-                    showError('passwordError', 'Please choose a stronger password')
-                    isValid = false
-                } else if (!passwordInput.value) {
+                // Validate password
+                if (!passwordInput.value) {
                     showError('passwordError', 'Please enter a password')
                     isValid = false
+                } else {
+                    const strength = checkPasswordStrength(passwordInput.value)
+                    if (strength < 3) {
+                        showError('passwordError', 'Please choose a stronger password (at least medium strength)')
+                        isValid = false
+                    }
                 }
 
                 // Validate password confirmation
-                if (passwordInput.value !== confirmPasswordInput.value) {
+                if (!confirmPasswordInput.value) {
+                    showError('confirmPasswordError', 'Please confirm your password')
+                    isValid = false
+                } else if (passwordInput.value !== confirmPasswordInput.value) {
                     showError('confirmPasswordError', 'Passwords do not match')
                     isValid = false
                 }
@@ -1101,7 +1167,7 @@
             }
 
             function validatePhone(phone) {
-                const re = /^[\+]?[1-9][\d]{0,15}$/
+                const re = /^[\+]?[0-9]{10,15}$/
                 return re.test(String(phone).replace(/\D/g, ''))
             }
 
@@ -1121,6 +1187,100 @@
                 errorElements.forEach((element) => {
                     element.style.display = 'none'
                 })
+            }
+
+            function displayServerErrors(errors) {
+                hideAllErrors();
+
+                for (const [field, messages] of Object.entries(errors)) {
+                    let errorElementId;
+                    switch (field) {
+                        case 'first_name':
+                            errorElementId = 'firstNameError';
+                            break;
+                        case 'last_name':
+                            errorElementId = 'lastNameError';
+                            break;
+                        case 'email':
+                            errorElementId = 'emailError';
+                            break;
+                        case 'phone_number':
+                            errorElementId = 'phoneError';
+                            break;
+                        case 'date_of_birth':
+                            errorElementId = 'dobError';
+                            break;
+                        case 'profile_picture':
+                            errorElementId = 'fileError';
+                            break;
+                        case 'password':
+                            errorElementId = 'passwordError';
+                            break;
+                        case 'confirm_password':
+                            errorElementId = 'confirmPasswordError';
+                            break;
+                        case 'terms':
+                            errorElementId = 'termsError';
+                            break;
+                        default:
+                            continue;
+                    }
+                    showError(errorElementId, Array.isArray(messages) ? messages[0] : messages);
+                }
+            }
+
+            function showSuccessNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'success-notification';
+                notification.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            `;
+                notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #2ecc71;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            function showErrorNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'error-notification';
+                notification.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            `;
+                notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #e74c3c;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
             }
 
             // Form data persistence functions
@@ -1154,9 +1314,21 @@
                 localStorage.removeItem('londaLoansRegistration')
             }
 
-            // Demo functionality
-            console.log('Registration Page Loaded')
-            console.log('This page allows users to create a new account with comprehensive validation.')
+            // Add CSS animation for notifications
+            const style = document.createElement('style');
+            style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+            document.head.appendChild(style);
         })
     </script>
 </body>

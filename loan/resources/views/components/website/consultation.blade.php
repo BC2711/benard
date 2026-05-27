@@ -1,4 +1,25 @@
-@php $cs = \App\Models\ConsultationSection::first(); @endphp
+@php
+    $cs = \App\Models\ConsultationSection::firstOrNew([], [
+        'heading' => 'Book a lending consultation',
+        'description' => 'Tell us what you want to grow. We will help you understand loan options, repayment plans, and the next best step.',
+        'info_heading' => 'Designed for confident decisions',
+        'benefits' => [
+            ['icon' => 'fa-bolt', 'title' => 'Fast review', 'description' => 'A focused conversation around your exact funding need.'],
+            ['icon' => 'fa-chart-line', 'title' => 'Clear repayment view', 'description' => 'Understand affordability before you apply.'],
+            ['icon' => 'fa-shield-halved', 'title' => 'Transparent guidance', 'description' => 'No confusing fine print or pressure.'],
+        ],
+        'expect_heading' => 'What to expect',
+        'expectations' => [
+            ['text' => 'A quick review of your business goals'],
+            ['text' => 'Loan amount and repayment recommendations'],
+            ['text' => 'Clear next steps from the Londa Loans team'],
+        ],
+        'contact_heading' => 'Need help now?',
+        'contact_description' => 'Reach our team directly and we will point you in the right direction.',
+        'phone' => '+260 965508033',
+        'email' => 'binesschama1127@gmail.com',
+    ]);
+@endphp
 
 <style>
     .form-input:focus {
@@ -7,24 +28,23 @@
     }
 </style>
 
-<section id="consultation" class="py-16 bg-gradient-to-br from-primary-primary via-primary-800 to-primary-700 text-white">
-    <div class="container mx-auto px-4">
-        <div class="max-w-7xl mx-auto text-center mb-10">
+<section id="consultation" class="relative overflow-hidden py-20 text-white premium-hero">
+    <div class="premium-shell relative z-10">
+        <div class="premium-reveal mx-auto mb-12 max-w-4xl text-center">
             <div
-                class="inline-flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wider mb-5 border border-white/20">
+                class="premium-eyebrow border-white/15 bg-white/10 text-cyan-100">
                 <i class="fas fa-calendar-check text-xs"></i>
                 <span>Free Consultation</span>
             </div>
-            <h1 class="text-3xl lg:text-4xl xl:text-5xl font-black mb-4">{{ $cs->heading }}</h1>
-            <div class="w-20 h-1 bg-primary-accent mx-auto rounded-full mb-5"></div>
-            <p class="text-lg text-white/80 leading-relaxed max-w-3xl mx-auto">{{ $cs->description }}</p>
+            <h1 class="mt-5 text-4xl font-black tracking-tight lg:text-6xl">{{ $cs->heading }}</h1>
+            <p class="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-200">{{ $cs->description }}</p>
         </div>
 
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1.05fr_0.95fr]">
 
             <!-- Form Column -->
-            <div class="bg-white rounded-2xl p-6 lg:p-8 shadow-2xl">
-                <form action="{{ route('management.consultation.store') }}" method="POST" class="space-y-5">
+            <div class="premium-card premium-reveal rounded-[2rem] bg-white p-6 lg:p-8">
+                <form action="{{ route('consultation.store') }}" method="POST" class="space-y-5">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -130,7 +150,7 @@
                     @endif
 
                     <button type="submit" id="submitBtn"
-                        class="w-full bg-primary-primary text-white py-3 rounded-xl font-bold shadow-lg hover:bg-primary-secondary transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                        class="premium-btn w-full py-3">
                         <i class="fas fa-calendar-check"></i>
                         <span id="submit-text">Schedule My Consultation</span>
                         <i class="fas fa-arrow-right text-sm"></i>
@@ -154,51 +174,51 @@
             </div>
 
             <!-- Info Column -->
-            <div>
-                <h2 class="text-2xl lg:text-3xl font-black mb-5">{{ $cs->info_heading }}</h2>
+            <div class="premium-reveal">
+                <h2 class="text-3xl font-black tracking-tight lg:text-4xl">{{ $cs->info_heading }}</h2>
 
-                <div class="space-y-5 mb-6">
+                <div class="premium-stagger my-7 space-y-4">
                     @foreach ($cs->benefits ?? [] as $benefit)
-                        <div class="flex items-start gap-3">
-                            <div class="bg-white/20 p-2.5 rounded-full flex-shrink-0">
-                                <i class="fas {{ $benefit['icon'] }} text-primary-accent text-lg"></i>
+                        <div class="flex items-start gap-4 rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl">
+                            <div class="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+                                <i class="fas {{ $benefit['icon'] }} text-amber-300 text-lg"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold mb-1">{{ $benefit['title'] }}</h3>
-                                <p class="text-white/70 text-sm">{{ $benefit['description'] }}</p>
+                                <h3 class="text-lg font-black">{{ $benefit['title'] }}</h3>
+                                <p class="mt-1 text-sm leading-6 text-slate-300">{{ $benefit['description'] }}</p>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 mb-6 border border-white/20">
+                <div class="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl mb-6">
                     <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
-                        <i class="fas fa-list-check text-primary-accent"></i>
+                        <i class="fas fa-list-check text-amber-300"></i>
                         {{ $cs->expect_heading }}
                     </h3>
                     <ul class="space-y-2">
                         @foreach ($cs->expectations ?? [] as $exp)
                             <li class="flex items-center gap-2 text-sm">
-                                <i class="fas fa-check-circle text-primary-accent text-xs"></i>
-                                <span class="text-white/80">{{ $exp['text'] }}</span>
+                                <i class="fas fa-check-circle text-amber-300 text-xs"></i>
+                                <span class="text-slate-200">{{ $exp['text'] }}</span>
                             </li>
                         @endforeach
                     </ul>
                 </div>
 
-                <div class="bg-white rounded-xl p-5 shadow-lg">
-                    <h3 class="text-lg font-bold text-primary-primary mb-2 flex items-center gap-2">
-                        <i class="fas fa-headset text-primary-secondary"></i>
+                <div class="rounded-3xl bg-white p-5 shadow-2xl">
+                    <h3 class="text-lg font-black text-slate-950 mb-2 flex items-center gap-2">
+                        <i class="fas fa-headset text-cyan-700"></i>
                         {{ $cs->contact_heading }}
                     </h3>
-                    <p class="text-gray-500 text-sm mb-3">{{ $cs->contact_description }}</p>
+                    <p class="text-slate-500 text-sm mb-3">{{ $cs->contact_description }}</p>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <a href="tel:{{ preg_replace('/\D/', '', $cs->phone) }}"
-                            class="flex items-center gap-2 text-primary-primary hover:text-primary-secondary transition text-sm font-semibold">
+                            class="flex items-center gap-2 text-cyan-800 hover:text-cyan-600 transition text-sm font-semibold">
                             <i class="fas fa-phone"></i> <span>{{ $cs->phone }}</span>
                         </a>
                         <a href="mailto:{{ $cs->email }}"
-                            class="flex items-center gap-2 text-primary-primary hover:text-primary-secondary transition text-sm font-semibold">
+                            class="flex items-center gap-2 text-cyan-800 hover:text-cyan-600 transition text-sm font-semibold">
                             <i class="fas fa-envelope"></i> <span>{{ $cs->email }}</span>
                         </a>
                     </div>

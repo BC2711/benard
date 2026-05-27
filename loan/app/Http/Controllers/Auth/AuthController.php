@@ -10,65 +10,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, User $user)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(User $user)
-    {
-        //
-    }
-
     /**
      * Show the login form.
      */
@@ -81,6 +26,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // dd($request->all());
         $maxAttempts = 5;
         $validatedData = $request->validate([
             'email' => 'required|email',
@@ -150,7 +96,7 @@ class AuthController extends Controller
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
             ]);
-            return back()->withErrors(['email' => 'An unexpected error occurred. Please try again later.'.$th->getMessage()]);
+            return back()->withErrors(['email' => 'An unexpected error occurred. Please try again later.' . $th->getMessage()]);
         }
     }
 
@@ -171,6 +117,123 @@ class AuthController extends Controller
         return view('pages.website.auth.register');
     }
 
+    public function register(Request $request)
+    {
+        // dd($request->all());
+        // Validate the request data
+        $validated = $request->validate([
+            'first_name' => 'required|string|min:2|max:255',
+            'last_name' => 'required|string|min:2|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone_number' => 'required|string|max:20|unique:users,phone',
+            'date_of_birth' => 'required|date|before:-18 years',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+            'password' => 'required|string|min:8',
+            'confirm_password' => 'required|same:password',
+            'terms' => 'accepted',
+        ], [
+            'first_name.required' => 'Please enter your first name',
+            'first_name.min' => 'First name must be at least 2 characters',
+            'last_name.required' => 'Please enter your last name',
+            'last_name.min' => 'Last name must be at least 2 characters',
+            'email.required' => 'Please enter your email address',
+            'email.email' => 'Please enter a valid email address',
+            'email.unique' => 'This email is already registered',
+            'phone_number.required' => 'Please enter your phone number',
+            'phone_number.unique' => 'This phone number is already registered',
+            'date_of_birth.required' => 'Please enter your date of birth',
+            'date_of_birth.before' => 'You must be at least 18 years old',
+            'password.required' => 'Please enter a password',
+            'password.min' => 'Password must be at least 8 characters',
+            // 'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+            'confirm_password.same' => 'Passwords do not match',
+            'terms.accepted' => 'You must agree to the terms and conditions',
+            'profile_picture.image' => 'Please upload a valid image file',
+            'profile_picture.mimes' => 'Profile picture must be a JPEG, PNG, GIF, or WebP file',
+            'profile_picture.max' => 'Profile picture must be less than 5MB',
+        ]);
+
+        try {
+            // Handle profile picture upload
+            $profilePicturePath = null;
+            if ($request->hasFile('profile_picture')) {
+                $file = $request->file('profile_picture');
+                $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $profilePicturePath = $file->storeAs('profile_pictures', $fileName, 'public');
+            }
+
+            // Create the user
+            $user = User::create([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone_number'],
+                'date_of_birth' => $validated['date_of_birth'],
+                'profile_picture' => $profilePicturePath,
+                'password' => Hash::make($validated['password']),
+                'username'=>$validated['email'], // Using email as username for simplicity
+                // 'username' => $this->generateUsername($validated['first_name'], $validated['last_name']),
+                'role' => 'ADMIN', // Default role for new registrations
+                'status' => 'ACTIVE', // Or 'ACTIVE' if email verification is not required
+                'attempts' => 0,
+            ]);
+
+            // Optionally send welcome email
+            // Mail::to($user->email)->send(new WelcomeEmail($user));
+
+            // Log the registration
+            Log::info('New user registered', ['user_id' => $user->id, 'email' => $user->email]);
+
+            // Return success response
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Registration successful! Please login to continue.',
+                    'redirect' => route('login')
+                ]);
+            }
+
+            // For web requests, redirect with success message
+            return redirect()->route('login')->with('success', 'Registration successful! Please login to continue.');
+        } catch (\Exception $e) {
+            Log::error('Registration error', [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'data' => $request->except(['password', 'confirm_password'])
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to register. Please try again later.'
+                ], 500);
+            }
+
+            return back()->withInput($request->except(['password', 'confirm_password', 'profile_picture']))
+                ->withErrors(['error' => 'Registration failed. Please try again.']);
+        }
+    }
+
+    /**
+     * Generate a unique username from first and last name
+     */
+    private function generateUsername($firstName, $lastName)
+    {
+        $baseUsername = strtolower($firstName . '.' . $lastName);
+        $baseUsername = preg_replace('/[^a-z0-9.]/', '', $baseUsername);
+
+        $username = $baseUsername;
+        $counter = 1;
+
+        // Check if username exists and make it unique
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
+    }
     // Show forgot password form
     public function showForgotPasswordForm(Request $request)
     {
@@ -185,6 +248,7 @@ class AuthController extends Controller
             'email' => $request->email,
         ]);
     }
+
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -208,7 +272,6 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Failed to send reset link. Please try again.']);
         }
     }
-
     public function resetPassword(Request $request)
     {
         $request->validate([

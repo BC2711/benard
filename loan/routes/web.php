@@ -34,8 +34,9 @@ Route::get('/', function () {
 Route::get('/consultation', function () {
     return view('website.consultation');
 });
+Route::post('/consultation', [ConsultationController::class, 'store'])->name('consultation.store');
 Route::get('/service-details', function () {
-    return view('website.review_testimonials');
+    return view('website.service_details');
 });
 Route::get('/testimonial-reviews', function () {
     return view('website.review_testimonials');

@@ -8,6 +8,7 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/logos/londa.jpg') }}">
     <script src="{{ asset('assets/js/tailwind.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/premium-ui.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
@@ -17,24 +18,24 @@
                 extend: {
                     colors: {
                         'primary': {
-                            '50': '#fef8f0',
-                            '100': '#fdebd6',
-                            '500': '#db9123',
-                            '600': '#c27a1a',
-                            '700': '#7a4603',
-                            '800': '#5c3502',
-                            'primary': '#7a4603',
-                            'primary_2': '#db9123',
-                            'secondary': '#db9123',
-                            'accent': '#f8b750',
-                            'light': '#f8f5f0',
+                            '50': '#ecfeff',
+                            '100': '#cffafe',
+                            '500': '#0891b2',
+                            '600': '#0e7490',
+                            '700': '#155e75',
+                            '800': '#164e63',
+                            'primary': '#155e75',
+                            'primary_2': '#0f766e',
+                            'secondary': '#0f766e',
+                            'accent': '#d99b2b',
+                            'light': '#f8fafc',
                             'dark': '#1a1a1a',
                         },
                         'accent': {
-                            '50': '#fdf8f3',
-                            '100': '#f7e9d9',
-                            '500': '#db9123',
-                            '600': '#c27a1a',
+                            '50': '#f0fdfa',
+                            '100': '#ccfbf1',
+                            '500': '#0f766e',
+                            '600': '#115e59',
                         }
 
                     },
@@ -174,4 +175,4 @@
 
 </head>
 
-<body class="bg-gray-50">
+<body class="premium-site bg-gray-50 antialiased">

@@ -1,6 +1,6 @@
 @include('components.website.header')
 @include('components.website.menu')
-<div class="h-20"></div>
+<div class="h-16"></div>
 @include('components.website.hero')
 @include('components.website.profile') {{-- Company profile (Londa Loan details) --}}
 @include('components.website.about') {{-- Business overview / mission --}}

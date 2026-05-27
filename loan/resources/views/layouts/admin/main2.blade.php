@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/premium-ui.css') }}">
 
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +26,7 @@
     @stack('styles')
 </head>
 
-<body class="h-full bg-gray-50 font-sans antialiased" x-data="adminApp">
+<body class="premium-admin h-full bg-gray-50 font-sans antialiased" x-data="adminApp">
     <!-- Loading Screen -->
     {{-- @include('layouts.components.ui.loading-screen') --}}
 

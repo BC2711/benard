@@ -125,9 +125,22 @@
                     </div>
                 </div>
 
-                <!-- Contact Form -->
+                <!-- Contact Form & Loan Agreement Download -->
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-2xl p-6 shadow-xl animate-fade-in-up" style="animation-delay: 0.1s;">
+                        <!-- NEW: Download Loan Agreement Button -->
+                        <div class="mb-6 pb-4 border-b border-gray-200">
+                            <button id="downloadAgreementBtn"
+                                class="w-full py-3 bg-gradient-to-r from-primary-700 to-primary-800 text-white font-bold rounded-xl hover:from-primary-800 hover:to-primary-900 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg group">
+                                <i class="fas fa-file-pdf text-xl group-hover:animate-pulse"></i>
+                                <span>Download Loan Agreement (PDF)</span>
+                                <i
+                                    class="fas fa-download text-sm opacity-80 group-hover:translate-y-0.5 transition-transform"></i>
+                            </button>
+                            <p class="text-xs text-gray-400 text-center mt-2">Preview our standard loan terms before
+                                applying</p>
+                        </div>
+
                         <h3 class="text-xl font-bold text-primary-primary mb-1">{{ $support->form_heading }}</h3>
                         <p class="text-gray-500 text-sm mb-5">{{ $support->form_subheading }}</p>
 
@@ -202,7 +215,7 @@
         </div>
 
         <!-- Trust Indicators -->
-        <div class="max-w-4xl mx-auto mt-12 animate-fade-in-up" style="animation-delay: 0.2s;">
+        {{-- <div class="max-w-4xl mx-auto mt-12 animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 @foreach ($support->trust_indicators as $t)
                     <div
@@ -213,11 +226,191 @@
                     </div>
                 @endforeach
             </div>
-        </div>
+        </div> --}}
     </div>
 </section>
 
 <script>
+    // PDF Generation and Download Function
+    function generateLoanAgreementPDF() {
+        // Create a new jsPDF instance (using 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size)
+        const {
+            jsPDF
+        } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Define page margins
+        const margin = {
+            left: 20,
+            right: 20,
+            top: 25,
+            bottom: 20
+        };
+        let yPos = margin.top;
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const contentWidth = doc.internal.pageSize.getWidth() - margin.left - margin.right;
+
+        // Helper function to add text with line wrapping
+        function addWrappedText(text, x, y, maxWidth, fontSize = 10, lineHeight = 6) {
+            doc.setFontSize(fontSize);
+            const lines = doc.splitTextToSize(text, maxWidth);
+            doc.text(lines, x, y);
+            return y + (lines.length * lineHeight);
+        }
+
+        // Helper to add a new page and reset Y position
+        function addNewPage() {
+            doc.addPage();
+            return margin.top;
+        }
+
+        // --- Page 1 Content ---
+
+        // Title
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.text('LOAN AGREEMENT', margin.left + contentWidth / 2, yPos, {
+            align: 'center'
+        });
+        yPos += 12;
+
+        // Subtitle
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Standard Terms and Conditions', margin.left + contentWidth / 2, yPos, {
+            align: 'center'
+        });
+        yPos += 15;
+
+        // 1. Borrower Details
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('1. Borrower Details', margin.left, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const borrowerLines = [
+            'Name: _________________________________',
+            'ID/Passport Number: ____________________',
+            'Contact: _______________________________',
+            'Address: _______________________________'
+        ];
+        borrowerLines.forEach(line => {
+            doc.text(line, margin.left, yPos);
+            yPos += 6;
+        });
+        yPos += 4;
+
+        // 2. Loan Details
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('2. Loan Details', margin.left, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const loanLines = [
+            'Loan Amount: K _________________________',
+            'Purpose of Loan: _______________________',
+            'Disbursement Date: _____________________'
+        ];
+        loanLines.forEach(line => {
+            doc.text(line, margin.left, yPos);
+            yPos += 6;
+        });
+        yPos += 4;
+
+        // 3. Repayment Terms
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('3. Repayment Terms', margin.left, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const repaymentLines = [
+            'Repayment Schedule:',
+            '  • Within 1 week:  20% of loan amount',
+            '  • Within 2 weeks: 30% of loan amount',
+            '  • Within 1 month: 35% of loan amount',
+            '',
+            'Instalments allowed within agreed period.',
+            'Late payment penalty: 2.5% per day on outstanding amount'
+        ];
+        repaymentLines.forEach(line => {
+            doc.text(line, margin.left, yPos);
+            yPos += 6;
+        });
+        yPos += 8;
+
+        // Check if we need a new page for the rest of the content
+        const remainingSpace = pageHeight - yPos - margin.bottom;
+
+        if (remainingSpace < 60) {
+            yPos = addNewPage();
+        }
+
+        // --- Agreement Section (continued on same or new page) ---
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Agreement', margin.left, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const agreementText =
+            'I, the borrower, agree to repay the loan as per the terms outlined above. I confirm that all information provided is true and accurate, and I understand that failure to repay according to the schedule may result in additional penalties and legal action.';
+        yPos = addWrappedText(agreementText, margin.left, yPos, contentWidth, 10, 5);
+        yPos += 10;
+
+        // Signature lines
+        doc.text('Borrower Signature: ________________________', margin.left, yPos);
+        yPos += 10;
+        doc.text('Date: ____________________________________', margin.left, yPos);
+        yPos += 10;
+        doc.text('Witness Signature: ________________________', margin.left, yPos);
+        yPos += 10;
+        doc.text('Date: ____________________________________', margin.left, yPos);
+        yPos += 15;
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        const footer = 'This document serves as a legally binding agreement between the lender and the borrower.';
+        const footerWidth = doc.getTextWidth(footer);
+        doc.text(footer, margin.left + contentWidth / 2, pageHeight - 10, {
+            align: 'center'
+        });
+
+        // Save the PDF
+        doc.save('loan_agreement.pdf');
+    }
+
+    // Add click event listener for the download button
+    document.getElementById('downloadAgreementBtn').addEventListener('click', function() {
+        // Show loading state on button
+        const btn = this;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+        btn.disabled = true;
+
+        try {
+            generateLoanAgreementPDF();
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            alert('Unable to generate PDF. Please try again or contact support.');
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    });
+
+    // Form submission handler (existing)
     document.getElementById('loanApplicationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -340,3 +533,6 @@
         transition: width 1s ease-out;
     }
 </style>
+
+<!-- Include jsPDF library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

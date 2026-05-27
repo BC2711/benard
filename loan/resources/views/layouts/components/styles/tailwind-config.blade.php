@@ -4,20 +4,20 @@
             extend: {
                 colors: {
                     'londa': {
-                        '50': '#fef6e6',
-                        '100': '#fdebc7',
-                        '200': '#fbd895',
-                        '300': '#f8be58',
-                        '400': '#f5a32a',
-                        '500': '#ef8710',
-                        '600': '#db9123',
-                        '700': '#b3741c',
-                        '800': '#7a4603',
-                        '900': '#663a0a',
+                        '50': '#ecfeff',
+                        '100': '#cffafe',
+                        '200': '#a5f3fc',
+                        '300': '#67e8f9',
+                        '400': '#22d3ee',
+                        '500': '#0891b2',
+                        '600': '#0e7490',
+                        '700': '#155e75',
+                        '800': '#164e63',
+                        '900': '#083344',
                     },
-                    'londa-brown': '#7a4603',
-                    'londa-orange': '#db9123',
-                    'londa-light': '#f8f5f0'
+                    'londa-brown': '#155e75',
+                    'londa-orange': '#0f766e',
+                    'londa-light': '#f8fafc'
                 },
                 fontFamily: {
                     'sans': ['Inter', 'system-ui', 'sans-serif'],

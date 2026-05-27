@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/premium-ui.css') }}">
 
     <!-- Tailwind CSS -->
     <script src="{{ asset('assets/js/tailwind.js') }}"></script>
@@ -27,17 +28,17 @@
                 extend: {
                     colors: {
                         'primary': {
-                            '50': '#fef8f0',
-                            '100': '#fdebd6',
-                            '500': '#db9123',
-                            '600': '#c27a1a',
-                            '700': '#7a4603',
-                            '800': '#5c3502',
-                            'primary': '#7a4603',
-                            'primary_2': '#db9123',
-                            'secondary': '#db9123',
-                            'accent': '#f8b750',
-                            'light': '#f8f5f0',
+                            '50': '#ecfeff',
+                            '100': '#cffafe',
+                            '500': '#0891b2',
+                            '600': '#0e7490',
+                            '700': '#155e75',
+                            '800': '#164e63',
+                            'primary': '#155e75',
+                            'primary_2': '#0f766e',
+                            'secondary': '#0f766e',
+                            'accent': '#d99b2b',
+                            'light': '#f8fafc',
                             'dark': '#1a1a1a',
                         },
                         'londa': {
@@ -52,9 +53,9 @@
                             '800': '#7a4603',
                             '900': '#663a0a',
                         },
-                        'londa-brown': '#7a4603',
-                        'londa-orange': '#db9123',
-                        'londa-light': '#f8f5f0'
+                        'londa-brown': '#155e75',
+                        'londa-orange': '#0f766e',
+                        'londa-light': '#f8fafc'
                     },
                     fontFamily: {
                         'sans': ['Inter', 'system-ui', 'sans-serif'],
@@ -207,7 +208,7 @@
     @stack('styles')
 </head>
 
-<body class="h-full bg-gray-50 font-sans antialiased" x-data="{
+<body class="premium-admin h-full bg-gray-50 font-sans antialiased" x-data="{
     darkMode: localStorage.getItem('darkMode') === 'true',
     sidebarOpen: false,
     sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
