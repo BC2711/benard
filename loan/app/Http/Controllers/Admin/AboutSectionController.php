@@ -74,10 +74,10 @@ class AboutSectionController extends Controller
             'stat_4_label' => 'nullable|string',
 
             // Images
-            'image_1' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'image_3' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'image_4' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image_1' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5048',
+            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5048',
+            'image_3' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5048',
+            'image_4' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5048',
 
             // Rating card
             'rating_icon'   => 'required|string',

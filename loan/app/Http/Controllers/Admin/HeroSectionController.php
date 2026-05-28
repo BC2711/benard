@@ -77,7 +77,7 @@ class HeroSectionController extends Controller
 
             'card_title' => 'required|string',
             'card_description' => 'required|string',
-            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5048',
 
             'badge_1_icon' => 'required|string',
             'badge_1_title' => 'required|string',

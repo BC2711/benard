@@ -2,7 +2,8 @@
 @section('title', 'Footer Management')
 @section('breadcrumbs')
     <nav class="flex items-center space-x-2">
-        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Website
+            Management</a>
         <span class="text-gray-400">/</span>
         <span class="text-sm text-gray-500">Footer</span>
     </nav>
@@ -123,8 +124,16 @@
                 <x-input name="footer_note" label="Footer Note" :value="old('footer_note', $footer->footer_note)" />
             </div>
 
-            <button type="submit" class="bg-primary-primary text-white px-8 py-3 rounded-lg font-bold">Save
-                Footer</button>
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+                <a href="{{ url()->previous() }}"
+                    class="bg-gray-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-600 transition-colors duration-200">
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="bg-primary-700 text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-800 transition-colors duration-200 shadow-md">
+                    Save Changes
+                </button>
+            </div>
         </form>
     </div>
 

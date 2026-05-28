@@ -2,7 +2,8 @@
 @section('title', 'Features Management')
 @section('breadcrumbs')
     <nav class="flex items-center space-x-2">
-        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Website Management</a>
+        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Website
+            Management</a>
         <span class="text-gray-400">/</span>
         <span class="text-sm text-gray-500">Features</span>
     </nav>
@@ -136,8 +137,8 @@
                                     <x-input name="title[]" label="Title" :value="old('title', $f['title'])" placeholder="" required />
                                     <x-textarea name="desc[]" label="Description" rows="3" :value="old('desc', $f['desc'])"
                                         placeholder="" required />
-                                    <x-input type="text" name="learn_more[]" label="" :value="old('learn_more', $f['learn_more'])" placeholder=""
-                                        required />
+                                    <x-input type="text" name="learn_more[]" label="" :value="old('learn_more', $f['learn_more'])"
+                                        placeholder="" required />
                                 </div>
                             </div>
                         @endforeach
