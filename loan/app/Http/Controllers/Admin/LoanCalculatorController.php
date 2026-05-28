@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/Admin/LoanCalculatorController.php
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -12,7 +11,8 @@ class LoanCalculatorController extends Controller
     public function index()
     {
         $calc = LoanCalculator::firstOrCreate([]);
-        return view('admin.calculator.edit', compact('calc'));
+
+        return view('components.management.calculator.edit', compact('calc'));
     }
 
     public function update(Request $request, LoanCalculator $calc)

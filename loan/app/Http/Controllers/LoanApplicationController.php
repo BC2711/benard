@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/LoanApplicationController.php
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLoanApplicationRequest;

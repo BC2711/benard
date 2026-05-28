@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/Admin/ImpactNumbersController.php
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;

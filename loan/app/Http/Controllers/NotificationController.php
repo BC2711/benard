@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/NotificationController.php
 
 namespace App\Http\Controllers;
 

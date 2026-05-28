@@ -1,6 +1,5 @@
 <?php
 
-// app/Models/TrustedClientsSection.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;

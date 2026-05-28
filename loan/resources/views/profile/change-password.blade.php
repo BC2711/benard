@@ -92,7 +92,7 @@
                 <!-- Main Form -->
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <form action="{{ route('management.change-password') }}" method="POST">
+                        <form action="{{ route('management.change-password.update') }}" method="POST">
                             @csrf
 
                             <!-- Form Header -->

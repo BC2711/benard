@@ -1,4 +1,3 @@
-{{-- resources/views/components/input.blade.php --}}
 @props(['name', 'label' => null, 'type' => 'text', 'required' => false, 'value' => '', 'placeholder' => ''])
 
 <div {{ $attributes->merge(['class' => 'space-y-2']) }}>

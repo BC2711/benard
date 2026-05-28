@@ -1,6 +1,5 @@
 <?php
 
-// app/Mail/LoanApplicationSubmitted.php
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;

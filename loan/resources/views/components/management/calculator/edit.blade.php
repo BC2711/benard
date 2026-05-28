@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.main')
 @section('title', 'Loan Calculator Management')
 @section('breadcrumbs')
     <nav class="flex items-center space-x-2">
@@ -21,7 +21,7 @@
             <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('admin.calculator.update', $calc) }}" method="POST" class="space-y-8">
+        <form action="{{ route('management.calculator.update', $calc) }}" method="POST" class="space-y-8">
             @csrf @method('PUT')
 
             <!-- Hero -->

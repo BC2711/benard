@@ -1,5 +1,4 @@
 <?php
-// app/Services/NotificationManagerService.php
 
 namespace App\Services;
 
@@ -111,15 +110,10 @@ class NotificationManagerService
         }
     }
 
-    /**
-     * Placeholder for SMS gateway integration
-     */
     private function sendViaSmsGateway($phone, $message): bool
     {
-        // Implement your preferred SMS gateway (Twilio, Nexmo, etc.)
         Log::info("SMS would be sent to: {$phone} - Message: {$message}");
 
-        // For demo purposes, return true
         return true;
     }
 
