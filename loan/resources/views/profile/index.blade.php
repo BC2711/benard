@@ -1,233 +1,204 @@
 @extends('layouts.admin.main')
 
 @section('title', 'User Management')
+@section('page-title', 'User Management')
+@section('page-description', 'Manage administrators, managers, access status, and profile records.')
+@section('page-icon')
+    <i class="fas fa-users-gear"></i>
+@endsection
 @section('breadcrumbs')
-    <nav class="flex items-center space-x-2">
-        <a href="{{ route('management.dashboard.index') }}" class="text-sm text-gray-500 hover:text-gray-700">User Management</a>
-        <span class="text-gray-400">/</span>
-        <span class="text-sm text-gray-500">User</span>
+    <nav class="flex items-center gap-2" aria-label="Breadcrumb">
+        <a href="{{ route('management.dashboard.index') }}" class="hover:text-brand-700 dark:hover:text-cyan-300">Admin</a>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+        <span>User Management</span>
     </nav>
 @endsection
-@section('page-icon')
-    <i class="fas fa-users fa-lg text-gray-700"></i>
-@endsection
-@section('page-title')
-    <h1 class="text-2xl font-bold text-gray-900">User Management</h1>
-    {{-- <p class="text-gray-600 text-sm mt-1">Manage system users and their permissions</p> --}}
+@section('page-actions')
+    <button type="button"
+        class="inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-200 hover:text-brand-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+        <i class="fas fa-file-export"></i> Export
+    </button>
+    <a href="{{ route('management.users.create') }}"
+        class="inline-flex h-11 items-center gap-2 rounded-xl bg-brand-700 px-4 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-brand-600">
+        <i class="fas fa-plus"></i> Add User
+    </a>
 @endsection
 
-@section('title', 'User Management')
 @section('content')
-    <div class="bg-white rounded-lg shadow-sm border border-gray-300">
-        <div class="px-6 py-4">
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="p-2 bg-blue-100 rounded-lg">
-                            <i class="fas fa-users text-blue-600 text-lg"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Total Users</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $users->total() }}</p>
-                        </div>
+    @php
+        $summary = [
+            ['label' => 'Total users', 'value' => $users->total(), 'icon' => 'fa-users', 'tone' => 'brand'],
+            ['label' => 'Active', 'value' => $users->where('status', 'ACTIVE')->count(), 'icon' => 'fa-user-check', 'tone' => 'emerald'],
+            ['label' => 'Inactive', 'value' => $users->where('status', 'INACTIVE')->count(), 'icon' => 'fa-user-clock', 'tone' => 'amber'],
+            ['label' => 'Locked', 'value' => $users->whereNotNull('locked_at')->count(), 'icon' => 'fa-lock', 'tone' => 'rose'],
+        ];
+    @endphp
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        @foreach ($summary as $item)
+            <article class="admin-card p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">{{ $item['label'] }}</p>
+                        <p class="mt-2 text-3xl font-extrabold">{{ number_format($item['value']) }}</p>
                     </div>
+                    <span class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                        <i class="fas {{ $item['icon'] }}"></i>
+                    </span>
                 </div>
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="p-2 bg-green-100 rounded-lg">
-                            <i class="fas fa-user-check text-green-600 text-lg"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Active Users</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $users->where('status', 'ACTIVE')->count() }}</p>
-                        </div>
-                    </div>
+            </article>
+        @endforeach
+    </section>
+
+    <section class="admin-card overflow-hidden" x-data="{ selected: [], query: '', role: '', status: '' }">
+        <div class="border-b border-slate-200 p-5 dark:border-slate-800">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Directory</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Search, filter, sort, and act on user records.</p>
                 </div>
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="p-2 bg-yellow-100 rounded-lg">
-                            <i class="fas fa-user-clock text-yellow-600 text-lg"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Inactive Users</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $users->where('status', 'INACTIVE')->count() }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="p-2 bg-red-100 rounded-lg">
-                            <i class="fas fa-user-lock text-red-600 text-lg"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Locked Accounts</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $users->whereNotNull('locked_at')->count() }}</p>
-                        </div>
-                    </div>
+                <div class="grid gap-3 sm:grid-cols-3">
+                    <label class="relative">
+                        <span class="sr-only">Search users</span>
+                        <i class="fas fa-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+                        <input type="search" x-model="query" class="admin-input h-11 w-full pl-9 pr-3 text-sm"
+                            placeholder="Search users">
+                    </label>
+                    <select x-model="role" class="admin-input h-11 px-3 text-sm" aria-label="Filter by role">
+                        <option value="">All roles</option>
+                        <option value="ADMIN">Administrator</option>
+                        <option value="MANAGER">Manager</option>
+                        <option value="USER">User</option>
+                    </select>
+                    <select x-model="status" class="admin-input h-11 px-3 text-sm" aria-label="Filter by status">
+                        <option value="">All statuses</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="SUSPENDED">Suspended</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Users Table -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-300">
-                <!-- Table Header -->
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                        <h2 class="text-lg font-semibold text-gray-900">All Users</h2>
-                        <div class="mt-2 sm:mt-0 flex space-x-2">
-                            <a href="{{ route('management.users.create') }}"
-                                class="mt-4 sm:mt-0 bg-londa-orange text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors duration-200 font-medium flex items-center">
-                                <i class="fas fa-plus mr-2"></i>
-                                Add New User
-                            </a>
-                            <input type="text" placeholder="Search users..."
-                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-londa-orange focus:border-londa-orange w-64">
-                            <select
-                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-londa-orange focus:border-londa-orange">
-                                <option value="">All Roles</option>
-                                <option value="admin">Administrator</option>
-                                <option value="manager">Manager</option>
-                                <option value="user">User</option>
-                            </select>
-                        </div>
-                    </div>
+            <div x-show="selected.length" x-transition
+                class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-brand-50 p-3 text-sm dark:border-cyan-400/10 dark:bg-cyan-400/5">
+                <span class="font-bold text-brand-700 dark:text-cyan-200" x-text="`${selected.length} selected`"></span>
+                <div class="flex gap-2">
+                    <button class="rounded-xl bg-white px-3 py-2 font-bold text-slate-600 shadow-sm dark:bg-slate-900 dark:text-slate-300">Bulk activate</button>
+                    <button class="rounded-xl bg-white px-3 py-2 font-bold text-red-600 shadow-sm dark:bg-slate-900 dark:text-red-300">Delete selected</button>
                 </div>
-
-                <!-- Table -->
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    User
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Role
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Last
-                                    Login</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($users as $user)
-                                <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img class="h-10 w-10 rounded-full object-cover"
-                                                    src="{{ $user->profile_picture ? Storage::url($user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->first_name . ' ' . $user->last_name) . '&color=7F9CF5&background=EBF4FF' }}"
-                                                    alt="{{ $user->first_name }}">
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $user->first_name }} {{ $user->last_name }}
-                                                </div>
-                                                <div class="text-sm text-gray-500">{{ $user->email }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                {{ $user->role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : '' }}
-                                {{ $user->role === 'MANAGER' ? 'bg-blue-100 text-blue-800' : '' }}
-                                {{ $user->role === 'USER' ? 'bg-gray-100 text-gray-800' : '' }}">
-                                            {{ ucfirst($user->role) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                    {{ $user->status === 'ACTIVE' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $user->status === 'INACTIVE' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                    {{ $user->status === 'SUSPENDED' ? 'bg-red-100 text-red-800' : '' }}">
-                                                {{ ucfirst($user->status) }}
-                                            </span>
-                                            @if ($user->locked_at)
-                                                <span
-                                                    class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                                                    <i class="fas fa-lock mr-1"></i> Locked
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $user->email_verified_at ? $user->email_verified_at->format('M j, Y') : 'Never' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex items-center space-x-2">
-                                            <a href="{{ route('management.users.show', $user) }}"
-                                                class="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                                                title="View">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('management.users.edit', $user) }}"
-                                                class="text-green-600 hover:text-green-900 transition-colors duration-200"
-                                                title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('management.toggle-status', $user) }}" method="POST"
-                                                class="inline">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="text-yellow-600 hover:text-yellow-900 transition-colors duration-200"
-                                                    title="{{ $user->status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}">
-                                                    <i
-                                                        class="fas {{ $user->status === 'ACTIVE' ? 'fa-pause' : 'fa-play' }}"></i>
-                                                </button>
-                                            </form>
-                                            @if ($user->locked_at)
-                                                <form action="{{ route('management.users.unlock', $user) }}" method="POST"
-                                                    class="inline">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="text-green-600 hover:text-green-900 transition-colors duration-200"
-                                                        title="Unlock Account">
-                                                        <i class="fas fa-unlock"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            <form action="{{ route('management.users.destroy', $user) }}" method="POST"
-                                                class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="text-red-600 hover:text-red-900 transition-colors duration-200"
-                                                    title="Delete"
-                                                    onclick="return confirm('Are you sure you want to delete this user?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                        <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
-                                        <p class="text-lg">No users found</p>
-                                        <p class="text-sm mt-1">Get started by creating your first user</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                @if ($users->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-200">
-                        {{ $users->links() }}
-                    </div>
-                @endif
             </div>
         </div>
-    </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                <thead class="bg-slate-50 text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:bg-slate-900">
+                    <tr>
+                        <th class="w-12 px-5 py-4">
+                            <input type="checkbox" class="rounded border-slate-300 text-brand-700 focus:ring-brand-600"
+                                @change="selected = $event.target.checked ? [...document.querySelectorAll('[data-user-id]')].map(el => el.value) : []"
+                                aria-label="Select all users">
+                        </th>
+                        <th class="px-5 py-4">
+                            <button class="inline-flex items-center gap-2">User <i class="fas fa-sort text-slate-300"></i></button>
+                        </th>
+                        <th class="px-5 py-4">Role</th>
+                        <th class="px-5 py-4">Status</th>
+                        <th class="px-5 py-4">Verified</th>
+                        <th class="px-5 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                    @forelse($users as $user)
+                        <tr class="transition hover:bg-brand-50/50 dark:hover:bg-cyan-400/5"
+                            x-show="(!query || '{{ strtolower($user->first_name . ' ' . $user->last_name . ' ' . $user->email) }}'.includes(query.toLowerCase())) && (!role || role === '{{ $user->role }}') && (!status || status === '{{ $user->status }}')">
+                            <td class="px-5 py-4">
+                                <input type="checkbox" data-user-id value="{{ $user->id }}" x-model="selected"
+                                    class="rounded border-slate-300 text-brand-700 focus:ring-brand-600"
+                                    aria-label="Select {{ $user->first_name }} {{ $user->last_name }}">
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <img class="h-11 w-11 rounded-xl object-cover"
+                                        src="{{ $user->profile_picture ? Storage::url($user->profile_picture) : 'https://ui-avatars.com/api/?name=' . urlencode($user->first_name . ' ' . $user->last_name) . '&color=155e75&background=ecfeff' }}"
+                                        alt="{{ $user->first_name }} {{ $user->last_name }}">
+                                    <div>
+                                        <p class="font-bold text-slate-950 dark:text-white">{{ $user->first_name }} {{ $user->last_name }}</p>
+                                        <p class="text-slate-500">{{ $user->email }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-4">
+                                <span class="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold text-violet-700 dark:bg-violet-400/10 dark:text-violet-200">
+                                    {{ ucfirst(strtolower($user->role)) }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="rounded-full px-3 py-1 text-xs font-bold {{ $user->status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200' : ($user->status === 'SUSPENDED' ? 'bg-red-100 text-red-700 dark:bg-red-400/10 dark:text-red-200' : 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-200') }}">
+                                        {{ ucfirst(strtolower($user->status)) }}
+                                    </span>
+                                    @if ($user->locked_at)
+                                        <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-400/10 dark:text-red-200">Locked</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 text-slate-500">
+                                {{ $user->email_verified_at ? $user->email_verified_at->format('M j, Y') : 'Pending' }}
+                            </td>
+                            <td class="px-5 py-4 text-right" x-data="{ open: false }">
+                                <div class="relative inline-block text-left">
+                                    <button type="button" class="admin-icon-btn h-10 w-10" @click="open = !open"
+                                        aria-label="Open row actions for {{ $user->first_name }}">
+                                        <i class="fas fa-ellipsis"></i>
+                                    </button>
+                                    <div x-show="open" x-transition @click.outside="open = false"
+                                        class="absolute right-0 z-20 mt-2 w-48 rounded-2xl border border-slate-200 bg-white p-2 text-left shadow-lift dark:border-slate-800 dark:bg-slate-900">
+                                        <a href="{{ route('management.users.show', $user) }}" class="admin-menu-item"><i class="fas fa-eye"></i>View</a>
+                                        <a href="{{ route('management.users.edit', $user) }}" class="admin-menu-item"><i class="fas fa-pen"></i>Edit</a>
+                                        <form action="{{ route('management.toggle-status', $user) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="admin-menu-item w-full">
+                                                <i class="fas {{ $user->status === 'ACTIVE' ? 'fa-pause' : 'fa-play' }}"></i>
+                                                {{ $user->status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+                                            </button>
+                                        </form>
+                                        @if ($user->locked_at)
+                                            <form action="{{ route('management.unlock', $user) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="admin-menu-item w-full"><i class="fas fa-unlock"></i>Unlock</button>
+                                            </form>
+                                        @endif
+                                        <form action="{{ route('management.users.destroy', $user) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="admin-menu-item w-full text-red-600 dark:text-red-300"
+                                                onclick="AdminUI.confirmSubmit(this.form, 'Delete this user permanently?')">
+                                                <i class="fas fa-trash"></i>Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-5 py-16 text-center">
+                                <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-slate-800">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                                <p class="mt-4 font-bold">No users found</p>
+                                <p class="mt-1 text-sm text-slate-500">Create your first administrator to get started.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if ($users->hasPages())
+            <div class="border-t border-slate-200 px-5 py-4 dark:border-slate-800">
+                {{ $users->links() }}
+            </div>
+        @endif
+    </section>
 @endsection

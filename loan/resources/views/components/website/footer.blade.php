@@ -1,4 +1,24 @@
-@php $footer = \App\Models\FooterSection::first(); @endphp
+@php
+    $footer = \App\Models\FooterSection::firstOrNew([], [
+        'brand_name' => $frontendSettings['site']['brand_name'][0] ?? 'Londa Loans',
+        'brand_tagline' => 'empowering marketeers',
+        'brand_description' => 'Flexible financing solutions for marketeers and growing businesses.',
+        'email' => $frontendSettings['contact']['email'][0] ?? 'hello@londaloans.com',
+        'phone' => $frontendSettings['contact']['phone'][0] ?? '+260 965508033',
+        'address_line1' => $frontendSettings['contact']['address'][0] ?? 'Lusaka, Zambia',
+        'address_line2' => '',
+        'quick_links' => [],
+        'resources' => [],
+        'trust_badges' => [],
+        'legal_links' => [],
+        'newsletter_heading' => 'Newsletter',
+        'newsletter_description' => 'Get updates and financial tips.',
+        'copyright_text' => 'Copyright ' . date('Y') . ' Londa Loans. All rights reserved.',
+        'footer_note' => '',
+    ]);
+    $dynamicFooterLinks = ($footerMenuItems ?? collect())->map(fn ($item) => ['text' => $item->label, 'url' => $item->href])->values()->toArray();
+    $quickLinks = !empty($dynamicFooterLinks) ? $dynamicFooterLinks : ($footer->quick_links ?? []);
+@endphp
 
 <footer
     class="bg-gradient-to-br from-primary-primary via-primary-800 to-primary-700 text-white relative overflow-hidden">
@@ -80,7 +100,7 @@
                 <div class="animate-fade-in-up" style="animation-delay: 0.1s">
                     <h4 class="text-lg font-bold text-primary-accent mb-4">Quick Links</h4>
                     <ul class="space-y-2">
-                        @foreach ($footer->quick_links as $link)
+                        @foreach ($quickLinks as $link)
                             <li>
                                 <a href="{{ $link['url'] }}"
                                     class="text-white/60 hover:text-primary-accent text-sm flex items-center gap-2 group transition">

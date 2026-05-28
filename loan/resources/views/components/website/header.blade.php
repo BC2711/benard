@@ -4,7 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LondaLoans</title>
+    @php
+        $seo = $cmsPage->seoMeta ?? null;
+        $site = $frontendSettings['site'] ?? [];
+        $brand = $site['brand_name'][0] ?? 'Londa Loans';
+        $metaTitle = $seo->meta_title ?? (($cmsPage->title ?? 'Home') . ' - ' . $brand);
+        $metaDescription = $seo->meta_description ?? ($site['meta_description'][0] ?? 'Flexible financing solutions for marketeers and growing businesses.');
+        $ogTitle = $seo->og_title ?? $metaTitle;
+        $ogDescription = $seo->og_description ?? $metaDescription;
+        $ogImage = $seo?->og_image ? asset($seo->og_image) : asset('assets/logos/londa.jpg');
+    @endphp
+    <title>{{ $metaTitle }}</title>
+    <meta name="description" content="{{ $metaDescription }}">
+    <meta name="robots" content="{{ $seo->robots ?? 'index,follow' }}">
+    <link rel="canonical" href="{{ $seo->canonical_url ?? url()->current() }}">
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $ogDescription }}">
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta name="twitter:card" content="{{ $seo->twitter_card ?? 'summary_large_image' }}">
+    @if (!empty($seo?->structured_data))
+        <script type="application/ld+json">{!! json_encode($seo->structured_data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @endif
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/logos/londa.jpg') }}">
     <script src="{{ asset('assets/js/tailwind.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">

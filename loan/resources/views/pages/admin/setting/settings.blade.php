@@ -1,197 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.admin.main')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Londa Loans Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+@section('title', 'Settings')
+@section('page-title', 'System Settings')
+@section('page-description', 'Configure company defaults, notifications, security posture, integrations, and loan rules.')
+@section('page-icon')
+    <i class="fas fa-sliders"></i>
+@endsection
+@section('page-actions')
+    <button class="inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900"><i class="fas fa-rotate-left"></i>Reset</button>
+    <button class="inline-flex h-11 items-center gap-2 rounded-xl bg-brand-700 px-4 text-sm font-bold text-white shadow-soft"><i class="fas fa-save"></i>Save</button>
+@endsection
 
-<body class="bg-gray-50">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="bg-white w-64 shadow-lg">
-            <nav class="p-4">
-                <a href="settings.html"
-                    class="flex items-center px-4 py-3 text-londa-orange bg-londa-light rounded-lg border-r-4 border-londa-orange">
-                    <i class="fas fa-cog w-6"></i>
-                    <span class="ml-3">System Settings</span>
+@section('content')
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-[20rem_1fr]">
+        <aside class="admin-card p-3">
+            @foreach ([['General','fa-sliders'],['Loan rules','fa-hand-holding-dollar'],['Notifications','fa-bell'],['Security','fa-shield-halved'],['Integrations','fa-plug'],['Data management','fa-database']] as $item)
+                <a href="#" class="admin-menu-item {{ $loop->first ? 'bg-brand-50 text-brand-700 dark:bg-cyan-400/10 dark:text-cyan-200' : '' }}">
+                    <i class="fas {{ $item[1] }}"></i>{{ $item[0] }}
                 </a>
-                <a href="admin-users.html"
-                    class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-londa-light">
-                    <i class="fas fa-user-shield w-6"></i>
-                    <span class="ml-3">Admin Users</span>
-                </a>
-            </nav>
-        </div>
+            @endforeach
+        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 p-6">
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">System Settings</h1>
-                <p class="text-gray-600">Configure your Londa Loans system preferences</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Settings Navigation -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow">
-                        <nav class="p-4 space-y-1">
-                            <a href="#"
-                                class="flex items-center px-3 py-2 text-londa-orange bg-londa-light rounded-lg">
-                                <i class="fas fa-sliders-h w-5 mr-3"></i>
-                                General Settings
-                            </a>
-                            <a href="#"
-                                class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-hand-holding-usd w-5 mr-3"></i>
-                                Loan Settings
-                            </a>
-                            <a href="#"
-                                class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-bell w-5 mr-3"></i>
-                                Notifications
-                            </a>
-                            <a href="#"
-                                class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-shield-alt w-5 mr-3"></i>
-                                Security
-                            </a>
-                            <a href="#"
-                                class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-plug w-5 mr-3"></i>
-                                Integrations
-                            </a>
-                            <a href="#"
-                                class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-database w-5 mr-3"></i>
-                                Data Management
-                            </a>
-                        </nav>
-                    </div>
+        <div class="space-y-6">
+            <form class="admin-card p-5">
+                <h2 class="text-lg font-bold">General settings</h2>
+                <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <label class="block">
+                        <span class="mb-2 block text-sm font-bold text-slate-600 dark:text-slate-300">Company name</span>
+                        <input class="admin-input h-11 w-full px-4" value="Londa Loans">
+                    </label>
+                    <label class="block">
+                        <span class="mb-2 block text-sm font-bold text-slate-600 dark:text-slate-300">Support email</span>
+                        <input class="admin-input h-11 w-full px-4" value="support@londaloans.com">
+                    </label>
+                    <label class="block md:col-span-2">
+                        <span class="mb-2 block text-sm font-bold text-slate-600 dark:text-slate-300">Company address</span>
+                        <textarea class="admin-input min-h-24 w-full px-4 py-3">Lusaka, Zambia</textarea>
+                    </label>
                 </div>
-
-                <!-- Settings Content -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- General Settings -->
-                    <div class="bg-white rounded-lg shadow">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-medium text-gray-900">General Settings</h2>
-                        </div>
-                        <div class="p-6 space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                                    <input type="text" value="Londa Loans"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-londa-orange focus:border-londa-orange">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Support Email</label>
-                                    <input type="email" value="support@londaloans.com"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-londa-orange focus:border-londa-orange">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Address</label>
-                                <textarea
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-londa-orange focus:border-londa-orange"
-                                    rows="3">123 Marketing District, San Francisco, CA 94105</textarea>
-                            </div>
-
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-medium text-gray-700">Maintenance Mode</h3>
-                                    <p class="text-sm text-gray-500">Temporarily disable the application</p>
-                                </div>
-                                <button type="button"
-                                    class="bg-gray-200 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-londa-orange"
-                                    role="switch">
-                                    <span
-                                        class="translate-x-0 pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
-                                </button>
-                            </div>
-                        </div>
+                <div class="mt-5 flex items-center justify-between rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
+                    <div>
+                        <p class="font-bold">Maintenance mode</p>
+                        <p class="text-sm text-slate-500">Temporarily disable public application access.</p>
                     </div>
-
-                    <!-- Loan Settings -->
-                    <div class="bg-white rounded-lg shadow">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-medium text-gray-900">Loan Configuration</h2>
-                        </div>
-                        <div class="p-6 space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Loan
-                                        Amount</label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500">$</span>
-                                        </div>
-                                        <input type="number" value="5000"
-                                            class="pl-7 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-londa-orange focus:border-londa-orange">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Maximum Loan
-                                        Amount</label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500">$</span>
-                                        </div>
-                                        <input type="number" value="500000"
-                                            class="pl-7 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-londa-orange focus:border-londa-orange">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Interest Rate
-                                    (%)</label>
-                                <input type="number" value="8.5" step="0.1"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-londa-orange focus:border-londa-orange">
-                            </div>
-
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-medium text-gray-700">Auto-Approval</h3>
-                                    <p class="text-sm text-gray-500">Automatically approve loans meeting criteria</p>
-                                </div>
-                                <button type="button"
-                                    class="bg-londa-orange relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-londa-orange"
-                                    role="switch">
-                                    <span
-                                        class="translate-x-5 pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Save Settings -->
-                    <div class="bg-white rounded-lg shadow">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-lg font-medium text-gray-900">Save Changes</h2>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex justify-end space-x-3">
-                                <button
-                                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                    Reset to Defaults
-                                </button>
-                                <button class="px-4 py-2 bg-londa-orange text-white rounded-lg hover:bg-orange-600">
-                                    Save Changes
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <button type="button" class="h-7 w-12 rounded-full bg-slate-300 p-1" role="switch" aria-checked="false">
+                        <span class="block h-5 w-5 rounded-full bg-white shadow"></span>
+                    </button>
                 </div>
-            </div>
-        </div>
-    </div>
-</body>
+            </form>
 
-</html>
+            <form class="admin-card p-5">
+                <h2 class="text-lg font-bold">Loan configuration</h2>
+                <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-3">
+                    <label>
+                        <span class="mb-2 block text-sm font-bold text-slate-600 dark:text-slate-300">Minimum amount</span>
+                        <input type="number" class="admin-input h-11 w-full px-4" value="5000">
+                    </label>
+                    <label>
+                        <span class="mb-2 block text-sm font-bold text-slate-600 dark:text-slate-300">Maximum amount</span>
+                        <input type="number" class="admin-input h-11 w-full px-4" value="500000">
+                    </label>
+                    <label>
+                        <span class="mb-2 block text-sm font-bold text-slate-600 dark:text-slate-300">Default rate</span>
+                        <input type="number" step="0.1" class="admin-input h-11 w-full px-4" value="8.5">
+                    </label>
+                </div>
+                <div class="mt-5 flex items-center justify-between rounded-2xl bg-brand-50 p-4 dark:bg-cyan-400/5">
+                    <div>
+                        <p class="font-bold">Auto approval</p>
+                        <p class="text-sm text-slate-500">Automatically approve requests that match configured policy.</p>
+                    </div>
+                    <button type="button" class="h-7 w-12 rounded-full bg-brand-700 p-1" role="switch" aria-checked="true">
+                        <span class="ml-auto block h-5 w-5 rounded-full bg-white shadow"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+@endsection

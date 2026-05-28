@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Menu;
 use App\Models\Section;
+use App\Services\FrontendContentService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +34,15 @@ class AppServiceProvider extends ServiceProvider
 
         // Website sections (unchanged)
         $this->registerWebsiteSections();
+
+        view()->composer(['components.website.header', 'components.website.menu', 'components.website.footer'], function ($view) {
+            $content = app(FrontendContentService::class);
+            $view->with([
+                'frontendSettings' => $content->settings(),
+                'primaryMenuItems' => $content->menu('primary'),
+                'footerMenuItems' => $content->menu('footer'),
+            ]);
+        });
     }
 
     /**

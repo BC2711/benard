@@ -1,486 +1,232 @@
 @extends('layouts.admin.main')
 
 @section('title', 'Dashboard')
+@section('page-title', 'Executive Dashboard')
+@section('page-description', 'Monitor users, consultations, subscriptions, and operational activity from one command center.')
+@section('page-icon')
+    <i class="fas fa-chart-pie"></i>
+@endsection
+@section('page-actions')
+    <select class="admin-input h-11 px-4 text-sm" aria-label="Select reporting range">
+        <option>Last 7 days</option>
+        <option>Last 30 days</option>
+        <option>This quarter</option>
+    </select>
+    <button type="button"
+        class="inline-flex h-11 items-center gap-2 rounded-xl bg-brand-700 px-4 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-brand-600">
+        <i class="fas fa-download"></i> Export
+    </button>
+@endsection
 
 @section('content')
-    <div class="min-h-screen bg-white rounded-lg border-b border-gray-200">
-        <!-- Header -->
-        <div class="bg-gray-50 border-b border-gray-200">
-            <div class="px-6 py-4">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    @php
+        $metrics = [
+            ['label' => 'Total users', 'value' => number_format($stats['total_users']), 'change' => '+12.4%', 'icon' => 'fa-users', 'tone' => 'cyan'],
+            ['label' => 'Active consultations', 'value' => number_format($stats['total_consultation']), 'change' => '+8.1%', 'icon' => 'fa-calendar-check', 'tone' => 'emerald'],
+            ['label' => 'Pending actions', 'value' => number_format($stats['pending_consultation']), 'change' => 'Needs review', 'icon' => 'fa-clock', 'tone' => 'amber'],
+            ['label' => 'Subscribers', 'value' => number_format($stats['total_subscribers']), 'change' => '+5.2%', 'icon' => 'fa-envelope-open-text', 'tone' => 'violet'],
+        ];
+        $trendLabels = collect($stats['consultation_trend'])->pluck('country')->values();
+        $trendValues = collect($stats['consultation_trend'])->pluck('value')->values();
+    @endphp
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        @foreach ($metrics as $metric)
+            <article class="admin-card group overflow-hidden p-5">
+                <div class="flex items-start justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-                        <p class="text-sm text-gray-600 mt-1">Welcome back! Here's your platform overview.</p>
+                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">{{ $metric['label'] }}</p>
+                        <p class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">{{ $metric['value'] }}</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="relative">
-                            <select
-                                class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                <option>Last 7 days</option>
-                                <option>Last 30 days</option>
-                                <option>Last 90 days</option>
-                            </select>
-                            <i
-                                class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
-                        </div>
-                        <button
-                            class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg shadow-sm transition-all duration-200 hover:shadow-md">
-                            <i class="fas fa-download mr-2 text-sm"></i>
-                            Export Report
-                        </button>
+                    <div class="grid h-12 w-12 place-items-center rounded-2xl bg-{{ $metric['tone'] }}-100 text-{{ $metric['tone'] }}-700 transition group-hover:scale-105 dark:bg-{{ $metric['tone'] }}-400/10 dark:text-{{ $metric['tone'] }}-200">
+                        <i class="fas {{ $metric['icon'] }}"></i>
+                    </div>
+                </div>
+                <div class="mt-5 flex items-center justify-between">
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ $metric['change'] }}</span>
+                    <span class="text-xs font-semibold text-slate-400">vs previous period</span>
+                </div>
+            </article>
+        @endforeach
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="admin-card p-5 xl:col-span-2">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Consultation trend</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Daily requests across the current reporting window.</p>
+                </div>
+                <div class="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-900">
+                    <button class="rounded-lg bg-white px-3 py-1.5 text-xs font-bold shadow-sm dark:bg-slate-800">Week</button>
+                    <button class="px-3 py-1.5 text-xs font-bold text-slate-500">Month</button>
+                    <button class="px-3 py-1.5 text-xs font-bold text-slate-500">Year</button>
+                </div>
+            </div>
+            <div class="mt-6 h-80">
+                <canvas id="consultationChart" aria-label="Consultation trend chart"></canvas>
+            </div>
+        </div>
+
+        <div class="admin-card p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">User health</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Status distribution</p>
+                </div>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">Stable</span>
+            </div>
+            <div class="mt-6 space-y-4">
+                <div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold">Active users</span>
+                        <span class="text-2xl font-extrabold text-emerald-600">{{ number_format($stats['active_users']) }}</span>
+                    </div>
+                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                        <div class="h-full rounded-full bg-emerald-500" style="width: 72%"></div>
+                    </div>
+                </div>
+                <div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold">Pending users</span>
+                        <span class="text-2xl font-extrabold text-amber-600">{{ number_format($stats['pending_users']) }}</span>
+                    </div>
+                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                        <div class="h-full rounded-full bg-amber-500" style="width: 28%"></div>
+                    </div>
+                </div>
+                <div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold">Scheduled consultations</span>
+                        <span class="text-2xl font-extrabold text-brand-600">{{ number_format($stats['completed_consultation']) }}</span>
+                    </div>
+                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                        <div class="h-full rounded-full bg-brand-600" style="width: 54%"></div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Main Content -->
-        <div class="p-6 space-y-6">
-            <!-- Alert Messages -->
-            @if (session('success'))
-                <div
-                    class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-center animate-fade-in">
-                    <i class="fas fa-check-circle mr-3 text-green-500"></i>
-                    <span class="flex-1">{{ session('success') }}</span>
-                    <button class="ml-4 text-green-600 hover:text-green-800">
-                        <i class="fas fa-times"></i>
-                    </button>
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="admin-card p-5 xl:col-span-2">
+            <div class="mb-5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Recent consultations</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Newest customer intent and scheduling activity.</p>
                 </div>
-            @endif
-
-            @if (session('error'))
-                <div
-                    class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-center animate-fade-in">
-                    <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
-                    <span class="flex-1">{{ session('error') }}</span>
-                    <button class="ml-4 text-red-600 hover:text-red-800">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            @endif
-
-            <!-- Key Metrics Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Total Users Card -->
-                <div
-                    class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-blue-100 text-sm font-medium">Total Users</p>
-                            <p class="text-3xl font-bold mt-2" id="totalUsers">{{ number_format($stats['total_users']) }}
-                            </p>
-                            <div class="flex items-center mt-2">
-                                <i class="fas fa-arrow-up text-green-300 mr-1 text-sm"></i>
-                                <span class="text-blue-100 text-xs">12% growth</span>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                            <i class="fas fa-users text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Consultations Card -->
-                <div
-                    class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-green-100 text-sm font-medium">Active Consultations</p>
-                            <p class="text-3xl font-bold mt-2" id="totalConsultations">
-                                {{ number_format($stats['total_consultation']) }}</p>
-                            <div class="flex items-center mt-2">
-                                <i class="fas fa-arrow-up text-green-300 mr-1 text-sm"></i>
-                                <span class="text-green-100 text-xs">8% this week</span>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                            <i class="fas fa-calendar-check text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pending Actions Card -->
-                <div
-                    class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-orange-100 text-sm font-medium">Pending Actions</p>
-                            <p class="text-3xl font-bold mt-2" id="pendingConsultations">
-                                {{ number_format($stats['pending_consultation']) }}</p>
-                            <div class="flex items-center mt-2">
-                                <i class="fas fa-clock text-orange-200 mr-1 text-sm"></i>
-                                <span class="text-orange-100 text-xs">Needs attention</span>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                            <i class="fas fa-clock text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Subscribers Card -->
-                <div
-                    class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-purple-100 text-sm font-medium">Newsletter Subscribers</p>
-                            <p class="text-3xl font-bold mt-2" id="totalSubscribers">
-                                {{ number_format($stats['total_subscribers']) }}</p>
-                            <div class="flex items-center mt-2">
-                                <i class="fas fa-arrow-up text-green-300 mr-1 text-sm"></i>
-                                <span class="text-purple-100 text-xs">5.2% growth</span>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                            <i class="fas fa-envelope text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
+                <a href="{{ route('management.consultation.index') }}" class="text-sm font-bold text-brand-700 dark:text-cyan-300">View all</a>
             </div>
-
-            <!-- Charts & Analytics Row -->
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <!-- Consultation Trends -->
-                <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Consultation Trends</h3>
-                            <p class="text-sm text-gray-600">Last 7 days performance</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="px-3 py-1 text-xs font-medium bg-primary-50 text-primary-700 rounded-lg">Week</button>
-                            <button
-                                class="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Month</button>
-                            <button
-                                class="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Year</button>
-                        </div>
-                    </div>
-                    <div id="chartdiv"></div>
-                </div>
-
-                <!-- User Analytics -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-6">User Analytics</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user-check text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">Active Users</p>
-                                    <p class="text-sm text-gray-600">Currently online</p>
-                                </div>
-                            </div>
-                            <span class="text-2xl font-bold text-blue-600"
-                                id="activeUsers">{{ number_format($stats['active_users']) }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-orange-50 rounded-xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user-clock text-orange-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">Pending Users</p>
-                                    <p class="text-sm text-gray-600">Awaiting approval</p>
-                                </div>
-                            </div>
-                            <span class="text-2xl font-bold text-orange-600"
-                                id="pendingUsers">{{ number_format($stats['pending_users']) }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-green-50 rounded-xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-calendar-check text-green-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">Completed</p>
-                                    <p class="text-sm text-gray-600">Consultations</p>
-                                </div>
-                            </div>
-                            <span class="text-2xl font-bold text-green-600"
-                                id="completedConsultations">{{ number_format($stats['completed_consultation']) }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Tables Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Recent Consultations -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900">Recent Consultations</h3>
-                        <a href="{{ route('management.consultation.index') }}"
-                            class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium">
-                            View all
-                            <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-                    <div class="space-y-4">
+            <div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+                <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                    <thead class="bg-slate-50 text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:bg-slate-900">
+                        <tr>
+                            <th class="px-4 py-3">Customer</th>
+                            <th class="px-4 py-3">Preferred date</th>
+                            <th class="px-4 py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white/50 dark:divide-slate-800 dark:bg-slate-950/20">
                         @forelse($stats['recent_consultation'] as $consultation)
-                            <div
-                                class="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-200">
-                                <div class="flex items-center gap-4">
-                                    <div
-                                        class="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-sm">
-                                        {{ substr($consultation->first_name ?? 'U', 0, 1) }}{{ substr($consultation->last_name ?? 'N', 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900">
-                                            {{ $consultation->first_name ?? 'Unknown' }}
-                                            {{ $consultation->last_name ?? 'User' }}</p>
-                                        <p class="text-sm text-gray-600">{{ $consultation->email ?? 'No email' }}</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-medium text-gray-900">
-                                        @if (isset($consultation->preferred_date) && $consultation->preferred_date)
-                                            {{ \Carbon\Carbon::parse($consultation->preferred_date)->format('M j, Y') }}
-                                        @else
-                                            Not set
-                                        @endif
-                                    </p>
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ ($consultation->status ?? 'new') === 'new'
-                                    ? 'bg-orange-100 text-orange-800'
-                                    : (($consultation->status ?? 'new') === 'scheduled'
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-blue-100 text-blue-800') }}">
-                                        {{ ucfirst($consultation->status ?? 'new') }}
-                                    </span>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-8">
-                                <i class="fas fa-calendar-times text-3xl text-gray-300 mb-3"></i>
-                                <p class="text-gray-500">No recent consultations</p>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Recent Users & Quick Actions -->
-                <div class="space-y-6">
-                    <!-- Recent Users -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-lg font-semibold text-gray-900">Recent Users</h3>
-                            <a href="{{ route('management.users.index') }}"
-                                class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium">
-                                View all
-                                <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                            </a>
-                        </div>
-                        <div class="space-y-4">
-                            @forelse($stats['recent_users'] as $user)
-                                <div
-                                    class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                            <tr class="transition hover:bg-brand-50/60 dark:hover:bg-cyan-400/5">
+                                <td class="px-4 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                                            {{ substr($user->first_name ?? 'U', 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-gray-900">{{ $user->first_name ?? 'Unknown User' }}</p>
-                                            <p class="text-sm text-gray-500">{{ $user->email ?? 'No email' }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xs text-gray-600">{{ $user->created_at->diffForHumans() }}</p>
-                                        <span
-                                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                    {{ $user->email_verified_at ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                            {{ $user->email_verified_at ? 'Verified' : 'Pending' }}
+                                        <span class="grid h-10 w-10 place-items-center rounded-xl bg-brand-700 text-sm font-bold text-white">
+                                            {{ substr($consultation->first_name ?? 'U', 0, 1) }}{{ substr($consultation->last_name ?? 'N', 0, 1) }}
+                                        </span>
+                                        <span>
+                                            <span class="block font-bold">{{ $consultation->first_name ?? 'Unknown' }} {{ $consultation->last_name ?? 'User' }}</span>
+                                            <span class="text-slate-500">{{ $consultation->email ?? 'No email' }}</span>
                                         </span>
                                     </div>
-                                </div>
-                            @empty
-                                <div class="text-center py-8">
-                                    <i class="fas fa-users text-3xl text-gray-300 mb-3"></i>
-                                    <p class="text-gray-500">No users yet</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-slate-600 dark:text-slate-300">
+                                    {{ isset($consultation->preferred_date) && $consultation->preferred_date ? \Carbon\Carbon::parse($consultation->preferred_date)->format('M j, Y') : 'Not set' }}
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="rounded-full px-3 py-1 text-xs font-bold {{ ($consultation->status ?? 'new') === 'new' ? 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-200' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200' }}">
+                                        {{ ucfirst($consultation->status ?? 'new') }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-4 py-12 text-center text-slate-500">
+                                    <i class="fas fa-calendar-xmark mb-3 text-3xl text-slate-300"></i>
+                                    <p class="font-semibold">No consultations yet</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                    <!-- Quick Actions -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                        <div class="grid grid-cols-2 gap-3">
-                            <a href="{{ route('management.users.create') }}"
-                                class="flex flex-col items-center justify-center p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group">
-                                <i
-                                    class="fas fa-user-plus text-blue-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-sm font-medium text-gray-900">Add User</span>
-                            </a>
-                            <a href="#"
-                                class="flex flex-col items-center justify-center p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors group">
-                                <i
-                                    class="fas fa-list text-green-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-sm font-medium text-gray-900">Consultations</span>
-                            </a>
-                            <a href="#"
-                                class="flex flex-col items-center justify-center p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors group">
-                                <i
-                                    class="fas fa-chart-bar text-purple-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-sm font-medium text-gray-900">Reports</span>
-                            </a>
-                            <a href="#"
-                                class="flex flex-col items-center justify-center p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors group">
-                                <i
-                                    class="fas fa-cog text-orange-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-sm font-medium text-gray-900">Settings</span>
-                            </a>
+        <div class="space-y-6">
+            <div class="admin-card p-5">
+                <h2 class="text-lg font-bold">Quick actions</h2>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <a href="{{ route('management.users.create') }}" class="admin-quick-action"><i class="fas fa-user-plus"></i><span>Add user</span></a>
+                    <a href="{{ route('management.consultation.index') }}" class="admin-quick-action"><i class="fas fa-calendar"></i><span>Schedule</span></a>
+                    <button type="button" class="admin-quick-action"><i class="fas fa-file-export"></i><span>Report</span></button>
+                    <button type="button" class="admin-quick-action"><i class="fas fa-sliders"></i><span>Settings</span></button>
+                </div>
+            </div>
+
+            <div class="admin-card p-5">
+                <h2 class="text-lg font-bold">Activity timeline</h2>
+                <div class="mt-5 space-y-5">
+                    @forelse($stats['recent_users']->take(4) as $user)
+                        <div class="flex gap-3">
+                            <span class="mt-1 h-2.5 w-2.5 rounded-full bg-brand-600"></span>
+                            <div>
+                                <p class="text-sm font-bold">{{ $user->first_name ?? 'A user' }} joined the workspace</p>
+                                <p class="text-xs text-slate-500">{{ $user->created_at->diffForHumans() }}</p>
+                            </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500 dark:border-slate-700">
+                            No recent activity.
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+@endsection
 
-    <!-- Use a reliable Chart.js CDN -->
-    <!-- Styles -->
-    <style>
-        #chartdiv {
-            width: 100%;
-            height: 300px;
-        }
-    </style>
-
-    <!-- Resources -->
-    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-
-    <!-- Chart code -->
+@push('scripts')
     <script>
-        am5.ready(function() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const chart = document.getElementById('consultationChart');
+            if (!chart || typeof Chart === 'undefined') return;
 
-            // Create root element
-            // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-            var root = am5.Root.new("chartdiv");
-
-            // Set themes
-            // https://www.amcharts.com/docs/v5/concepts/themes/
-            root.setThemes([
-                am5themes_Animated.new(root)
-            ]);
-
-            // Create chart
-            // https://www.amcharts.com/docs/v5/charts/xy-chart/
-            var chart = root.container.children.push(am5xy.XYChart.new(root, {
-                panX: true,
-                panY: true,
-                wheelX: "panX",
-                wheelY: "zoomX",
-                pinchZoomX: true,
-                paddingLeft: 0,
-                paddingRight: 1
-            }));
-
-            // Add cursor
-            // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-            var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
-            cursor.lineY.set("visible", false);
-
-
-            // Create axes
-            // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-            var xRenderer = am5xy.AxisRendererX.new(root, {
-                minGridDistance: 30,
-                minorGridEnabled: true
+            new Chart(chart, {
+                type: 'line',
+                data: {
+                    labels: @json($trendLabels),
+                    datasets: [{
+                        label: 'Consultations',
+                        data: @json($trendValues),
+                        fill: true,
+                        tension: 0.42,
+                        borderColor: '#0e7490',
+                        backgroundColor: 'rgba(14, 116, 144, 0.12)',
+                        pointBackgroundColor: '#d99b2b',
+                        pointBorderWidth: 0,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(148, 163, 184, 0.18)' } }
+                    }
+                }
             });
-
-            xRenderer.labels.template.setAll({
-                rotation: -90,
-                centerY: am5.p50,
-                centerX: am5.p100,
-                paddingRight: 15
-            });
-
-            xRenderer.grid.template.setAll({
-                location: 1
-            })
-
-            var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-                maxDeviation: 0.3,
-                categoryField: "country",
-                renderer: xRenderer,
-                tooltip: am5.Tooltip.new(root, {})
-            }));
-
-            var yRenderer = am5xy.AxisRendererY.new(root, {
-                strokeOpacity: 0.1
-            })
-
-            var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-                maxDeviation: 0.3,
-                renderer: yRenderer
-            }));
-
-            // Create series
-            // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-            var series = chart.series.push(am5xy.ColumnSeries.new(root, {
-                name: "Series 1",
-                xAxis: xAxis,
-                yAxis: yAxis,
-                valueYField: "value",
-                sequencedInterpolation: true,
-                categoryXField: "country",
-                tooltip: am5.Tooltip.new(root, {
-                    labelText: "{valueY}"
-                })
-            }));
-
-            series.columns.template.setAll({
-                cornerRadiusTL: 5,
-                cornerRadiusTR: 5,
-                strokeOpacity: 0
-            });
-            series.columns.template.adapters.add("fill", function(fill, target) {
-                return chart.get("colors").getIndex(series.columns.indexOf(target));
-            });
-
-            series.columns.template.adapters.add("stroke", function(stroke, target) {
-                return chart.get("colors").getIndex(series.columns.indexOf(target));
-            });
-
-
-            // Set data
-            var data = @json($stats['consultation_trend']);
-
-            xAxis.data.setAll(data);
-            series.data.setAll(data);
-
-
-            // Make stuff animate on load
-            // https://www.amcharts.com/docs/v5/concepts/animations/
-            series.appear(1000);
-            chart.appear(1000, 100);
-
         });
     </script>
-
-
-    <style>
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-@endsection
+@endpush

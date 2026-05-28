@@ -3,6 +3,9 @@
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\ConsultationSectionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\CmsPageController as AdminCmsPageController;
+use App\Http\Controllers\Admin\CmsPageSectionController;
+use App\Http\Controllers\Admin\CmsCollectionController;
 use App\Http\Controllers\Admin\FeatureSectionController;
 use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\HeroSectionController;
@@ -23,14 +26,13 @@ use App\Http\Controllers\LoanApplicationController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\CmsPageController;
 use App\Http\Controllers\Web\SectionController;
 use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/', function () {
-    return view('website.index');
-});
+Route::get('/', [CmsPageController::class, 'home'])->name('website.home');
 Route::get('/consultation', function () {
     return view('website.consultation');
 });
@@ -101,6 +103,19 @@ Route::prefix('management')->name('management.')->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::resource('dashboard', DashboardController::class);
+        Route::resource('cms/pages', AdminCmsPageController::class)
+            ->names('cms.pages')
+            ->parameters(['pages' => 'page']);
+        Route::post('cms/pages/{page}/sections/reorder', [CmsPageSectionController::class, 'reorder'])->name('cms.pages.sections.reorder');
+        Route::post('cms/pages/{page}/sections', [CmsPageSectionController::class, 'store'])->name('cms.pages.sections.store');
+        Route::put('cms/pages/{page}/sections/{section}', [CmsPageSectionController::class, 'update'])->name('cms.pages.sections.update');
+        Route::delete('cms/pages/{page}/sections/{section}', [CmsPageSectionController::class, 'destroy'])->name('cms.pages.sections.destroy');
+        Route::get('cms/collections/{type}', [CmsCollectionController::class, 'index'])->name('cms.collections.index');
+        Route::get('cms/collections/{type}/create', [CmsCollectionController::class, 'create'])->name('cms.collections.create');
+        Route::post('cms/collections/{type}', [CmsCollectionController::class, 'store'])->name('cms.collections.store');
+        Route::get('cms/collections/{type}/{id}/edit', [CmsCollectionController::class, 'edit'])->name('cms.collections.edit');
+        Route::put('cms/collections/{type}/{id}', [CmsCollectionController::class, 'update'])->name('cms.collections.update');
+        Route::delete('cms/collections/{type}/{id}', [CmsCollectionController::class, 'destroy'])->name('cms.collections.destroy');
 
         Route::resource('hero', HeroSectionController::class);
         Route::resource('about', AboutSectionController::class);
@@ -119,6 +134,18 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::resource('footer', FooterController::class);
     });
 });
+
+Route::get('/sitemap.xml', function () {
+    $pages = \App\Models\Page::published()->get();
+
+    return response()
+        ->view('website.sitemap', compact('pages'))
+        ->header('Content-Type', 'application/xml');
+})->name('website.sitemap');
+
+Route::get('/{slug}', [CmsPageController::class, 'show'])
+    ->where('slug', '^(?!management|admin|notifications|register|consultation|calculator|service-details|testimonial-reviews|view-success-stories|storage|up).*$')
+    ->name('website.page');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');

@@ -9,8 +9,7 @@
                 </div>
                 <div class="leading-none">
                     <div class="flex items-baseline gap-1">
-                        <span class="text-xl font-black tracking-tight text-slate-950">Londa</span>
-                        <span class="text-xl font-black tracking-tight text-cyan-700">Loans</span>
+                        <span class="text-xl font-black tracking-tight text-slate-950">{{ ($frontendSettings['site']['brand_name'][0] ?? 'Londa Loans') }}</span>
                     </div>
                     <div class="mt-1 hidden items-center gap-2 text-xs font-semibold text-slate-500 sm:flex">
                         <span class="text-amber-600">Ma Loans Yama Londas!</span>
@@ -21,16 +20,20 @@
             </a>
 
             <nav class="hidden items-center gap-8 text-sm font-bold lg:flex" role="navigation" aria-label="Main navigation">
-                <a href="/" class="premium-link">Home</a>
-                <a href="/#about" class="premium-link">About</a>
-                <a href="/#features" class="premium-link">Features</a>
-                <a href="/#services" class="premium-link">Services</a>
-                <a href="/calculator" class="premium-link">Calculator</a>
-                <a href="/#support" class="premium-link">Contact</a>
+                @forelse ($primaryMenuItems ?? [] as $item)
+                    <a href="{{ $item->href }}" target="{{ $item->target }}" class="premium-link">{{ $item->label }}</a>
+                @empty
+                    <a href="/" class="premium-link">Home</a>
+                    <a href="/#about" class="premium-link">About</a>
+                    <a href="/#features" class="premium-link">Features</a>
+                    <a href="/#services" class="premium-link">Services</a>
+                    <a href="/calculator" class="premium-link">Calculator</a>
+                    <a href="/#support" class="premium-link">Contact</a>
+                @endforelse
             </nav>
 
             <div class="hidden items-center gap-3 lg:flex">
-                <a href="/consultation" class="premium-btn-secondary px-5 text-sm">
+                <a href="{{ $frontendSettings['site']['consultation_url'][0] ?? '/consultation' }}" class="premium-btn-secondary px-5 text-sm">
                     <i class="fas fa-calendar-check text-cyan-700"></i>
                     <span>Consultation</span>
                 </a>
@@ -53,34 +56,26 @@
 
         <div data-mobile-menu class="premium-mobile-panel absolute left-3 right-3 top-[82px] rounded-3xl border border-white/80 bg-white/95 p-4 shadow-2xl backdrop-blur-2xl lg:hidden">
             <nav class="grid gap-2 text-sm font-bold text-slate-700" aria-label="Mobile navigation">
-                <a href="/" class="flex items-center gap-3 rounded-2xl bg-cyan-50 px-4 py-3 text-cyan-800">
-                    <i class="fas fa-home w-5"></i>
-                    <span>Home</span>
-                </a>
-                <a href="/#about" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
-                    <i class="fas fa-building-columns w-5 text-slate-400"></i>
-                    <span>About</span>
-                </a>
-                <a href="/#features" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
-                    <i class="fas fa-star w-5 text-slate-400"></i>
-                    <span>Features</span>
-                </a>
-                <a href="/#services" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
-                    <i class="fas fa-hand-holding-dollar w-5 text-slate-400"></i>
-                    <span>Services</span>
-                </a>
-                <a href="/calculator" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
-                    <i class="fas fa-calculator w-5 text-slate-400"></i>
-                    <span>Calculator</span>
-                </a>
-                <a href="/#support" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
-                    <i class="fas fa-envelope w-5 text-slate-400"></i>
-                    <span>Contact</span>
-                </a>
+                @forelse ($primaryMenuItems ?? [] as $item)
+                    <a href="{{ $item->href }}" target="{{ $item->target }}"
+                        class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                        <i class="{{ $item->icon ?: 'fas fa-circle' }} w-5 text-slate-400"></i>
+                        <span>{{ $item->label }}</span>
+                    </a>
+                @empty
+                    <a href="/" class="flex items-center gap-3 rounded-2xl bg-cyan-50 px-4 py-3 text-cyan-800">
+                        <i class="fas fa-home w-5"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="/#about" class="flex items-center gap-3 rounded-2xl px-4 py-3 transition hover:bg-slate-50">
+                        <i class="fas fa-building-columns w-5 text-slate-400"></i>
+                        <span>About</span>
+                    </a>
+                @endforelse
             </nav>
 
             <div class="mt-4 grid gap-3 border-t border-slate-200 pt-4">
-                <a href="/consultation" class="premium-btn-secondary px-5 text-sm">
+                <a href="{{ $frontendSettings['site']['consultation_url'][0] ?? '/consultation' }}" class="premium-btn-secondary px-5 text-sm">
                     <i class="fas fa-calendar-check text-cyan-700"></i>
                     <span>Book Consultation</span>
                 </a>
