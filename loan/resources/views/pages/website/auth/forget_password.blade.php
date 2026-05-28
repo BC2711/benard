@@ -1,661 +1,432 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Londa Loans - Reset Password</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Laravel Asset Helper -->
-    <script defer src="{{ asset('assets/js/tailwind.js') }}"></script>
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/logos/londa.jpg') }}" />
+    <title>Londa Loans - Forgot Password</title>
 
-    <!-- Include Alpine.js for x-data functionality -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.2.4/cdn.min.js" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/logos/londa.jpg') }}">
 
-    <style>
-        :root {
-            --primary-color: #db9123;
-            --secondary-color: #7a4603;
-            --white: #ffffff;
-            --light-bg: #f8f9fa;
-            --text-dark: #333333;
-            --text-light: #666666;
-            --border-color: #e0e0e0;
-            --error-color: #e74c3c;
-            --success-color: #2ecc71;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .forgot-password-container {
-            display: flex;
-            width: 100%;
-            max-width: 1000px;
-            background-color: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            animation: fadeIn 0.8s ease-out;
-        }
+    <link rel="stylesheet" href="{{ asset('assets/css/premium-ui.css') }}">
 
-        .forgot-password-left {
-            flex: 1;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-            color: var(--white);
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .forgot-password-left::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background-color: var(--white);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-        }
-
-        .logo-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .logo-londa {
-            color: var(--white);
-        }
-
-        .logo-loans {
-            color: var(--primary-color);
-        }
-
-        .welcome-text {
-            margin-bottom: 1.5rem;
-        }
-
-        .welcome-text h1 {
-            font-size: 2.2rem;
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
-        }
-
-        .welcome-text p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .steps {
-            list-style: none;
-            margin-top: 2rem;
-        }
-
-        .steps li {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-        }
-
-        .step-number {
-            width: 30px;
-            height: 30px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            flex-shrink: 0;
-            font-weight: 600;
-        }
-
-        .step-content h3 {
-            margin-bottom: 0.3rem;
-            font-size: 1.1rem;
-        }
-
-        .step-content p {
-            opacity: 0.9;
-            font-size: 0.95rem;
-        }
-
-        .forgot-password-right {
-            flex: 1;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .back-to-login {
-            margin-bottom: 1.5rem;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .back-link i {
-            margin-right: 0.5rem;
-        }
-
-        .forgot-password-header {
-            margin-bottom: 2rem;
-        }
-
-        .forgot-password-header h2 {
-            color: var(--secondary-color);
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .forgot-password-header p {
-            color: var(--text-light);
-        }
-
-        .forgot-password-form {
-            width: 100%;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .input-with-icon {
-            position: relative;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .form-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(219, 145, 35, 0.2);
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-        }
-
-        .reset-button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: var(--primary-color);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .reset-button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .reset-button:disabled {
-            background-color: var(--border-color);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .divider {
-            text-align: center;
-            position: relative;
-            margin: 1.5rem 0;
-            color: var(--text-light);
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background-color: var(--border-color);
-            z-index: 1;
-        }
-
-        .divider span {
-            background-color: var(--white);
-            padding: 0 1rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .contact-support {
-            text-align: center;
-            color: var(--text-light);
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .contact-support a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .contact-support a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            color: var(--error-color);
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .success-message {
-            color: var(--success-color);
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .success-state {
-            text-align: center;
-            display: none;
-        }
-
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background-color: rgba(46, 204, 113, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            color: var(--success-color);
-            font-size: 2rem;
-        }
-
-        .success-state h3 {
-            color: var(--secondary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .success-state p {
-            color: var(--text-light);
-            margin-bottom: 1.5rem;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-5px);
-            }
-
-            75% {
-                transform: translateX(5px);
-            }
-        }
-
-        .shake {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .forgot-password-container {
-                flex-direction: column;
-                max-width: 450px;
-            }
-
-            .forgot-password-left {
-                padding: 2rem;
-            }
-
-            .forgot-password-right {
-                padding: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-
-            .forgot-password-left,
-            .forgot-password-right {
-                padding: 1.5rem;
-            }
-
-            .welcome-text h1 {
-                font-size: 1.8rem;
-            }
-
-            .forgot-password-header h2 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="forgot-password-container">
-        <!-- Left Side: Branding and Information -->
-        <div class="forgot-password-left">
-            <div class="logo">
-                <div class="logo-icon">
-                    <span style="color: #db9123; font-weight: bold; font-size: 1.2rem;">
-                        <img src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans Logo" />
-                    </span>
-                </div>
-                <div class="logo-text">
-                    <span class="logo-londa">Londa</span>
-                    <span class="logo-loans">Loans</span>
-                </div>
-            </div>
-            <div class="welcome-text">
-                <h1>Reset Your Password</h1>
-                <p>Follow these simple steps to regain access to your account.</p>
-            </div>
-            <ul class="steps">
-                <li>
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Enter Your Email</h3>
-                        <p>Provide the email address associated with your Londa Loans account.</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Check Your Inbox</h3>
-                        <p>We'll send a password reset link to your email address.</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Create New Password</h3>
-                        <p>Follow the link in the email to set up your new password.</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Right Side: Forgot Password Form -->
-        <div class="forgot-password-right">
-            <div class="back-to-login">
-                <a href="{{ route('login') }}" class="back-link">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Login
-                </a>
-            </div>
-
-            <div class="forgot-password-header">
-                <h2>Forgot Your Password?</h2>
-                <p>Enter your email address and we'll send you a link to reset your password.</p>
-            </div>
-
-            <!-- Laravel Session Messages -->
-            @if (session('status'))
-                <div class="success-state" id="successState" style="display: block;">
-                    <div class="success-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <h3>Check Your Email</h3>
-                    <p>
-                        We've sent a password reset link to <strong>{{ session('email') ?? 'your email' }}</strong>. The
-                        link will expire in 30 minutes.
-                    </p>
-                    <button class="reset-button" onclick="window.location.href='{{ route('management.login') }}'">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Return to Login
-                    </button>
-                    <div class="contact-support">
-                        <p>
-                            Didn't receive the email? <a href="#" id="resendLink">Resend</a> or <a
-                                href="/contact">Contact Support</a>
-                        </p>
-                    </div>
-                </div>
-            @else
-                <!-- Initial Form State -->
-                <form class="forgot-password-form" id="forgotPasswordForm"
-                    action="{{ route('management.password.email') }}" method="POST">
-                    @csrf
-
-                    <!-- Laravel Validation Errors -->
-                    @if ($errors->any())
-                        <div class="error-message" style="display: block; margin-bottom: 1rem;">
-                            @foreach ($errors->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email Address</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-envelope input-icon"></i>
-                            <input type="email" id="email" name="email"
-                                class="form-input @error('email') shake @enderror"
-                                placeholder="Enter your email address" value="{{ old('email') }}" required />
-                        </div>
-                        <div class="error-message" id="emailError">Please enter a valid email address</div>
-                        @error('email')
-                            <div class="error-message" style="display: block;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <button type="submit" class="reset-button" id="resetButton">
-                        <i class="fas fa-paper-plane"></i>
-                        Send Reset Link
-                    </button>
-
-                    <div class="divider">
-                        <span>Need help?</span>
-                    </div>
-
-                    <div class="contact-support">
-                        <p>
-                            Can't access your email? <a href="/contact">Contact Support</a>
-                        </p>
-                    </div>
-                </form>
-
-                <!-- Success State (Hidden by default) -->
-                <div class="success-state" id="successState">
-                    <div class="success-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <h3>Check Your Email</h3>
-                    <p>
-                        We've sent a password reset link to <strong id="userEmail"></strong>. The link will expire in 30
-                        minutes.
-                    </p>
-                    <button class="reset-button" onclick="window.location.href='{{ route('login') }}'">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Return to Login
-                    </button>
-                    <div class="contact-support">
-                        <p>
-                            Didn't receive the email? <a href="#" id="resendLink">Resend</a> or <a
-                                href="/contact">Contact Support</a>
-                        </p>
-                    </div>
-                </div>
-            @endif
-        </div>
-    </div>
+    <script src="{{ asset('assets/js/tailwind.js') }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const forgotPasswordForm = document.getElementById('forgotPasswordForm')
-            const successState = document.getElementById('successState')
-            const emailInput = document.getElementById('email')
-            const resetButton = document.getElementById('resetButton')
-            const emailError = document.getElementById('emailError')
-            const userEmail = document.getElementById('userEmail')
-            const resendLink = document.getElementById('resendLink')
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
 
-            // Only run if form exists (not in success state)
-            if (forgotPasswordForm) {
-                // Form validation and submission
-                forgotPasswordForm.addEventListener('submit', function(event) {
-                    let isValid = true
+                    colors: {
+                        brand: {
+                            600: '#0e7490',
+                            700: '#155e75',
+                            900: '#083344'
+                        },
 
-                    // Reset error message
-                    emailError.style.display = 'none'
-                    emailInput.classList.remove('shake')
+                        gold: {
+                            500: '#d99b2b'
+                        }
+                    },
 
-                    // Validate email
-                    if (!validateEmail(emailInput.value.trim())) {
-                        emailError.style.display = 'block'
-                        emailInput.classList.add('shake')
-                        isValid = false
+                    boxShadow: {
+                        lift: '0 30px 90px rgba(15, 23, 42, 0.18)'
                     }
-
-                    if (isValid) {
-                        // Show loading state
-                        resetButton.disabled = true
-                        resetButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'
-                    } else {
-                        event.preventDefault()
-                    }
-                })
-
-                // Real-time validation
-                emailInput.addEventListener('input', function() {
-                    if (validateEmail(this.value.trim())) {
-                        emailError.style.display = 'none'
-                        this.classList.remove('shake')
-                    }
-                })
+                }
             }
-
-            // Resend link functionality
-            if (resendLink) {
-                resendLink.addEventListener('click', function(event) {
-                    event.preventDefault()
-
-                    // Show loading state
-                    const originalText = this.textContent
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resending...'
-                    this.style.pointerEvents = 'none'
-
-                    // Simulate API call
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="fas fa-check"></i> Sent!'
-
-                        // Reset after 2 seconds
-                        setTimeout(() => {
-                            this.textContent = originalText
-                            this.style.pointerEvents = 'auto'
-                        }, 2000)
-                    }, 1500)
-                })
-            }
-
-            // Email validation function
-            function validateEmail(email) {
-                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                return re.test(String(email).toLowerCase())
-            }
-
-            // Demo functionality to show how it works
-            console.log('Forgot Password Page Loaded')
-            console.log('This page allows users to request a password reset link via email.')
-        })
+        }
     </script>
+</head>
+
+<body class="min-h-screen overflow-x-hidden bg-slate-950 font-sans text-white antialiased">
+
+    <main class="relative min-h-screen overflow-hidden lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+
+        <!-- LEFT SIDE -->
+        <section
+            class="relative hidden min-h-screen overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-8 xl:p-10">
+
+            <!-- Background -->
+            <div
+                class="absolute inset-0 bg-[linear-gradient(135deg,rgba(14,116,144,0.92),rgba(15,118,110,0.78)),url('/assets/images/hero.png')] bg-cover bg-center">
+            </div>
+
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(217,155,43,0.35),transparent_32%)]">
+            </div>
+
+            <!-- Logo -->
+            <div class="relative z-10">
+                <div class="flex items-center gap-3">
+
+                    <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-lift">
+
+                        <img src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans"
+                            class="h-9 w-9 rounded-xl object-cover">
+
+                    </span>
+
+                    <div>
+                        <p class="text-xl font-extrabold">
+                            Londa Loans
+                        </p>
+
+                        <p class="text-sm text-cyan-50/80">
+                            Administration System
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="relative z-10 max-w-lg xl:max-w-xl">
+
+                <span class="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold backdrop-blur">
+
+                    Secure account recovery
+
+                </span>
+
+                <h1 class="mt-6 text-3xl font-extrabold leading-tight tracking-tight xl:text-5xl">
+
+                    Recover access to your admin workspace safely.
+
+                </h1>
+
+                <p class="mt-5 text-base leading-7 text-cyan-50/85 xl:text-lg xl:leading-8">
+
+                    Enter your registered email address and we will send a secure
+                    password reset link directly to your inbox.
+
+                </p>
+
+                <!-- Steps -->
+                <div class="mt-6 space-y-3 xl:mt-8 xl:space-y-4">
+
+                    <!-- Step 1 -->
+                    <div class="rounded-2xl border border-white/15 bg-white/10 p-3 xl:p-4 backdrop-blur">
+
+                        <div class="flex gap-4">
+
+                            <span
+                                class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/15 font-extrabold">
+
+                                1
+
+                            </span>
+
+                            <div>
+                                <p class="font-bold">
+                                    Verify your email
+                                </p>
+
+                                <p class="mt-1 text-sm text-cyan-50/80">
+                                    Use the email address linked to your admin account.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="rounded-2xl border border-white/15 bg-white/10 p-3 xl:p-4 backdrop-blur">
+
+                        <div class="flex gap-4">
+
+                            <span
+                                class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/15 font-extrabold">
+
+                                2
+
+                            </span>
+
+                            <div>
+                                <p class="font-bold">
+                                    Check your inbox
+                                </p>
+
+                                <p class="mt-1 text-sm text-cyan-50/80">
+                                    Open the secure reset link sent to your email.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="rounded-2xl border border-white/15 bg-white/10 p-3 xl:p-4 backdrop-blur">
+
+                        <div class="flex gap-4">
+
+                            <span
+                                class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/15 font-extrabold">
+
+                                3
+
+                            </span>
+
+                            <div>
+                                <p class="font-bold">
+                                    Create a new password
+                                </p>
+
+                                <p class="mt-1 text-sm text-cyan-50/80">
+                                    Set a strong new password and continue securely.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT SIDE -->
+        <section
+            class="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 py-5 text-slate-950 sm:px-6 lg:px-8 xl:px-10">
+
+            <!-- Grid Background -->
+            <div
+                class="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:44px_44px]">
+            </div>
+
+            <div class="relative w-full max-w-lg">
+
+                <!-- Mobile Logo -->
+                <div class="mb-8 flex items-center gap-3 lg:hidden">
+
+                    <span class="grid h-12 w-12 place-items-center rounded-2xl bg-brand-700 shadow-lift">
+
+                        <img src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans"
+                            class="h-9 w-9 rounded-xl object-cover">
+
+                    </span>
+
+                    <div>
+                        <p class="text-xl font-extrabold">
+                            Londa Loans
+                        </p>
+
+                        <p class="text-sm text-slate-500">
+                            Administration System
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Card -->
+                <div
+                    class="w-full rounded-3xl border border-white bg-white/95 p-5 shadow-lift backdrop-blur sm:p-7 lg:p-8">
+
+                    <!-- Back -->
+                    <a href="{{ route('login') }}"
+                        class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-brand-700 transition hover:text-brand-600">
+
+                        <i class="fas fa-arrow-left"></i>
+
+                        Back to login
+
+                    </a>
+
+                    @if (session('status'))
+
+                        <!-- Success State -->
+                        <div class="text-center">
+
+                            <div
+                                class="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-50 text-3xl text-emerald-600">
+
+                                <i class="fas fa-check"></i>
+
+                            </div>
+
+                            <h2 class="mt-6 text-3xl font-extrabold tracking-tight">
+                                Check your email
+                            </h2>
+
+                            <p class="mt-3 text-sm leading-6 text-slate-500">
+
+                                We have sent a secure password reset link to
+
+                                <strong class="text-slate-800">
+                                    {{ session('email') ?? 'your email address' }}
+                                </strong>
+
+                                . The link will expire in 30 minutes.
+
+                            </p>
+
+                            <a href="{{ route('management.login') }}"
+                                class="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-brand-700 px-4 font-bold text-white shadow-lift transition hover:-translate-y-0.5 hover:bg-brand-600">
+
+                                <i class="fas fa-arrow-right-to-bracket"></i>
+
+                                Return to login
+
+                            </a>
+
+                            <p class="mt-6 border-t border-slate-200 pt-5 text-sm text-slate-500">
+
+                                Did not receive the email?
+
+                                <a href="/contact" class="font-bold text-brand-700 hover:text-brand-600">
+
+                                    Contact support
+
+                                </a>
+
+                            </p>
+
+                        </div>
+                    @else
+                        <!-- Header -->
+                        <div>
+
+                            <p class="text-sm font-bold uppercase tracking-wider text-brand-700">
+
+                                Password recovery
+
+                            </p>
+
+                            <h2 class="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
+
+                                Forgot password?
+
+                            </h2>
+
+                            <p class="mt-2 text-sm leading-6 text-slate-500">
+
+                                Enter your admin email address and we will send
+                                you a secure password reset link.
+
+                            </p>
+
+                        </div>
+
+                        <!-- Errors -->
+                        <div class="mt-6 space-y-3">
+
+                            @if ($errors->any())
+
+                                <div class="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+
+                                    <ul class="list-inside list-disc">
+
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+
+                                    </ul>
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                        <!-- Form -->
+                        <form class="mt-5 space-y-4" action="{{ route('management.password.email') }}" method="POST"
+                            x-data="{ loading: false }" @submit="loading = true">
+
+                            @csrf
+
+                            <!-- Email -->
+                            <div>
+
+                                <label for="email" class="mb-2 block text-sm font-bold text-slate-700">
+
+                                    Email address
+
+                                </label>
+
+                                <div class="relative">
+
+                                    <i
+                                        class="fas fa-envelope pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+
+                                    <input id="email" name="email" type="email" value="{{ old('email') }}"
+                                        required autofocus class="admin-input h-12 w-full pl-11 pr-4"
+                                        placeholder="you@londaloans.com">
+
+                                </div>
+
+                                @error('email')
+                                    <p class="mt-2 text-sm font-semibold text-red-600">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+
+                            </div>
+
+                            <!-- Button -->
+                            <button type="submit"
+                                class="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-brand-700 px-4 font-bold text-white shadow-lift transition hover:-translate-y-0.5 hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+                                :disabled="loading">
+
+                                <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+
+                                <span x-show="!loading">
+                                    Send reset link
+                                </span>
+
+                                <span x-show="loading">
+                                    Sending link...
+                                </span>
+
+                            </button>
+
+                            <!-- Divider -->
+                            <div class="relative py-2 text-center">
+
+                                <div class="absolute inset-x-0 top-1/2 h-px bg-slate-200"></div>
+
+                                <span
+                                    class="relative bg-white px-3 text-xs font-bold uppercase tracking-wider text-slate-400">
+
+                                    Need help?
+
+                                </span>
+
+                            </div>
+
+                            <!-- Support -->
+                            <div
+                                class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center text-sm text-slate-500">
+
+                                Cannot access your email?
+
+                                <a href="/contact" class="font-bold text-brand-700 hover:text-brand-600">
+
+                                    Contact support
+
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    @endif
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 </body>
 
 </html>
