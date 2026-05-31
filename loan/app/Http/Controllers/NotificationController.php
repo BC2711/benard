@@ -11,10 +11,9 @@ class NotificationController extends Controller
 {
     protected $notificationService;
 
-    public function __construct()
+    public function __construct(NotificationManagerService $notificationService)
     {
-        // Manual instantiation to avoid dependency injection issues
-        $this->notificationService = new \App\Services\NotificationManagerService();
+        $this->notificationService = $notificationService;
     }
 
     /**

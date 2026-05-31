@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Services\EmailDeliveryService;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 
 class UserController extends Controller
 {
@@ -63,7 +66,11 @@ class UserController extends Controller
             // Hash password
             $validated['password'] = Hash::make($validated['password']);
 
-            User::create($validated);
+            $user = User::create($validated);
+            app(EmailDeliveryService::class)->queue('auth.account_status', $user->email, [
+                'first_name' => $user->first_name,
+                'status' => $user->status,
+            ]);
 
             return redirect()->route('management.users.index')
                 ->with('success', 'User created successfully.');
@@ -141,7 +148,26 @@ class UserController extends Controller
                 unset($validated['password']);
             }
 
+            $passwordChanged = $request->filled('password');
+            $statusChanged = $user->status !== $validated['status'];
             $user->update($validated);
+            $email = app(EmailDeliveryService::class);
+            $email->queue('auth.profile_updated', $user->email, [
+                'first_name' => $user->first_name,
+                'changed_at' => now()->toDayDateTimeString(),
+            ]);
+            if ($passwordChanged) {
+                $email->queue('auth.password_changed', $user->email, [
+                    'first_name' => $user->first_name,
+                    'changed_at' => now()->toDayDateTimeString(),
+                ]);
+            }
+            if ($statusChanged) {
+                $email->queue('auth.account_status', $user->email, [
+                    'first_name' => $user->first_name,
+                    'status' => $user->status,
+                ]);
+            }
 
             return redirect()->route('management.users.index')
                 ->with('success', 'User updated successfully.');
@@ -159,7 +185,7 @@ class UserController extends Controller
     {
         try {
             // Prevent users from deleting themselves
-            if ($user->id === Auth::id()) {
+            if ($user->id === Auth::guard('management')->id()) {
                 return redirect()->back()
                     ->with('error', 'You cannot delete your own account.');
             }
@@ -188,6 +214,10 @@ class UserController extends Controller
             $user->update([
                 'status' => $user->status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
             ]);
+            app(EmailDeliveryService::class)->queue('auth.account_status', $user->email, [
+                'first_name' => $user->first_name,
+                'status' => $user->status,
+            ]);
 
             return redirect()->back()
                 ->with('success', 'User status updated successfully.');
@@ -207,6 +237,9 @@ class UserController extends Controller
                 'locked_at' => null,
                 'attempts' => 0
             ]);
+            app(EmailDeliveryService::class)->queue('auth.account_recovered', $user->email, [
+                'first_name' => $user->first_name,
+            ]);
 
             return redirect()->back()
                 ->with('success', 'User account unlocked successfully.');
@@ -221,7 +254,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        $user = Auth::user();
+        $user = Auth::guard('management')->user();
         $genders = ['MALE' => 'Male', 'FEMALE' => 'Female', 'OTHER' => 'Other'];
         return view('profile.profile', compact('user', 'genders'));
     }
@@ -231,7 +264,7 @@ class UserController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $user = User::findOrFail(Auth::user()->id);
+        $user = User::findOrFail(Auth::guard('management')->id());
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -263,10 +296,26 @@ class UserController extends Controller
                 $validated['profile_picture'] = $request->file('profile_picture')->store('profile-pictures', 'public');
             }
 
+            $newEmail = $validated['email'];
+            unset($validated['email']);
+
+            if ($newEmail !== $user->email) {
+                $token = Str::random(64);
+                $validated['pending_email'] = $newEmail;
+                $validated['pending_email_token'] = $token;
+                $this->queueEmailChangeVerification($user, $newEmail, $token);
+            }
+
             $user->update($validated);
+            app(EmailDeliveryService::class)->queue('auth.profile_updated', $user->email, [
+                'first_name' => $user->first_name,
+                'changed_at' => now()->toDayDateTimeString(),
+            ]);
 
             return redirect()->route('management.profile')
-                ->with('success', 'Profile updated successfully.');
+                ->with('success', $newEmail !== $user->email
+                    ? 'Profile updated. Check your new email address to confirm the change.'
+                    : 'Profile updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error updating profile: ' . $e->getMessage())
@@ -287,7 +336,7 @@ class UserController extends Controller
      */
     public function changePassword(Request $request)
     {
-        $user = User::findOrFail(Auth::user()->id);
+        $user = User::findOrFail(Auth::guard('management')->id());
 
         $validated = $request->validate([
             'current_password' => 'required|string',
@@ -303,6 +352,10 @@ class UserController extends Controller
             }
             $user->password = Hash::make($validated['password']);
             $user->save();
+            app(EmailDeliveryService::class)->queue('auth.password_changed', $user->email, [
+                'first_name' => $user->first_name,
+                'changed_at' => now()->toDayDateTimeString(),
+            ]);
 
             return redirect()->route('management.profile')
                 ->with('success', 'Password changed successfully.');
@@ -310,5 +363,20 @@ class UserController extends Controller
             return redirect()->back()
                 ->with('error', 'Error changing password: ' . $e->getMessage());
         }
+    }
+
+    private function queueEmailChangeVerification(User $user, string $newEmail, string $token): void
+    {
+        $url = URL::temporarySignedRoute(
+            'email-change.verify',
+            now()->addHours(24),
+            ['user' => $user->id, 'token' => $token],
+        );
+
+        app(EmailDeliveryService::class)->queue('auth.email_change_verification', $newEmail, [
+            'first_name' => $user->first_name,
+            'action_url' => $url,
+            'action_text' => 'Confirm email address',
+        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\EmailTrackingController;
 use App\Http\Controllers\Web\CmsPageController;
 use App\Models\Page;
 use Illuminate\Support\Facades\Route;
@@ -9,7 +10,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [CmsPageController::class, 'home'])->name('website.home');
 
 Route::view('/consultation', 'website.consultation')->name('website.consultation');
-Route::post('/consultation', [ConsultationController::class, 'store'])->name('consultation.store');
+Route::post('/consultation', [ConsultationController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('consultation.store');
+
+Route::get('/email/open/{token}', [EmailTrackingController::class, 'open'])->name('email.track.open');
+Route::get('/email/click/{token}', [EmailTrackingController::class, 'click'])->name('email.track.click');
 
 Route::view('/service-details', 'website.service_details')->name('website.service-details');
 Route::view('/testimonial-reviews', 'website.review_testimonials')->name('website.testimonial-reviews');
@@ -21,6 +27,12 @@ Route::post('/management/login', [AuthController::class, 'login'])->middleware('
 
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::get('/email/verify/{user}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware('signed')
+    ->name('verification.verify');
+Route::get('/email/change/{user}/{token}', [AuthController::class, 'confirmEmailChange'])
+    ->middleware('signed')
+    ->name('email-change.verify');
 
 Route::get('/sitemap.xml', function () {
     $pages = Page::published()->get();

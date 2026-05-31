@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Recaptcha;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreConsultationRequest extends FormRequest
 {
@@ -21,7 +23,11 @@ class StoreConsultationRequest extends FormRequest
             'preferred_date' => 'required|date|after_or_equal:today',
             'preferred_time' => 'required|in:09:00,10:00,11:00,13:00,14:00,15:00,16:00',
             'message' => 'nullable|string|max:2000',
-            'g-recaptcha-response' => 'nullable|recaptcha', 
+            'website' => 'nullable|string|max:0',
+            'g-recaptcha-response' => [
+                Rule::requiredIf((bool) config('services.recaptcha.secret_key')),
+                new Recaptcha(),
+            ],
         ];
     }
 

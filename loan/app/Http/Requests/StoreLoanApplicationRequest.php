@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Recaptcha;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreLoanApplicationRequest extends FormRequest
 {
@@ -23,6 +25,11 @@ class StoreLoanApplicationRequest extends FormRequest
             'loanPurpose' => 'required|string|in:marketing-campaign,business-expansion,equipment,working-capital,other',
             'timeline' => 'nullable|string|in:immediately,1-2-weeks,1-month,flexible',
             'message' => 'nullable|string|max:1000',
+            'website' => 'nullable|string|max:0',
+            'g-recaptcha-response' => [
+                Rule::requiredIf((bool) config('services.recaptcha.secret_key')),
+                new Recaptcha(),
+            ],
         ];
     }
 

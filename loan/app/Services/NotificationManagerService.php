@@ -4,10 +4,13 @@ namespace App\Services;
 
 use App\Models\Notification;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class NotificationManagerService
 {
+    public function __construct(private readonly EmailDeliveryService $email)
+    {
+    }
+
     /**
      * Send notification based on type
      */
@@ -44,22 +47,13 @@ class NotificationManagerService
             throw new \Exception("Email address is required for email notifications");
         }
 
-        $data = [
+        $this->email->queue('notification.generic', $notification->email, [
             'full_name' => $notification->full_name,
             'message' => $notification->message,
-            'subject' => $notification->subject
-        ];
+            'subject' => $notification->subject ?? 'Notification from ' . config('app.name'),
+        ]);
 
-        Mail::send('emails.notification', $data, function ($message) use ($notification) {
-            $message->to($notification->email)
-                ->subject($notification->subject ?? 'Notification from ' . config('app.name'));
-        });
-
-        if (count(Mail::failures()) > 0) {
-            throw new \Exception("Email failed to send to: " . $notification->email);
-        }
-
-        $notification->markAsSent("Email sent successfully to {$notification->email}");
+        $notification->markAsSent("Email queued successfully for {$notification->email}");
         return true;
     }
 
@@ -72,22 +66,11 @@ class NotificationManagerService
             throw new \Exception("Email address is required for newsletter subscription");
         }
 
-        $data = [
-            'full_name' => $notification->full_name,
-            'message' => "Welcome to the Londa loan news! You have successfully subscribed to our newsletter.",
-            'subject' => "Welcome to Londa Loan News"
-        ];
+        $this->email->queue('newsletter.confirmation', $notification->email, [
+            'email' => $notification->email,
+        ]);
 
-        Mail::send('emails.newslatter', $data, function ($message) use ($notification) {
-            $message->to($notification->email)
-                ->subject('Welcome to Londa Loan Newsletter');
-        });
-
-        if (count(Mail::failures()) > 0) {
-            throw new \Exception("Welcome email failed to send to: " . $notification->email);
-        }
-
-        $notification->markAsSent("Newsletter subscription confirmed and email sent to {$notification->email}");
+        $notification->markAsSent("Newsletter confirmation queued for {$notification->email}");
         return true;
     }
 

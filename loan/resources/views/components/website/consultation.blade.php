@@ -46,6 +46,7 @@
             <div class="premium-card premium-reveal rounded-[2rem] bg-white p-6 lg:p-8">
                 <form action="{{ route('consultation.store') }}" method="POST" class="space-y-5">
                     @csrf
+                    <input type="text" name="website" value="" class="hidden" tabindex="-1" autocomplete="off">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>

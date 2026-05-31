@@ -7,6 +7,9 @@ use App\Http\Controllers\Admin\CmsPageSectionController;
 use App\Http\Controllers\Admin\ConsultationSectionController;
 use App\Http\Controllers\Admin\FeatureSectionController;
 use App\Http\Controllers\Admin\FooterController;
+use App\Http\Controllers\Admin\EmailLogController;
+use App\Http\Controllers\Admin\EmailSettingsController;
+use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\HeroSectionController;
 use App\Http\Controllers\Admin\ImpactNumbersController;
 use App\Http\Controllers\Admin\LoanCalculatorController;
@@ -29,6 +32,8 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:5,1');
         Route::get('/password/reset/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
         Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:5,1');
+        Route::get('/two-factor', [AuthController::class, 'showTwoFactorForm'])->name('two-factor.form');
+        Route::post('/two-factor', [AuthController::class, 'verifyTwoFactor'])->name('two-factor.verify')->middleware('throttle:5,1');
     });
 
     Route::middleware('auth:management')->group(function () {
@@ -72,5 +77,13 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::resource('support', SupportController::class);
         Route::resource('calculator', LoanCalculatorController::class)->only(['index', 'update']);
         Route::resource('footer', FooterController::class);
+        Route::get('email/settings', [EmailSettingsController::class, 'edit'])->name('email-settings.edit');
+        Route::put('email/settings', [EmailSettingsController::class, 'update'])->name('email-settings.update');
+        Route::post('email/settings/test', [EmailSettingsController::class, 'test'])->name('email-settings.test');
+        Route::get('email/templates', [EmailTemplateController::class, 'index'])->name('email-templates.index');
+        Route::get('email/templates/{template}/edit', [EmailTemplateController::class, 'edit'])->name('email-templates.edit');
+        Route::put('email/templates/{template}', [EmailTemplateController::class, 'update'])->name('email-templates.update');
+        Route::get('email/templates/{template}/preview', [EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+        Route::get('email/logs', [EmailLogController::class, 'index'])->name('email-logs.index');
     });
 });

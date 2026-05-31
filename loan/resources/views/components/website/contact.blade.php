@@ -145,6 +145,7 @@
                         <p class="text-gray-500 text-sm mb-5">{{ $support->form_subheading }}</p>
 
                         <form id="loanApplicationForm" class="space-y-5">
+                            <input type="text" name="website" value="" class="hidden" tabindex="-1" autocomplete="off">
                             <div id="formMessage" class="hidden p-4 rounded-lg mb-3"></div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -193,6 +194,10 @@
                             </div>
                             <x-textarea name="message" label="Tell us about your project" rows="3"
                                 placeholder="Describe your business and how you plan to use the loan..." />
+
+                            @if (config('services.recaptcha.site_key'))
+                                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                            @endif
 
                             <div class="flex items-center gap-3 p-3 bg-primary-50 rounded-lg">
                                 <i class="fas fa-shield-alt text-primary-secondary text-lg"></i>
@@ -424,7 +429,7 @@
 
         try {
             const formData = new FormData(this);
-            const res = await fetch('/notifications/application', {
+            const res = await fetch('{{ route('loan-application.store') }}', {
                 method: 'POST',
                 body: formData,
                 headers: {

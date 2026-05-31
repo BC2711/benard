@@ -6,7 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Notifications\SuperAdminResetPasswordNotification;
+use App\Services\EmailDeliveryService;
 
 class User extends Authenticatable
 {
@@ -23,6 +23,8 @@ class User extends Authenticatable
         'last_name',
         'phone',
         'email',
+        'pending_email',
+        'pending_email_token',
         'username',
         'address',
         'date_of_birth',
@@ -56,11 +58,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'date_of_birth' => 'date',
             'password' => 'hashed',
+            'two_factor_expires_at' => 'datetime',
         ];
     }
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new SuperAdminResetPasswordNotification($token));
+        $resetUrl = route('management.password.reset', [
+            'token' => $token,
+            'email' => $this->email,
+        ]);
+
+        app(EmailDeliveryService::class)->queue('auth.password_reset', $this->email, [
+            'first_name' => $this->first_name,
+            'action_url' => $resetUrl,
+            'action_text' => 'Reset password',
+        ]);
     }
 }

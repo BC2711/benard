@@ -137,6 +137,7 @@
 
                     <form id="newsletterForm" class="space-y-3">
                         @csrf
+                        <input type="text" name="website" value="" class="hidden" tabindex="-1" autocomplete="off">
                         <input type="email" name="email" placeholder="Your email address" required
                             class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 text-sm focus:outline-none focus:border-primary-accent focus:ring-1 focus:ring-primary-accent transition">
                         <button type="submit"
@@ -147,6 +148,9 @@
                                 <i class="fas fa-spinner fa-spin"></i>
                             </div>
                         </button>
+                        @if (config('services.recaptcha.site_key'))
+                            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        @endif
                     </form>
                     <div id="newsletterMessage" class="mt-3 text-xs min-h-6 transition-all duration-300"></div>
 

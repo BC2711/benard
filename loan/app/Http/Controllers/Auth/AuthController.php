@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
+use App\Services\EmailDeliveryService;
+use App\Services\EmailSettingsService;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -24,7 +27,7 @@ class AuthController extends Controller
     /**
      * Handle user login.
      */
-    public function login(Request $request)
+    public function login(Request $request, EmailDeliveryService $email, EmailSettingsService $settings)
     {
         // dd($request->all());
         $maxAttempts = 5;
@@ -46,6 +49,7 @@ class AuthController extends Controller
                 if ($user->attempts >= $maxAttempts) {
                     $user->locked_at = now();
                     $user->save();
+                    $this->queueAccountLockedEmail($email, $user, $request);
                     return back()->withErrors(['email' => __('auth.locked')])
                         ->with('account_locked', 'Your account has been locked due to too many failed attempts. Please reset your password.');
                 }
@@ -61,27 +65,61 @@ class AuthController extends Controller
 
             // Attempt to authenticate the user
             if (Auth::guard('management')->attempt($credentials)) {
-                if (Auth::guard('management')->user()->role !== 'ADMIN') {
+                $user = Auth::guard('management')->user();
+                if ($user->role !== 'ADMIN') {
                     Auth::guard('management')->logout();
                     return back()->withErrors(['email' => __('auth.unauthorized')]);
                 }
 
+                if ($user->status !== 'ACTIVE' || !$user->email_verified_at) {
+                    Auth::guard('management')->logout();
+                    return back()->withErrors(['email' => 'Your account is not active. Verify your email address or contact an administrator.']);
+                }
+
                 $user->update(['attempts' => 0, 'locked_at' => null]);
                 $request->session()->regenerate();
+
+                if ($settings->twoFactorEnabled()) {
+                    $code = (string) random_int(100000, 999999);
+                    $user->forceFill([
+                        'two_factor_code' => Hash::make($code),
+                        'two_factor_expires_at' => now()->addMinutes(10),
+                    ])->save();
+                    $request->session()->put('two_factor_user_id', $user->id);
+                    Auth::guard('management')->logout();
+                    $email->queue('auth.two_factor_code', $user->email, [
+                        'first_name' => $user->first_name,
+                        'code' => $code,
+                        'expires_in' => 10,
+                    ]);
+
+                    return redirect()->route('management.two-factor.form');
+                }
+
+                $this->queueLoginActivityEmail($email, $user, $request);
                 return redirect()->intended(route('management.dashboard.index'));
             }
 
             // Handle failed login attempt
             if ($user) {
                 $user->increment('attempts');
+                $user->refresh();
                 Log::warning('Failed login attempt', [
                     'email' => $request->email,
                     'ip' => $request->ip(),
-                    'attempts' => $user->fresh()->attempts,
+                    'attempts' => $user->attempts,
                     'user_agent' => $request->userAgent(),
                 ]);
 
                 $remainingAttempts = $maxAttempts - $user->attempts;
+                if ($remainingAttempts <= 0) {
+                    $user->update(['locked_at' => now()]);
+                    $this->queueAccountLockedEmail($email, $user, $request);
+
+                    return back()->withErrors(['email' => __('auth.locked')])
+                        ->with('account_locked', 'Your account has been locked due to too many failed attempts. Please reset your password.');
+                }
+
                 if ($remainingAttempts > 0) {
                     session()->flash('attempts_warning', "Invalid credentials. You have {$remainingAttempts} attempt(s) remaining.");
                 }
@@ -117,7 +155,7 @@ class AuthController extends Controller
         return view('pages.website.auth.register');
     }
 
-    public function register(Request $request)
+    public function register(Request $request, EmailDeliveryService $email)
     {
         // dd($request->all());
         // Validate the request data
@@ -174,12 +212,20 @@ class AuthController extends Controller
                 'username'=>$validated['email'], // Using email as username for simplicity
                 // 'username' => $this->generateUsername($validated['first_name'], $validated['last_name']),
                 'role' => 'ADMIN', // Default role for new registrations
-                'status' => 'ACTIVE', // Or 'ACTIVE' if email verification is not required
+                'status' => 'PENDING',
                 'attempts' => 0,
             ]);
 
-            // Optionally send welcome email
-            // Mail::to($user->email)->send(new WelcomeEmail($user));
+            $verificationUrl = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addHours(24),
+                ['user' => $user->id, 'hash' => sha1($user->email)],
+            );
+            $email->queue('auth.registration_verification', $user->email, [
+                'first_name' => $user->first_name,
+                'action_url' => $verificationUrl,
+                'action_text' => 'Verify email address',
+            ]);
 
             // Log the registration
             Log::info('New user registered', ['user_id' => $user->id, 'email' => $user->email]);
@@ -188,13 +234,13 @@ class AuthController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Registration successful! Please login to continue.',
+                    'message' => 'Registration successful. Please check your email to verify your account.',
                     'redirect' => route('login')
                 ]);
             }
 
             // For web requests, redirect with success message
-            return redirect()->route('login')->with('success', 'Registration successful! Please login to continue.');
+            return redirect()->route('login')->with('success', 'Registration successful. Please check your email to verify your account.');
         } catch (\Exception $e) {
             Log::error('Registration error', [
                 'error' => $e->getMessage(),
@@ -272,7 +318,7 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Failed to send reset link. Please try again.']);
         }
     }
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request, EmailDeliveryService $email)
     {
         $request->validate([
             'token' => 'required',
@@ -286,7 +332,7 @@ class AuthController extends Controller
         try {
             $status = Password::broker('management')->reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
-                function ($user, $password) {
+                function ($user, $password) use ($email) {
                     $user->forceFill([
                         'password' => bcrypt($password),
                         'remember_token' => Str::random(60),
@@ -296,6 +342,10 @@ class AuthController extends Controller
                     ])->save();
 
                     event(new PasswordReset($user));
+                    $email->queue('auth.password_changed', $user->email, [
+                        'first_name' => $user->first_name,
+                        'changed_at' => now()->toDayDateTimeString(),
+                    ]);
                 }
             );
 
@@ -311,5 +361,83 @@ class AuthController extends Controller
             ]);
             return back()->withErrors(['email' => __('auth.failed') . $th->getMessage()]);
         }
+    }
+
+    public function verifyEmail(Request $request, User $user, string $hash, EmailDeliveryService $email)
+    {
+        abort_unless(hash_equals($hash, sha1($user->email)), 403);
+
+        if (!$user->email_verified_at) {
+            $user->forceFill([
+                'email_verified_at' => now(),
+                'status' => 'ACTIVE',
+            ])->save();
+            $email->queue('auth.welcome', $user->email, ['first_name' => $user->first_name]);
+        }
+
+        return redirect()->route('login')->with('success', 'Your email address has been verified. You can now sign in.');
+    }
+
+    public function showTwoFactorForm()
+    {
+        abort_unless(session('two_factor_user_id'), 403);
+
+        return view('pages.website.auth.two-factor');
+    }
+
+    public function verifyTwoFactor(Request $request, EmailDeliveryService $email)
+    {
+        $validated = $request->validate(['code' => 'required|digits:6']);
+        $user = User::findOrFail($request->session()->get('two_factor_user_id'));
+
+        if (!$user->two_factor_expires_at || $user->two_factor_expires_at->isPast() || !Hash::check($validated['code'], $user->two_factor_code)) {
+            return back()->withErrors(['code' => 'The verification code is invalid or has expired.']);
+        }
+
+        $user->forceFill(['two_factor_code' => null, 'two_factor_expires_at' => null])->save();
+        $request->session()->forget('two_factor_user_id');
+        Auth::guard('management')->login($user);
+        $request->session()->regenerate();
+        $this->queueLoginActivityEmail($email, $user, $request);
+
+        return redirect()->intended(route('management.dashboard.index'));
+    }
+
+    public function confirmEmailChange(Request $request, User $user, string $token, EmailDeliveryService $email)
+    {
+        abort_unless(hash_equals((string) $user->pending_email_token, $token), 403);
+
+        $user->forceFill([
+            'email' => $user->pending_email,
+            'pending_email' => null,
+            'pending_email_token' => null,
+            'email_verified_at' => now(),
+        ])->save();
+        $email->queue('auth.profile_updated', $user->email, [
+            'first_name' => $user->first_name,
+            'changed_at' => now()->toDayDateTimeString(),
+        ]);
+
+        return redirect()->route('login')->with('success', 'Your new email address has been confirmed.');
+    }
+
+    private function queueLoginActivityEmail(EmailDeliveryService $email, User $user, Request $request): void
+    {
+        $email->queue('auth.login_activity', $user->email, [
+            'first_name' => $user->first_name,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent() ?: 'Unknown device',
+            'logged_in_at' => now()->toDayDateTimeString(),
+        ]);
+    }
+
+    private function queueAccountLockedEmail(EmailDeliveryService $email, User $user, Request $request): void
+    {
+        $email->queue('auth.account_locked', $user->email, [
+            'first_name' => $user->first_name,
+            'ip_address' => $request->ip(),
+            'action_url' => route('management.password.request'),
+            'action_text' => 'Recover account',
+        ]);
     }
 }

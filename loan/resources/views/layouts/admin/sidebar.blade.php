@@ -95,13 +95,20 @@
                     <i class="fas fa-file-export"></i>
                     <span x-show="!sidebarCollapsed">Reports</span>
                 </a>
-                <a href="#" class="admin-nav-link">
+                <a href="{{ route('management.email-logs.index') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.email-logs.*')])>
                     <i class="fas fa-server"></i>
-                    <span x-show="!sidebarCollapsed">System Monitor</span>
+                    <span x-show="!sidebarCollapsed">Email Logs</span>
                 </a>
-                <a href="#" class="admin-nav-link">
+                <a href="{{ route('management.email-templates.index') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.email-templates.*')])>
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span x-show="!sidebarCollapsed">Email Templates</span>
+                </a>
+                <a href="{{ route('management.email-settings.edit') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.email-settings.*')])>
                     <i class="fas fa-sliders"></i>
-                    <span x-show="!sidebarCollapsed">Settings</span>
+                    <span x-show="!sidebarCollapsed">Email Settings</span>
                 </a>
             </div>
         </div>
