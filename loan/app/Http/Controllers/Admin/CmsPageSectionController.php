@@ -3,22 +3,27 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cms\SavePageSectionRequest;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Services\FrontendContentService;
+use App\Services\CmsVersionService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class CmsPageSectionController extends Controller
 {
-    public function __construct(private readonly FrontendContentService $content)
+    public function __construct(
+        private readonly FrontendContentService $content,
+        private readonly CmsVersionService $versions,
+    )
     {
     }
 
-    public function store(Request $request, Page $page)
+    public function store(SavePageSectionRequest $request, Page $page)
     {
-        $data = $this->validated($request);
+        $data = $request->validated();
         $data['content'] = $this->decodeJson($request->input('content_json'));
+        $this->mergeRichText($data['content'], $request);
         $data['settings'] = $this->decodeJson($request->input('settings_json'));
 
         $page->sections()->create($data);
@@ -27,14 +32,16 @@ class CmsPageSectionController extends Controller
         return back()->with('success', 'Section added.');
     }
 
-    public function update(Request $request, Page $page, PageSection $section)
+    public function update(SavePageSectionRequest $request, Page $page, PageSection $section)
     {
         abort_unless($section->page_id === $page->id, 404);
 
-        $data = $this->validated($request);
+        $data = $request->validated();
         $data['content'] = $this->decodeJson($request->input('content_json'));
+        $this->mergeRichText($data['content'], $request);
         $data['settings'] = $this->decodeJson($request->input('settings_json'));
 
+        $this->versions->capture($section);
         $section->update($data);
         $this->content->clearCache();
 
@@ -67,17 +74,17 @@ class CmsPageSectionController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    private function validated(Request $request): array
+    public function duplicate(Page $page, PageSection $section)
     {
-        return $request->validate([
-            'name' => ['required', 'string', 'max:180'],
-            'section_key' => ['required', 'string', 'max:120'],
-            'component' => ['nullable', 'string', 'max:160'],
-            'status' => ['required', Rule::in(['draft', 'published', 'disabled'])],
-            'sort_order' => ['required', 'integer', 'min:0'],
-            'published_at' => ['nullable', 'date'],
-            'scheduled_for' => ['nullable', 'date'],
-        ]);
+        abort_unless($section->page_id === $page->id, 404);
+        $copy = $section->replicate(['section_key']);
+        $copy->section_key = $section->section_key . '-copy-' . now()->format('His');
+        $copy->name = $section->name . ' Copy';
+        $copy->sort_order = $section->sort_order + 1;
+        $copy->save();
+        $this->content->clearCache();
+
+        return back()->with('success', 'Section cloned.');
     }
 
     private function decodeJson(?string $json): array
@@ -88,5 +95,14 @@ class CmsPageSectionController extends Controller
 
         $decoded = json_decode($json, true);
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function mergeRichText(array &$content, Request $request): void
+    {
+        if ($request->filled('body_html')) {
+            $content['body'] = $request->input('body_html');
+        } else {
+            unset($content['body']);
+        }
     }
 }

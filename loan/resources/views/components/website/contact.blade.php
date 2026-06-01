@@ -54,10 +54,10 @@
 
         <!-- Content Grid -->
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 <!-- Contact Info -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-2xl p-6 shadow-xl animate-fade-in-up">
+                    <div class="bg-white rounded-2xl p-6 shadow-xl animate-fade-in-up h-full flex flex-col">
                         <h3 class="text-xl font-bold text-primary-primary mb-5">Contact Information</h3>
                         <div class="space-y-5 mb-6">
                             <div class="flex items-start gap-3">
@@ -127,7 +127,7 @@
 
                 <!-- Contact Form & Loan Agreement Download -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-2xl p-6 shadow-xl animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="bg-white rounded-2xl p-6 shadow-xl animate-fade-in-up h-full flex flex-col" style="animation-delay: 0.1s;">
                         <!-- NEW: Download Loan Agreement Button -->
                         <div class="mb-6 pb-4 border-b border-gray-200">
                             <button id="downloadAgreementBtn"

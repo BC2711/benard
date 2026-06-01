@@ -1,3 +1,4 @@
+<div data-cms-api="{{ route('api.website.pages.show', $cmsPage->slug ?? 'home') }}">
 @include('components.website.header')
 @include('components.website.menu')
 
@@ -19,3 +20,4 @@
 
 @include('components.website.footer')
 @include('components.website.closing_header')
+</div>

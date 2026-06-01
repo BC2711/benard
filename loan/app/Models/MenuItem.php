@@ -17,11 +17,23 @@ class MenuItem extends Model
         'icon',
         'status',
         'sort_order',
+        'published_at',
+        'expires_at',
+    ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     public function page()
     {
         return $this->belongsTo(Page::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function children()
@@ -31,7 +43,9 @@ class MenuItem extends Model
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', 'published');
+        return $query->where('status', 'published')
+            ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()))
+            ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()));
     }
 
     public function getHrefAttribute(): string

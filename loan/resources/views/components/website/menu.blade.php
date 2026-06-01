@@ -3,7 +3,7 @@
         <div class="flex h-16 items-center justify-between px-4 lg:h-18 lg:px-5">
             <a href="/" class="group flex items-center gap-3" aria-label="Londa Loans Homepage">
                 <div class="relative grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-slate-900/10">
-                    <img src="{{ asset('assets/logos/londa.jpg') }}" alt="Londa Loans Logo"
+                    <img src="{{ asset($frontendSettings['site']['logo'][0] ?? 'assets/logos/londa.jpg') }}" alt="Londa Loans Logo"
                         class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
                     <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-amber-400/20"></div>
                 </div>
@@ -12,16 +12,40 @@
                         <span class="text-xl font-black tracking-tight text-slate-950">{{ ($frontendSettings['site']['brand_name'][0] ?? 'Londa Loans') }}</span>
                     </div>
                     <div class="mt-1 hidden items-center gap-2 text-xs font-semibold text-slate-500 sm:flex">
-                        <span class="text-amber-600">Ma Loans Yama Londas!</span>
+                        <span class="text-amber-600">{{ $frontendSettings['site']['tagline'][0] ?? 'Ma Loans Yama Londas!' }}</span>
                         <span class="h-1 w-1 rounded-full bg-slate-300"></span>
-                        <span>empowering marketeers</span>
+                        <span>{{ $frontendSettings['site']['subtitle'][0] ?? 'empowering marketeers' }}</span>
                     </div>
                 </div>
             </a>
 
             <nav class="hidden items-center gap-8 text-sm font-bold lg:flex" role="navigation" aria-label="Main navigation">
                 @forelse ($primaryMenuItems ?? [] as $item)
-                    <a href="{{ $item->href }}" target="{{ $item->target }}" class="premium-link">{{ $item->label }}</a>
+                    <div class="group relative">
+                        <a href="{{ $item->href }}" target="{{ $item->target }}" class="premium-link inline-flex items-center gap-1">
+                            {{ $item->label }}
+                            @if ($item->children->isNotEmpty()) <i class="fas fa-chevron-down text-[9px]"></i> @endif
+                        </a>
+                        @if ($item->children->isNotEmpty())
+                            <div class="invisible absolute left-0 top-full min-w-52 translate-y-2 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                                @foreach ($item->children as $child)
+                                    <div class="group/sub relative">
+                                        <a href="{{ $child->href }}" target="{{ $child->target }}" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-slate-700 hover:bg-slate-50">
+                                            {{ $child->label }}
+                                            @if ($child->children->isNotEmpty()) <i class="fas fa-chevron-right text-[9px]"></i> @endif
+                                        </a>
+                                        @if ($child->children->isNotEmpty())
+                                            <div class="invisible absolute left-full top-0 min-w-52 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-xl transition group-hover/sub:visible group-hover/sub:opacity-100">
+                                                @foreach ($child->children as $grandchild)
+                                                    <a href="{{ $grandchild->href }}" target="{{ $grandchild->target }}" class="block rounded-xl px-3 py-2 text-slate-700 hover:bg-slate-50">{{ $grandchild->label }}</a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
                 @empty
                     <a href="/" class="premium-link">Home</a>
                     <a href="/#about" class="premium-link">About</a>
@@ -62,6 +86,13 @@
                         <i class="{{ $item->icon ?: 'fas fa-circle' }} w-5 text-slate-400"></i>
                         <span>{{ $item->label }}</span>
                     </a>
+                    @foreach ($item->children as $child)
+                        <a href="{{ $child->href }}" target="{{ $child->target }}"
+                            class="ml-6 flex items-center gap-3 rounded-2xl px-4 py-2 text-xs transition hover:bg-slate-50">
+                            <i class="{{ $child->icon ?: 'fas fa-angle-right' }} w-5 text-slate-400"></i>
+                            <span>{{ $child->label }}</span>
+                        </a>
+                    @endforeach
                 @empty
                     <a href="/" class="flex items-center gap-3 rounded-2xl bg-cyan-50 px-4 py-3 text-cyan-800">
                         <i class="fas fa-home w-5"></i>

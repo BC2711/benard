@@ -14,6 +14,11 @@ class ConsultationSectionController extends Controller
         return view('components.management.consultation.edit', compact('section'));
     }
 
+    public function create()
+    {
+        // This method can be used to show a form for creating a new consultation section if needed
+    }
+
     public function update(Request $request, $id)
     {
         $request->validate([

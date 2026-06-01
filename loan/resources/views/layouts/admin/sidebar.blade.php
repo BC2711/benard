@@ -54,15 +54,41 @@
                     <span x-show="!sidebarCollapsed">Consultations</span>
                     <span class="admin-count" x-show="!sidebarCollapsed">8</span>
                 </a>
+            </div>
+
+            <div>
+                <p class="mb-2 px-3 text-xs font-bold uppercase tracking-wider text-slate-400" x-show="!sidebarCollapsed">
+                    Website Content Management
+                </p>
                 <a href="{{ route('management.cms.pages.index') }}" class="admin-nav-link"
-                    @class(['is-active' => request()->routeIs('management.cms.*')])>
+                    @class(['is-active' => request()->routeIs('management.cms.pages.*')])>
                     <i class="fas fa-layer-group"></i>
-                    <span x-show="!sidebarCollapsed">CMS Pages</span>
+                    <span x-show="!sidebarCollapsed">Pages & Sections</span>
+                </a>
+                <a href="{{ route('management.cms.navigation.index') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.cms.navigation.*')])>
+                    <i class="fas fa-bars"></i>
+                    <span x-show="!sidebarCollapsed">Navigation</span>
+                </a>
+                <a href="{{ route('management.cms.media.index') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.cms.media.*')])>
+                    <i class="fas fa-photo-film"></i>
+                    <span x-show="!sidebarCollapsed">Media Library</span>
+                </a>
+                <a href="{{ route('management.cms.success-stories.index') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.cms.success-stories.*')])>
+                    <i class="fas fa-trophy"></i>
+                    <span x-show="!sidebarCollapsed">Success Stories Management</span>
                 </a>
                 <a href="{{ route('management.cms.collections.index', 'services') }}" class="admin-nav-link"
                     @class(['is-active' => request()->routeIs('management.cms.collections.*')])>
                     <i class="fas fa-database"></i>
-                    <span x-show="!sidebarCollapsed">CMS Collections</span>
+                    <span x-show="!sidebarCollapsed">Content Collections</span>
+                </a>
+                <a href="{{ route('management.cms.settings.edit') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.cms.settings.*')])>
+                    <i class="fas fa-globe"></i>
+                    <span x-show="!sidebarCollapsed">Website Settings</span>
                 </a>
             </div>
 

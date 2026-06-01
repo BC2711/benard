@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\CmsCollectionController;
+use App\Http\Controllers\Admin\CmsMediaController;
+use App\Http\Controllers\Admin\CmsNavigationController;
 use App\Http\Controllers\Admin\CmsPageController as AdminCmsPageController;
 use App\Http\Controllers\Admin\CmsPageSectionController;
+use App\Http\Controllers\Admin\CmsSettingController;
 use App\Http\Controllers\Admin\ConsultationSectionController;
 use App\Http\Controllers\Admin\FeatureSectionController;
 use App\Http\Controllers\Admin\FooterController;
@@ -16,6 +19,7 @@ use App\Http\Controllers\Admin\LoanCalculatorController;
 use App\Http\Controllers\Admin\LoanPlansController;
 use App\Http\Controllers\Admin\ServiceSectionController;
 use App\Http\Controllers\Admin\SuccessStoriesController;
+use App\Http\Controllers\Admin\SuccessStoryController;
 use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\TeamSectionController;
 use App\Http\Controllers\Admin\TestimonialsController;
@@ -50,10 +54,30 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::resource('cms/pages', AdminCmsPageController::class)
             ->names('cms.pages')
             ->parameters(['pages' => 'page']);
+        Route::post('cms/pages/{page}/duplicate', [AdminCmsPageController::class, 'duplicate'])->name('cms.pages.duplicate');
+        Route::get('cms/pages/{page}/preview', [AdminCmsPageController::class, 'preview'])->name('cms.pages.preview');
+        Route::post('cms/pages/{page}/versions/{version}/restore', [AdminCmsPageController::class, 'restore'])->name('cms.pages.versions.restore');
         Route::post('cms/pages/{page}/sections/reorder', [CmsPageSectionController::class, 'reorder'])->name('cms.pages.sections.reorder');
         Route::post('cms/pages/{page}/sections', [CmsPageSectionController::class, 'store'])->name('cms.pages.sections.store');
+        Route::post('cms/pages/{page}/sections/{section}/duplicate', [CmsPageSectionController::class, 'duplicate'])->name('cms.pages.sections.duplicate');
         Route::put('cms/pages/{page}/sections/{section}', [CmsPageSectionController::class, 'update'])->name('cms.pages.sections.update');
         Route::delete('cms/pages/{page}/sections/{section}', [CmsPageSectionController::class, 'destroy'])->name('cms.pages.sections.destroy');
+        Route::get('cms/navigation', [CmsNavigationController::class, 'index'])->name('cms.navigation.index');
+        Route::post('cms/navigation', [CmsNavigationController::class, 'store'])->name('cms.navigation.store');
+        Route::put('cms/navigation/{menuItem}', [CmsNavigationController::class, 'update'])->name('cms.navigation.update');
+        Route::delete('cms/navigation/{menuItem}', [CmsNavigationController::class, 'destroy'])->name('cms.navigation.destroy');
+        Route::post('cms/navigation/reorder', [CmsNavigationController::class, 'reorder'])->name('cms.navigation.reorder');
+        Route::resource('cms/media', CmsMediaController::class)->only(['index', 'store', 'update', 'destroy'])->names('cms.media');
+        Route::get('cms/settings', [CmsSettingController::class, 'edit'])->name('cms.settings.edit');
+        Route::put('cms/settings', [CmsSettingController::class, 'update'])->name('cms.settings.update');
+        Route::post('cms/success-stories/bulk', [SuccessStoryController::class, 'bulk'])->name('cms.success-stories.bulk');
+        Route::get('cms/success-stories/export', [SuccessStoryController::class, 'export'])->name('cms.success-stories.export');
+        Route::put('cms/success-stories/homepage-settings', [SuccessStoryController::class, 'updateHomepageSettings'])->name('cms.success-stories.homepage-settings');
+        Route::post('cms/success-stories/{success_story}/publish', [SuccessStoryController::class, 'publish'])->name('cms.success-stories.publish');
+        Route::post('cms/success-stories/{success_story}/unpublish', [SuccessStoryController::class, 'unpublish'])->name('cms.success-stories.unpublish');
+        Route::resource('cms/success-stories', SuccessStoryController::class)
+            ->names('cms.success-stories')
+            ->parameters(['success-stories' => 'success_story']);
 
         Route::get('cms/collections/{type}', [CmsCollectionController::class, 'index'])->name('cms.collections.index');
         Route::get('cms/collections/{type}/create', [CmsCollectionController::class, 'create'])->name('cms.collections.create');

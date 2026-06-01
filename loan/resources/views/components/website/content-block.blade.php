@@ -5,9 +5,13 @@
     $body = $content['body'] ?? $content['description'] ?? null;
     $items = $content['items'] ?? [];
     $cta = $content['cta'] ?? null;
+    $image = $content['image'] ?? null;
+    $video = $content['video'] ?? null;
+    $background = $sectionSettings['background'] ?? null;
+    $textColor = $sectionSettings['text_color'] ?? null;
 @endphp
 
-<section id="{{ $cmsSection->section_key }}" class="py-20">
+<section id="{{ $cmsSection->section_key }}" class="py-20" @style(['background: ' . $background => $background, 'color: ' . $textColor => $textColor])>
     <div class="premium-shell">
         <div class="premium-card rounded-3xl p-6 sm:p-10">
             <div class="max-w-3xl">
@@ -18,6 +22,16 @@
                 @endif
             </div>
 
+            @if ($image)
+                <img src="{{ asset($image) }}" alt="{{ $content['image_alt'] ?? $title }}" class="mt-8 max-h-[32rem] w-full rounded-3xl object-cover">
+            @endif
+
+            @if ($video)
+                <div class="mt-8 aspect-video overflow-hidden rounded-3xl bg-slate-950">
+                    <iframe class="h-full w-full" src="{{ $video }}" title="{{ $title }}" loading="lazy" allowfullscreen></iframe>
+                </div>
+            @endif
+
             @if (!empty($items))
                 <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($items as $item)
@@ -27,6 +41,15 @@
                             @endif
                             <h3 class="mt-3 font-black text-slate-950">{{ $item['title'] ?? 'Item' }}</h3>
                             <p class="mt-2 text-sm leading-6 text-slate-600">{{ $item['description'] ?? '' }}</p>
+                            @if (!empty($item['image']))
+                                <img src="{{ asset($item['image']) }}" alt="{{ $item['alt'] ?? ($item['title'] ?? '') }}" class="mt-4 h-36 w-full rounded-xl object-cover">
+                            @endif
+                            @if (!empty($item['value']))
+                                <p class="mt-3 text-2xl font-black text-cyan-700">{{ $item['value'] }}</p>
+                            @endif
+                            @if (!empty($item['url']))
+                                <a href="{{ $item['url'] }}" class="mt-3 inline-block text-sm font-bold text-cyan-700">{{ $item['link_text'] ?? 'Learn more' }}</a>
+                            @endif
                         </article>
                     @endforeach
                 </div>

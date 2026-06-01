@@ -52,6 +52,29 @@ class CmsSeeder extends Seeder
             );
         }
 
+        foreach ([
+            ['Consultation', 'consultation', 'website.consultation'],
+            ['Loan Calculator', 'calculator', 'website.calculator'],
+            ['Service Details', 'service-details', 'website.service_details'],
+            ['Testimonials', 'testimonial-reviews', 'website.review_testimonials'],
+            ['Success Stories', 'view-success-stories', 'website.case'],
+        ] as [$title, $slug, $component]) {
+            $page = Page::updateOrCreate(
+                ['slug' => $slug],
+                ['title' => $title, 'status' => 'published', 'published_at' => now()]
+            );
+            $page->sections()->updateOrCreate(
+                ['section_key' => $slug],
+                [
+                    'name' => $title,
+                    'type' => 'custom',
+                    'component' => $component,
+                    'status' => 'published',
+                    'published_at' => now(),
+                ]
+            );
+        }
+
         $home->seoMeta()->updateOrCreate([], [
             'meta_title' => 'Londa Loans - Flexible business funding for marketeers',
             'meta_description' => 'Fast, flexible financing solutions for Zambian marketeers, entrepreneurs, and small teams.',
@@ -83,6 +106,7 @@ class CmsSeeder extends Seeder
             ['Services', '/#services', 'fas fa-hand-holding-dollar', 40],
             ['Calculator', '/calculator', 'fas fa-calculator', 50],
             ['Contact', '/#support', 'fas fa-envelope', 60],
+            ['Success Stories', '/success-stories', 'fas fa-trophy', 70],
         ];
 
         foreach ($menuItems as [$label, $url, $icon, $order]) {

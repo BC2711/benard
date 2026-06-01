@@ -20,6 +20,8 @@ class SuccessStoriesSection extends Model
         'cta_secondary_link',
         'cta_secondary_icon',
         'stories',
+        'homepage_story_limit',
+        'homepage_story_mode',
     ];
 
     protected $casts = [

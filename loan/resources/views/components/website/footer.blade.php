@@ -18,6 +18,16 @@
     ]);
     $dynamicFooterLinks = ($footerMenuItems ?? collect())->map(fn ($item) => ['text' => $item->label, 'url' => $item->href])->values()->toArray();
     $quickLinks = !empty($dynamicFooterLinks) ? $dynamicFooterLinks : ($footer->quick_links ?? []);
+    $footer->brand_name = $frontendSettings['site']['brand_name'][0] ?? $footer->brand_name;
+    $footer->brand_description = $frontendSettings['site']['footer_content'][0] ?? $footer->brand_description;
+    $footer->copyright_text = $frontendSettings['site']['copyright'][0] ?? $footer->copyright_text;
+    $footer->email = $frontendSettings['contact']['email'][0] ?? $footer->email;
+    $footer->phone = $frontendSettings['contact']['phone'][0] ?? $footer->phone;
+    $footer->address_line1 = $frontendSettings['contact']['address'][0] ?? $footer->address_line1;
+    $footer->facebook = $frontendSettings['social']['facebook'][0] ?? $footer->facebook;
+    $footer->twitter = $frontendSettings['social']['twitter'][0] ?? $footer->twitter;
+    $footer->linkedin = $frontendSettings['social']['linkedin'][0] ?? $footer->linkedin;
+    $footer->instagram = $frontendSettings['social']['instagram'][0] ?? $footer->instagram;
 @endphp
 
 <footer

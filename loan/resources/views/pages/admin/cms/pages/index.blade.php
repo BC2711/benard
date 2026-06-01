@@ -52,6 +52,15 @@
                                 <a href="{{ route('management.cms.pages.edit', $page) }}" class="admin-icon-btn inline-grid h-10 w-10" aria-label="Edit {{ $page->title }}">
                                     <i class="fas fa-pen"></i>
                                 </a>
+                                <form method="POST" action="{{ route('management.cms.pages.duplicate', $page) }}" class="inline">
+                                    @csrf
+                                    <button class="admin-icon-btn inline-grid h-10 w-10" aria-label="Duplicate {{ $page->title }}"><i class="fas fa-copy"></i></button>
+                                </form>
+                                <form method="POST" action="{{ route('management.cms.pages.destroy', $page) }}" class="inline" onsubmit="return confirm('Delete this page?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="admin-icon-btn inline-grid h-10 w-10 text-red-600" aria-label="Delete {{ $page->title }}"><i class="fas fa-trash"></i></button>
+                                </form>
                             </td>
                         </tr>
                     @empty

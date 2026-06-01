@@ -7,5 +7,13 @@
         <changefreq>{{ $page->is_homepage ? 'daily' : 'weekly' }}</changefreq>
         <priority>{{ $page->is_homepage ? '1.0' : '0.7' }}</priority>
     </url>
-@endforeach
+    @endforeach
+    @foreach ($successStories ?? [] as $story)
+    <url>
+        <loc>{{ route('website.success-stories.show', $story) }}</loc>
+        <lastmod>{{ $story->updated_at->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
 </urlset>

@@ -34,7 +34,7 @@ class FrontendContentService
     public function menu(string $location = 'primary')
     {
         return Cache::remember("cms.menu.$location", 300, function () use ($location) {
-            return MenuItem::with(['page', 'children.page'])
+            return MenuItem::with(['page', 'children.page', 'children.children.page'])
                 ->published()
                 ->whereNull('parent_id')
                 ->where('location', $location)

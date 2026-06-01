@@ -5,17 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @php
-        $seo = $cmsPage->seoMeta ?? null;
+        $seo = $pageSeo ?? ($cmsPage->seoMeta ?? null);
         $site = $frontendSettings['site'] ?? [];
         $brand = $site['brand_name'][0] ?? 'Londa Loans';
-        $metaTitle = $seo->meta_title ?? (($cmsPage->title ?? 'Home') . ' - ' . $brand);
+        $metaTitle = $seo->meta_title ?? (($pageTitle ?? ($cmsPage->title ?? 'Home')) . ' - ' . $brand);
         $metaDescription = $seo->meta_description ?? ($site['meta_description'][0] ?? 'Flexible financing solutions for marketeers and growing businesses.');
         $ogTitle = $seo->og_title ?? $metaTitle;
         $ogDescription = $seo->og_description ?? $metaDescription;
-        $ogImage = $seo?->og_image ? asset($seo->og_image) : asset('assets/logos/londa.jpg');
+        $ogImage = data_get($seo, 'og_image') ? asset(data_get($seo, 'og_image')) : asset($site['logo'][0] ?? 'assets/logos/londa.jpg');
+        $favicon = $site['favicon'][0] ?? 'assets/logos/londa.jpg';
     @endphp
     <title>{{ $metaTitle }}</title>
     <meta name="description" content="{{ $metaDescription }}">
+    @if (!empty(data_get($seo, 'meta_keywords')))
+        <meta name="keywords" content="{{ $seo->meta_keywords }}">
+    @endif
     <meta name="robots" content="{{ $seo->robots ?? 'index,follow' }}">
     <link rel="canonical" href="{{ $seo->canonical_url ?? url()->current() }}">
     <meta property="og:title" content="{{ $ogTitle }}">
@@ -23,10 +27,13 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta name="twitter:card" content="{{ $seo->twitter_card ?? 'summary_large_image' }}">
-    @if (!empty($seo?->structured_data))
+    <meta name="twitter:title" content="{{ $seo->twitter_title ?? $ogTitle }}">
+    <meta name="twitter:description" content="{{ $seo->twitter_description ?? $ogDescription }}">
+    <meta name="twitter:image" content="{{ data_get($seo, 'twitter_image') ? asset(data_get($seo, 'twitter_image')) : $ogImage }}">
+    @if (!empty(data_get($seo, 'structured_data')))
         <script type="application/ld+json">{!! json_encode($seo->structured_data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
     @endif
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/logos/londa.jpg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset($favicon) }}">
     <script src="{{ asset('assets/js/tailwind.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/premium-ui.css') }}">
