@@ -77,9 +77,11 @@
                 <div class="lg:grid-cols-4 grid md:grid-cols-2 gap-4">
                     @php
 
-                        // Decode the JSON features string
-                        $features = json_decode($about->features, true) ?? [];
-                      
+                        $features = is_array($about->features)
+                            ? $about->features
+                            : json_decode((string) $about->features, true);
+                        $features ??= [];
+
                     @endphp
 
                     @foreach ($features as $index => $feat)

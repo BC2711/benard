@@ -44,8 +44,10 @@
                 </div>
 
                 {{-- Features Grid --}}
-                @php 
-                    $features = json_decode($about->features, true);
+                @php
+                    $features = is_array($about->features)
+                        ? $about->features
+                        : json_decode((string) $about->features, true);
                 @endphp
                 @if ($about->features && count($features) > 0)
                     <div class="grid sm:grid-cols-2 gap-5 mb-10">
