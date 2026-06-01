@@ -25,7 +25,7 @@ class StoreConsultationRequest extends FormRequest
             'message' => 'nullable|string|max:2000',
             'website' => 'nullable|string|max:0',
             'g-recaptcha-response' => [
-                Rule::requiredIf((bool) config('services.recaptcha.secret_key')),
+                Rule::requiredIf(!$this->routeIs('management.consultation.store') && (bool) config('services.recaptcha.secret_key')),
                 new Recaptcha(),
             ],
         ];

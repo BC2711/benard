@@ -19,7 +19,7 @@
     <div class="max-w-8xl mx-auto p-6 rounded-lg bg-white">
         <h1 class="text-3xl font-bold mb-6 text-gray-800">Edit Consultation Section</h1>
 
-        <form action="{{ route('management.consultation.update', $section->id) }}" method="POST" class="space-y-8">
+        <form action="{{ route('management.consultation-page.update', $section->id) }}" method="POST" class="space-y-8">
             @csrf
             @method('PUT')
 

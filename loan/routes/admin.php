@@ -96,8 +96,8 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::resource('testimonial', TestimonialsController::class);
         Route::resource('counter', ImpactNumbersController::class);
         Route::resource('client', TrustedClientsController::class);
-        Route::resource('consultation', ConsultationSectionController::class)->only(['index', 'update']);
-        Route::post('consultation', [ConsultationController::class, 'store'])->name('consultation.store');
+        Route::resource('consultation-page', ConsultationSectionController::class)->only(['index', 'update']);
+        Route::resource('consultation', ConsultationController::class);
         Route::resource('support', SupportController::class);
         Route::resource('calculator', LoanCalculatorController::class)->only(['index', 'update']);
         Route::resource('footer', FooterController::class);

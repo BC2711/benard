@@ -101,7 +101,7 @@ class MenuSeeder extends Seeder
                 'name' => 'Consult Section',
                 'menu_type' => 'WEB',
                 'parent_id' => $parentId,
-                'url' => 'consultation',
+                'url' => 'consultation-page',
                 'icon' => 'fas fa-users',
                 'status' => 'ACTIVE',
                 'type' => 'SUB',
