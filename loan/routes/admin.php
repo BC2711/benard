@@ -44,6 +44,7 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::resource('users', UserController::class);
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('users/{user}/unlock', [UserController::class, 'unlock'])->name('unlock');
+        Route::post('user/{user}/verifyUser', [UserController::class, 'verifyUser'])->name('verifyUser');
         Route::get('profile', [UserController::class, 'profile'])->name('profile');
         Route::put('profile', [UserController::class, 'updateProfile'])->name('update-profile');
         Route::get('change-password', [UserController::class, 'showChangePasswordForm'])->name('change-password');

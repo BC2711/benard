@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Services\EmailDeliveryService;
+use DateTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 
@@ -22,6 +23,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::latest()->paginate(10);
+        // dd($users);
         return view('profile.index', compact('users'));
     }
 
@@ -71,6 +73,7 @@ class UserController extends Controller
                 'first_name' => $user->first_name,
                 'status' => $user->status,
             ]);
+            $this->queueRegistrationVerification($user);
 
             return redirect()->route('management.users.index')
                 ->with('success', 'User created successfully.');
@@ -227,6 +230,35 @@ class UserController extends Controller
         }
     }
 
+
+
+    public function verifyUser(User $user)
+    {
+        try {
+
+            if ($user->email_verified_at) {
+                return redirect()->back()
+                    ->with('info', 'User is already verified.');
+            }
+
+            $user->forceFill([
+                'email_verified_at' => now(),
+            ])->save();
+
+            return redirect()->back()
+                ->with('success', "{$user->first_name} {$user->last_name} has been verified successfully.");
+        } catch (\Throwable $e) {
+
+            Log::error('User verification failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Failed to verify user. Please try again.');
+        }
+    }
+
     /**
      * Unlock user account
      */
@@ -377,6 +409,21 @@ class UserController extends Controller
             'first_name' => $user->first_name,
             'action_url' => $url,
             'action_text' => 'Confirm email address',
+        ]);
+    }
+
+    private function queueRegistrationVerification(User $user): void
+    {
+        $url = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addHours(24),
+            ['user' => $user->id, 'hash' => sha1($user->email)],
+        );
+
+        app(EmailDeliveryService::class)->queue('auth.registration_verification', $user->email, [
+            'first_name' => $user->first_name,
+            'action_url' => $url,
+            'action_text' => 'Verify email address',
         ]);
     }
 }

@@ -87,6 +87,34 @@ class EmailWorkflowTest extends TestCase
         $this->assertDatabaseHas(EmailDeliveryLog::class, ['template_key' => 'auth.registration_verification', 'recipient' => 'alex@example.com']);
     }
 
+    public function test_admin_created_user_receives_email_verification_link(): void
+    {
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+
+        $response = $this->actingAs($admin, 'management')
+            ->post(route('management.users.store'), [
+                'first_name' => 'Jamie',
+                'last_name' => 'Customer',
+                'email' => 'jamie@example.com',
+                'username' => 'jamie.customer',
+                'phone' => '+260955000002',
+                'address' => '123 Test Street',
+                'date_of_birth' => now()->subYears(25)->format('Y-m-d'),
+                'gender' => 'MALE',
+                'role' => 'USER',
+                'status' => 'ACTIVE',
+                'password' => 'Password123!',
+                'password_confirmation' => 'Password123!',
+            ]);
+
+        $response->assertRedirect(route('management.users.index'));
+        $this->assertDatabaseHas(User::class, ['email' => 'jamie@example.com', 'email_verified_at' => null]);
+        $this->assertDatabaseHas(EmailDeliveryLog::class, [
+            'template_key' => 'auth.registration_verification',
+            'recipient' => 'jamie@example.com',
+        ]);
+    }
+
     public function test_password_reset_uses_logged_templated_email(): void
     {
         $user = User::factory()->create(['role' => 'ADMIN']);
