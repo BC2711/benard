@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\LoanCalculator;
+use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\CmsSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProductionReadinessTest extends TestCase
@@ -116,6 +119,54 @@ class ProductionReadinessTest extends TestCase
         );
     }
 
+    public function test_admin_can_publish_replace_and_remove_the_website_loan_agreement(): void
+    {
+        Storage::fake('public');
+        $this->seed(CmsSeeder::class);
+        $admin = User::factory()->create(['role' => 'ADMIN']);
+
+        $this->get(route('loan-agreement.download'))->assertNotFound();
+        $this->get('/')->assertDontSee(route('loan-agreement.download'), false);
+
+        $this->actingAs($admin, 'management')
+            ->put(route('management.loan-agreement.update'), [
+                'agreement_pdf' => UploadedFile::fake()->create('loan-terms.txt', 10, 'text/plain'),
+            ])
+            ->assertSessionHasErrors('agreement_pdf');
+
+        $this->actingAs($admin, 'management')
+            ->put(route('management.loan-agreement.update'), [
+                'agreement_pdf' => UploadedFile::fake()->createWithContent('loan-terms.pdf', "%PDF-1.4\nLoan terms"),
+            ])
+            ->assertSessionHasNoErrors();
+
+        $firstPath = Setting::query()
+            ->where('group', 'documents')
+            ->where('key', 'loan_agreement_path')
+            ->firstOrFail()
+            ->value[0];
+
+        Storage::disk('public')->assertExists($firstPath);
+        $this->get(route('loan-agreement.download'))->assertDownload('loan-terms.pdf');
+        $this->get('/')->assertSee(route('loan-agreement.download'), false);
+
+        $this->actingAs($admin, 'management')
+            ->put(route('management.loan-agreement.update'), [
+                'agreement_pdf' => UploadedFile::fake()->createWithContent('updated-loan-terms.pdf', "%PDF-1.4\nUpdated loan terms"),
+            ])
+            ->assertSessionHasNoErrors();
+
+        Storage::disk('public')->assertMissing($firstPath);
+
+        $this->actingAs($admin, 'management')
+            ->delete(route('management.loan-agreement.destroy'))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseMissing('settings', ['group' => 'documents', 'key' => 'loan_agreement_path']);
+        $this->get(route('loan-agreement.download'))->assertNotFound();
+        $this->get('/')->assertDontSee(route('loan-agreement.download'), false);
+    }
+
     public function test_admin_navigation_pages_load_successfully(): void
     {
         $this->seed(DatabaseSeeder::class);
@@ -135,6 +186,7 @@ class ProductionReadinessTest extends TestCase
             '/management/cms/navigation',
             '/management/cms/media',
             '/management/cms/settings',
+            '/management/loan-agreement',
             '/management/cms/success-stories',
             '/management/cms/success-stories/create',
             '/management/cms/collections/services',

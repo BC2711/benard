@@ -7,6 +7,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\EmailTrackingController;
 use App\Http\Controllers\Web\CmsPageController;
 use App\Http\Controllers\Web\SuccessStoryController;
+use App\Http\Controllers\Web\LoanAgreementController;
 use App\Models\Page;
 use App\Models\SuccessStory;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,7 @@ Route::redirect('/view-success-stories', '/success-stories', 301);
 Route::get('/success-stories', [SuccessStoryController::class, 'index'])->name('website.success-stories.index');
 Route::get('/success-stories/{success_story:slug}', [SuccessStoryController::class, 'show'])->name('website.success-stories.show');
 Route::get('/calculator', [CmsPageController::class, 'show'])->defaults('slug', 'calculator')->name('website.calculator');
+Route::get('/loan-agreement/download', [LoanAgreementController::class, 'download'])->name('loan-agreement.download');
 
 Route::get('/management/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/management/login', [AuthController::class, 'login'])->middleware('throttle:5,1');

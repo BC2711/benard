@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\HeroSectionController;
 use App\Http\Controllers\Admin\ImpactNumbersController;
 use App\Http\Controllers\Admin\LoanCalculatorController;
+use App\Http\Controllers\Admin\LoanAgreementController;
 use App\Http\Controllers\Admin\LoanPlansController;
 use App\Http\Controllers\Admin\ServiceSectionController;
 use App\Http\Controllers\Admin\SuccessStoriesController;
@@ -69,6 +70,9 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::delete('cms/navigation/{menuItem}', [CmsNavigationController::class, 'destroy'])->name('cms.navigation.destroy');
         Route::post('cms/navigation/reorder', [CmsNavigationController::class, 'reorder'])->name('cms.navigation.reorder');
         Route::resource('cms/media', CmsMediaController::class)->only(['index', 'store', 'update', 'destroy'])->names('cms.media');
+        Route::get('loan-agreement', [LoanAgreementController::class, 'edit'])->name('loan-agreement.edit');
+        Route::put('loan-agreement', [LoanAgreementController::class, 'update'])->name('loan-agreement.update');
+        Route::delete('loan-agreement', [LoanAgreementController::class, 'destroy'])->name('loan-agreement.destroy');
         Route::get('cms/settings', [CmsSettingController::class, 'edit'])->name('cms.settings.edit');
         Route::put('cms/settings', [CmsSettingController::class, 'update'])->name('cms.settings.update');
         Route::post('cms/success-stories/bulk', [SuccessStoryController::class, 'bulk'])->name('cms.success-stories.bulk');

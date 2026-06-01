@@ -74,6 +74,11 @@
                     <i class="fas fa-photo-film"></i>
                     <span x-show="!sidebarCollapsed">Media Library</span>
                 </a>
+                <a href="{{ route('management.loan-agreement.edit') }}" class="admin-nav-link"
+                    @class(['is-active' => request()->routeIs('management.loan-agreement.*')])>
+                    <i class="fas fa-file-pdf"></i>
+                    <span x-show="!sidebarCollapsed">Loan Agreement PDF</span>
+                </a>
                 <a href="{{ route('management.cms.success-stories.index') }}" class="admin-nav-link"
                     @class(['is-active' => request()->routeIs('management.cms.success-stories.*')])>
                     <i class="fas fa-trophy"></i>

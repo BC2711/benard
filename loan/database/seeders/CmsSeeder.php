@@ -128,7 +128,7 @@ class CmsSeeder extends Seeder
             ['Services', '/#services', 'fas fa-hand-holding-dollar', 40],
             ['Calculator', '/calculator', 'fas fa-calculator', 50],
             ['Contact', '/#support', 'fas fa-envelope', 60],
-            ['Success Stories', '/success-stories', 'fas fa-trophy', 70],
+            // ['Success Stories', '/success-stories', 'fas fa-trophy', 70],
         ];
 
         foreach ($menuItems as [$label, $url, $icon, $order]) {
