@@ -6,6 +6,7 @@ use App\Models\Notification;
 use App\Services\NotificationManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -45,15 +46,12 @@ class NotificationController extends Controller
                 ], 500);
             }
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to send notification', $e);
         }
     }
 
     /**
-     * Subscribe to newsletter - FIXED (removed dd())
+     * Subscribe to newsletter.
      */
     public function subscribeNewsletter(Request $request): JsonResponse
     {
@@ -71,7 +69,6 @@ class NotificationController extends Controller
                 'message' => 'New newsletter subscription request'
             ]);
 
-            // Remove the dd() statement and uncomment the proper return statements
             if ($success) {
                 return response()->json([
                     'success' => true,
@@ -84,10 +81,7 @@ class NotificationController extends Controller
                 ], 500);
             }
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to subscribe to newsletter', $e);
         }
     }
 
@@ -145,6 +139,8 @@ class NotificationController extends Controller
                 'unread_count' => $unreadCount
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to fetch notifications', ['error' => $e->getMessage()]);
+
             // Return empty data with success false for frontend to use fallback
             return response()->json([
                 'success' => false,
@@ -205,6 +201,8 @@ class NotificationController extends Controller
                 'message' => 'Notification marked as read'
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to mark notification as read', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to mark notification as read'
@@ -229,6 +227,8 @@ class NotificationController extends Controller
                 'message' => 'All notifications marked as read'
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to mark all notifications as read', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to mark all notifications as read'
@@ -249,10 +249,7 @@ class NotificationController extends Controller
                 'data' => $stats
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to fetch notification statistics', $e);
         }
     }
 
@@ -270,10 +267,7 @@ class NotificationController extends Controller
                 'data' => $results
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to process pending notifications', $e);
         }
     }
 
@@ -309,10 +303,17 @@ class NotificationController extends Controller
                 'count' => $count
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to list notifications', $e);
         }
+    }
+
+    private function errorResponse(string $message, \Throwable $exception): JsonResponse
+    {
+        Log::error($message, ['error' => $exception->getMessage()]);
+
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+        ], 500);
     }
 }

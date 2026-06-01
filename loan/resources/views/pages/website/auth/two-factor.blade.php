@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete Londa Loans management portal two-factor verification.">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="canonical" href="{{ route('management.two-factor.form') }}">
     <title>Verify Login - {{ config('app.name') }}</title>
     <link rel="stylesheet" href="{{ asset('assets/css/premium-ui.css') }}">
 </head>

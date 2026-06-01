@@ -243,15 +243,15 @@
                                     <i class="fas fa-key text-gray-400"></i>
                                 </a>
 
-                                <a href="#"
+                                <a href="{{ route('management.cms.settings.edit') }}"
                                     class="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                    <span class="font-medium text-gray-700">Privacy Settings</span>
+                                    <span class="font-medium text-gray-700">Website Settings</span>
                                     <i class="fas fa-shield-alt text-gray-400"></i>
                                 </a>
 
-                                <a href="#"
+                                <a href="{{ route('management.email-settings.edit') }}"
                                     class="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                    <span class="font-medium text-gray-700">Notification Preferences</span>
+                                    <span class="font-medium text-gray-700">Email Settings</span>
                                     <i class="fas fa-bell text-gray-400"></i>
                                 </a>
                             </div>

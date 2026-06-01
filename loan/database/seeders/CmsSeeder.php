@@ -75,6 +75,28 @@ class CmsSeeder extends Seeder
             );
         }
 
+        foreach ([
+            ['Terms & Conditions', 'terms', 'Terms & Conditions', 'Please review the terms that govern the use of Londa Loans services.'],
+            ['Privacy Policy', 'privacy', 'Privacy Policy', 'Learn how Londa Loans handles personal information submitted through this website.'],
+            ['Frequently Asked Questions', 'faq', 'Frequently Asked Questions', 'Find answers to common questions about Londa Loans products and services.'],
+        ] as [$title, $slug, $heading, $body]) {
+            $page = Page::updateOrCreate(
+                ['slug' => $slug],
+                ['title' => $title, 'status' => 'published', 'published_at' => now()]
+            );
+            $page->sections()->updateOrCreate(
+                ['section_key' => $slug],
+                [
+                    'name' => $heading,
+                    'type' => 'content',
+                    'component' => 'website.content-block',
+                    'status' => 'published',
+                    'published_at' => now(),
+                    'content' => ['title' => $heading, 'body' => $body],
+                ]
+            );
+        }
+
         $home->seoMeta()->updateOrCreate([], [
             'meta_title' => 'Londa Loans - Flexible business funding for marketeers',
             'meta_description' => 'Fast, flexible financing solutions for Zambian marketeers, entrepreneurs, and small teams.',

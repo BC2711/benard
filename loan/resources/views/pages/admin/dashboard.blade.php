@@ -7,27 +7,27 @@
     <i class="fas fa-chart-pie"></i>
 @endsection
 @section('page-actions')
-    <select class="admin-input h-11 px-4 text-sm" aria-label="Select reporting range">
-        <option>Last 7 days</option>
-        <option>Last 30 days</option>
-        <option>This quarter</option>
-    </select>
-    <button type="button"
+    <a href="{{ route('management.cms.success-stories.export') }}"
         class="inline-flex h-11 items-center gap-2 rounded-xl bg-brand-700 px-4 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-brand-600">
-        <i class="fas fa-download"></i> Export
-    </button>
+        <i class="fas fa-download"></i> Export stories
+    </a>
 @endsection
 
 @section('content')
     @php
         $metrics = [
-            ['label' => 'Total users', 'value' => number_format($stats['total_users']), 'change' => '+12.4%', 'icon' => 'fa-users', 'tone' => 'cyan'],
-            ['label' => 'Active consultations', 'value' => number_format($stats['total_consultation']), 'change' => '+8.1%', 'icon' => 'fa-calendar-check', 'tone' => 'emerald'],
-            ['label' => 'Pending actions', 'value' => number_format($stats['pending_consultation']), 'change' => 'Needs review', 'icon' => 'fa-clock', 'tone' => 'amber'],
-            ['label' => 'Subscribers', 'value' => number_format($stats['total_subscribers']), 'change' => '+5.2%', 'icon' => 'fa-envelope-open-text', 'tone' => 'violet'],
+            ['label' => 'Total users', 'value' => number_format($stats['total_users']), 'change' => number_format($stats['active_users']) . ' active', 'icon' => 'fa-users', 'tone' => 'cyan'],
+            ['label' => 'Consultations', 'value' => number_format($stats['total_consultation']), 'change' => number_format($stats['completed_consultation']) . ' scheduled', 'icon' => 'fa-calendar-check', 'tone' => 'emerald'],
+            ['label' => 'Pending actions', 'value' => number_format($stats['pending_consultation']), 'change' => number_format($stats['pending_consultation']) . ' awaiting review', 'icon' => 'fa-clock', 'tone' => 'amber'],
+            ['label' => 'Subscribers', 'value' => number_format($stats['total_subscribers']), 'change' => 'Current total', 'icon' => 'fa-envelope-open-text', 'tone' => 'violet'],
         ];
         $trendLabels = collect($stats['consultation_trend'])->pluck('country')->values();
         $trendValues = collect($stats['consultation_trend'])->pluck('value')->values();
+        $userTotal = max($stats['total_users'], 1);
+        $consultationTotal = max($stats['total_consultation'], 1);
+        $activeUserPercentage = round(($stats['active_users'] / $userTotal) * 100);
+        $pendingUserPercentage = round(($stats['pending_users'] / $userTotal) * 100);
+        $scheduledConsultationPercentage = round(($stats['completed_consultation'] / $consultationTotal) * 100);
     @endphp
 
     <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -44,7 +44,7 @@
                 </div>
                 <div class="mt-5 flex items-center justify-between">
                     <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ $metric['change'] }}</span>
-                    <span class="text-xs font-semibold text-slate-400">vs previous period</span>
+                    <span class="text-xs font-semibold text-slate-400">Live data</span>
                 </div>
             </article>
         @endforeach
@@ -57,11 +57,7 @@
                     <h2 class="text-lg font-bold">Consultation trend</h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400">Daily requests across the current reporting window.</p>
                 </div>
-                <div class="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-900">
-                    <button class="rounded-lg bg-white px-3 py-1.5 text-xs font-bold shadow-sm dark:bg-slate-800">Week</button>
-                    <button class="px-3 py-1.5 text-xs font-bold text-slate-500">Month</button>
-                    <button class="px-3 py-1.5 text-xs font-bold text-slate-500">Year</button>
-                </div>
+                <span class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500 dark:bg-slate-800">Last 7 days</span>
             </div>
             <div class="mt-6 h-80">
                 <canvas id="consultationChart" aria-label="Consultation trend chart"></canvas>
@@ -83,7 +79,7 @@
                         <span class="text-2xl font-extrabold text-emerald-600">{{ number_format($stats['active_users']) }}</span>
                     </div>
                     <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                        <div class="h-full rounded-full bg-emerald-500" style="width: 72%"></div>
+                        <div class="h-full rounded-full bg-emerald-500" style="width: {{ $activeUserPercentage }}%"></div>
                     </div>
                 </div>
                 <div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
@@ -92,7 +88,7 @@
                         <span class="text-2xl font-extrabold text-amber-600">{{ number_format($stats['pending_users']) }}</span>
                     </div>
                     <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                        <div class="h-full rounded-full bg-amber-500" style="width: 28%"></div>
+                        <div class="h-full rounded-full bg-amber-500" style="width: {{ $pendingUserPercentage }}%"></div>
                     </div>
                 </div>
                 <div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
@@ -101,7 +97,7 @@
                         <span class="text-2xl font-extrabold text-brand-600">{{ number_format($stats['completed_consultation']) }}</span>
                     </div>
                     <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                        <div class="h-full rounded-full bg-brand-600" style="width: 54%"></div>
+                        <div class="h-full rounded-full bg-brand-600" style="width: {{ $scheduledConsultationPercentage }}%"></div>
                     </div>
                 </div>
             </div>
@@ -168,8 +164,8 @@
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <a href="{{ route('management.users.create') }}" class="admin-quick-action"><i class="fas fa-user-plus"></i><span>Add user</span></a>
                     <a href="{{ route('management.consultation.index') }}" class="admin-quick-action"><i class="fas fa-calendar"></i><span>Schedule</span></a>
-                    <button type="button" class="admin-quick-action"><i class="fas fa-file-export"></i><span>Report</span></button>
-                    <button type="button" class="admin-quick-action"><i class="fas fa-sliders"></i><span>Settings</span></button>
+                    <a href="{{ route('management.cms.success-stories.index') }}" class="admin-quick-action"><i class="fas fa-trophy"></i><span>Stories</span></a>
+                    <a href="{{ route('management.cms.settings.edit') }}" class="admin-quick-action"><i class="fas fa-sliders"></i><span>Settings</span></a>
                 </div>
             </div>
 

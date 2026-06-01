@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Choose a new password for your Londa Loans management portal account." />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="canonical" href="{{ url()->current() }}" />
     <title>Londa Loans - Reset Password</title>
 
     <!-- Laravel Asset Helper -->

@@ -52,7 +52,6 @@
                     @class(['is-active' => request()->routeIs('management.consultation.*')])>
                     <i class="fas fa-calendar-check"></i>
                     <span x-show="!sidebarCollapsed">Consultations</span>
-                    <span class="admin-count" x-show="!sidebarCollapsed">8</span>
                 </a>
             </div>
 
@@ -113,14 +112,6 @@
                 <p class="mb-2 px-3 text-xs font-bold uppercase tracking-wider text-slate-400" x-show="!sidebarCollapsed">
                     Intelligence
                 </p>
-                <a href="#" class="admin-nav-link">
-                    <i class="fas fa-chart-line"></i>
-                    <span x-show="!sidebarCollapsed">Analytics</span>
-                </a>
-                <a href="#" class="admin-nav-link">
-                    <i class="fas fa-file-export"></i>
-                    <span x-show="!sidebarCollapsed">Reports</span>
-                </a>
                 <a href="{{ route('management.email-logs.index') }}" class="admin-nav-link"
                     @class(['is-active' => request()->routeIs('management.email-logs.*')])>
                     <i class="fas fa-server"></i>

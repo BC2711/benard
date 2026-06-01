@@ -40,7 +40,7 @@ Route::prefix('management')->name('management.')->group(function () {
         Route::post('/two-factor', [AuthController::class, 'verifyTwoFactor'])->name('two-factor.verify')->middleware('throttle:5,1');
     });
 
-    Route::middleware('auth:management')->group(function () {
+    Route::middleware(['auth:management', 'admin'])->group(function () {
         Route::resource('users', UserController::class);
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('users/{user}/unlock', [UserController::class, 'unlock'])->name('unlock');
@@ -89,19 +89,19 @@ Route::prefix('management')->name('management.')->group(function () {
 
         Route::resource('hero', HeroSectionController::class);
         Route::resource('about', AboutSectionController::class);
-        Route::resource('features', FeatureSectionController::class);
-        Route::resource('service', ServiceSectionController::class);
-        Route::resource('price', LoanPlansController::class);
-        Route::resource('team', TeamSectionController::class);
-        Route::resource('project', SuccessStoriesController::class);
-        Route::resource('testimonial', TestimonialsController::class);
-        Route::resource('counter', ImpactNumbersController::class);
-        Route::resource('client', TrustedClientsController::class);
+        Route::resource('features', FeatureSectionController::class)->only(['index', 'update']);
+        Route::resource('service', ServiceSectionController::class)->only(['index', 'update']);
+        Route::resource('price', LoanPlansController::class)->only(['index', 'update']);
+        Route::resource('team', TeamSectionController::class)->only(['index', 'update']);
+        Route::resource('project', SuccessStoriesController::class)->only(['index', 'update']);
+        Route::resource('testimonial', TestimonialsController::class)->only(['index', 'update']);
+        Route::resource('counter', ImpactNumbersController::class)->only(['index', 'update']);
+        Route::resource('client', TrustedClientsController::class)->only(['index', 'update']);
         Route::resource('consultation-page', ConsultationSectionController::class)->only(['index', 'update']);
         Route::resource('consultation', ConsultationController::class);
-        Route::resource('support', SupportController::class);
+        Route::resource('support', SupportController::class)->only(['index', 'update']);
         Route::resource('calculator', LoanCalculatorController::class)->only(['index', 'update']);
-        Route::resource('footer', FooterController::class);
+        Route::resource('footer', FooterController::class)->only(['index', 'update']);
         Route::get('email/settings', [EmailSettingsController::class, 'edit'])->name('email-settings.edit');
         Route::put('email/settings', [EmailSettingsController::class, 'update'])->name('email-settings.update');
         Route::post('email/settings/test', [EmailSettingsController::class, 'test'])->name('email-settings.test');

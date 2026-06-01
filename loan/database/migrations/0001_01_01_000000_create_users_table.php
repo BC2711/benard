@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('address')->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->enum('gender', ['MALE', 'FEMALE'])->nullable();
-            $table->enum('role', ['USER', 'ADMIN'])->default('USER');
+            $table->enum('gender', ['MALE', 'FEMALE', 'OTHER'])->nullable();
+            $table->enum('role', ['USER', 'ADMIN', 'MANAGER'])->default('USER');
             $table->enum('status', ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'BLOCKED', 'PENDING'])->default('ACTIVE');
             $table->string('profile_picture')->nullable();
             $table->timestamp('locked_at')->nullable();

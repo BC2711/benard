@@ -30,7 +30,7 @@
 
     <div class="container mx-auto px-4 lg:px-8 py-16 lg:py-24 relative z-10">
         <nav class="mb-6 animate-fade-in">
-            <a href="/services" class="text-white/70 hover:text-white transition-colors duration-300 text-sm">Our Services</a>
+            <a href="/#services" class="text-white/70 hover:text-white transition-colors duration-300 text-sm">Our Services</a>
             <span class="text-white/50 mx-2 text-sm">/</span>
             <span class="text-primary-accent font-semibold text-sm">Campaign Expansion Loan</span>
         </nav>
@@ -412,7 +412,7 @@
             <a href="#apply" class="bg-white text-primary-primary px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                 Apply Now
             </a>
-            <a href="/contact" class="border-2 border-white text-white px-6 py-3 rounded-xl font-bold hover:bg-white hover:text-primary-primary transition-all duration-300 hover:scale-105">
+            <a href="/#support" class="border-2 border-white text-white px-6 py-3 rounded-xl font-bold hover:bg-white hover:text-primary-primary transition-all duration-300 hover:scale-105">
                 Speak With an Expert
             </a>
         </div>

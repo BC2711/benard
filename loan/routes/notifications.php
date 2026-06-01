@@ -6,7 +6,7 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('notifications')->group(function () {
-    Route::middleware('auth:management')->group(function () {
+    Route::middleware(['auth:management', 'admin'])->group(function () {
         Route::post('/send', [NotificationController::class, 'sendNotification']);
         Route::get('/statistics', [NotificationController::class, 'statistics']);
         Route::post('/process-pending', [NotificationController::class, 'processPending']);

@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Sign in to the Londa Loans management portal.">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="canonical" href="{{ route('login') }}">
     <title>Londa Loans - Admin Login</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/logos/londa.jpg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">

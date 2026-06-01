@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Services\EmailDeliveryService;
-use DateTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 
@@ -23,7 +22,6 @@ class UserController extends Controller
     public function index()
     {
         $users = User::latest()->paginate(10);
-        // dd($users);
         return view('profile.index', compact('users'));
     }
 

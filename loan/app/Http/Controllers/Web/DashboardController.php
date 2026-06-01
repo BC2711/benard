@@ -34,14 +34,8 @@ class DashboardController extends Controller
             $endDate = now()->endOfDay();
 
             $consultation_trend = DB::table('consultation_requests')
-                ->select(
-                    DB::raw('EXTRACT(DOW FROM created_at) as day_of_week'),
-                    DB::raw('TO_CHAR(created_at, \'Day\') as day_name'),
-                    DB::raw('COUNT(*) as count')
-                )
+                ->select('created_at')
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->groupBy('day_of_week', 'day_name')
-                ->orderBy('day_of_week')
                 ->get();
 
             $daysOfWeek = [
@@ -70,10 +64,8 @@ class DashboardController extends Controller
             }
 
             foreach ($consultation_trend as $data) {
-                $dayName = trim($data->day_name);
-                if (isset($counts[$dayName])) {
-                    $counts[$dayName] = $data->count;
-                }
+                $dayName = \Carbon\Carbon::parse($data->created_at)->format('l');
+                $counts[$dayName]++;
             }
 
             $convertedData = [];
@@ -123,7 +115,7 @@ class DashboardController extends Controller
 
             return view('pages.admin.dashboard')
                 ->with('stats', $fallback_stats)
-                ->with('error', 'Unable to load dashboard data: ' . $e->getMessage());
+                ->with('error', 'Unable to load dashboard data. Please try again.');
         }
     }
 }

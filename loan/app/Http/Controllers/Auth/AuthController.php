@@ -29,7 +29,6 @@ class AuthController extends Controller
      */
     public function login(Request $request, EmailDeliveryService $email, EmailSettingsService $settings)
     {
-        // dd($request->all());
         $maxAttempts = 5;
         $validatedData = $request->validate([
             'email' => 'required|email',
@@ -134,7 +133,7 @@ class AuthController extends Controller
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
             ]);
-            return back()->withErrors(['email' => 'An unexpected error occurred. Please try again later.' . $th->getMessage()]);
+            return back()->withErrors(['email' => 'An unexpected error occurred. Please try again later.']);
         }
     }
 
@@ -157,7 +156,6 @@ class AuthController extends Controller
 
     public function register(Request $request, EmailDeliveryService $email)
     {
-        // dd($request->all());
         // Validate the request data
         $validated = $request->validate([
             'first_name' => 'required|string|min:2|max:255',
@@ -353,13 +351,12 @@ class AuthController extends Controller
                 ? redirect()->route('login')->with('status', __($status))
                 : back()->withErrors(['email' => __($status)]);
         } catch (\Throwable $th) {
-            //throw $th;
             Log::error('Error resetting password', [
                 'email' => $request->email,
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
             ]);
-            return back()->withErrors(['email' => __('auth.failed') . $th->getMessage()]);
+            return back()->withErrors(['email' => __('auth.failed')]);
         }
     }
 

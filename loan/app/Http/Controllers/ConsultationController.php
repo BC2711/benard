@@ -18,10 +18,12 @@ class ConsultationController extends Controller
                 $search = $request->string('search')->toString();
 
                 $query->where(function ($query) use ($search) {
-                    $query->where('first_name', 'ilike', "%{$search}%")
-                        ->orWhere('last_name', 'ilike', "%{$search}%")
-                        ->orWhere('email', 'ilike', "%{$search}%")
-                        ->orWhere('phone', 'ilike', "%{$search}%");
+                    $search = '%' . strtolower($search) . '%';
+
+                    $query->whereRaw('LOWER(first_name) LIKE ?', [$search])
+                        ->orWhereRaw('LOWER(last_name) LIKE ?', [$search])
+                        ->orWhereRaw('LOWER(email) LIKE ?', [$search])
+                        ->orWhereRaw('LOWER(phone) LIKE ?', [$search]);
                 });
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))

@@ -15,7 +15,7 @@ class LoanCalculatorController extends Controller
         return view('components.management.calculator.edit', compact('calc'));
     }
 
-    public function update(Request $request, LoanCalculator $calc)
+    public function update(Request $request, LoanCalculator $calculator)
     {
         $data = $request->validate([
             'hero_title' => 'required|string',
@@ -46,18 +46,22 @@ class LoanCalculatorController extends Controller
 
         // Payment Schedules
         $schedules = [];
-        $labels = $request->input('schedule_label', []);
-        foreach ($labels as $i => $label) {
-            if ($label && $request->input("schedule_days_{$i}")) {
+        foreach ($request->all() as $key => $label) {
+            if (preg_match('/^schedule_label_(\d+)$/', $key, $matches) && filled($label)) {
+                $days = $request->input("schedule_days_{$matches[1]}");
+                if (!$days) {
+                    continue;
+                }
+
                 $schedules[] = [
-                    'days' => $request->input("schedule_days_{$i}"),
+                    'days' => $days,
                     'label' => $label,
                 ];
             }
         }
         $data['payment_schedules'] = $schedules;
 
-        $calc->update($data);
+        $calculator->update($data);
 
         return back()->with('success', 'Calculator updated!');
     }

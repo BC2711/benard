@@ -90,7 +90,7 @@ class SuccessStoriesController extends Controller
                 $index++;
             }
 
-            $data = $section->update([
+            $section->update([
                 'heading'            => $request->heading,
                 'description'        => $request->description,
                 'stats'              => $stats,
@@ -105,11 +105,7 @@ class SuccessStoriesController extends Controller
                 'cta_secondary_icon' => $request->cta_secondary_icon,
                 'stories'            => $stories,
             ]);
-            if ($data) {
-                return back()->with('success', 'Success Stories updated successfully!');
-            } else {
-                dd($data);
-            }
+            return back()->with('success', 'Success Stories updated successfully!');
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Throwable $e) {
