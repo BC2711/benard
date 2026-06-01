@@ -67,7 +67,7 @@ class NotificationController extends Controller
                 'type' => 'SUBSCRIBE',
                 'email' => $request->email,
                 'full_name' => $request->full_name ?? '',
-                'subject' => 'Newsletter Subscriptions',
+                'subject' => 'Newsletter Subscription',
                 'message' => 'New newsletter subscription request'
             ]);
 
