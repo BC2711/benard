@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Rules\Recaptcha;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
 class StoreLoanApplicationRequest extends FormRequest
@@ -11,6 +13,25 @@ class StoreLoanApplicationRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $fields = ['fullname', 'email', 'phone', 'company', 'businessType', 'loanAmount', 'loanPurpose', 'timeline', 'message'];
+
+        foreach ($fields as $field) {
+            if ($this->has($field) && is_string($this->input($field))) {
+                $this->merge([$field => trim($this->input($field))]);
+            }
+        }
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'errors' => $validator->errors()->toArray(),
+        ], 422));
     }
 
     public function rules(): array

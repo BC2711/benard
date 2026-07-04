@@ -8,6 +8,7 @@ use App\Services\EmailDeliveryService;
 use App\Services\EmailSettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class LoanApplicationController extends Controller
 {
@@ -17,7 +18,14 @@ class LoanApplicationController extends Controller
         EmailSettingsService $settings,
     ): JsonResponse
     {
-        $data = $request->validated();
+        try {
+            $data = $request->validated();
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'success' => false,
+                'errors' => $exception->errors(),
+            ], 422);
+        }
 
         try {
             $context = [

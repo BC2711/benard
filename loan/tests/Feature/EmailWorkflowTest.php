@@ -52,6 +52,40 @@ class EmailWorkflowTest extends TestCase
         $this->assertDatabaseHas(EmailDeliveryLog::class, ['template_key' => 'loan_application.confirmation', 'recipient' => 'alex@example.com']);
     }
 
+    public function test_loan_application_rejects_blank_name_and_email(): void
+    {
+        $response = $this->postJson(route('loan-application.store'), [
+            'fullname' => '   ',
+            'email' => '   ',
+            'businessType' => 'marketing-agency',
+            'loanAmount' => '25k-75k',
+            'loanPurpose' => 'business-expansion',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['fullname', 'email']);
+    }
+
+    public function test_loan_application_validation_returns_consistent_json_payload(): void
+    {
+        $response = $this->postJson(route('loan-application.store'), [
+            'fullname' => '   ',
+            'email' => 'not-an-email',
+            'businessType' => 'marketing-agency',
+            'loanAmount' => '25k-75k',
+            'loanPurpose' => 'business-expansion',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'errors' => [
+                    'fullname' => ['Please enter your full name'],
+                    'email' => ['Please enter a valid email address'],
+                ],
+            ]);
+    }
+
     public function test_consultation_request_is_persisted_and_emails_both_parties(): void
     {
         $response = $this->postJson(route('consultation.store'), [
